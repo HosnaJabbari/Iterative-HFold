@@ -1,0 +1,10 @@
+prefix=/home/hiufungk/Desktop/simfold_library
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: simfold
+Description: Simfold C++ library.
+Version: 1.0
+Libs: -L${libdir} -lsimfold   
+Cflags: -I${includedir} 

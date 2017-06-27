@@ -1,0 +1,405 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+
+
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type"><title>README for MultiRNAFold</title></head>
+<body>
+<big>Readme file for the MultiRNAFold package - latest version is 2.0. </big><br>
+- last updated March 21st, 2009, by Mirela Andronescu<br>
+<br>
+<a href="#ref">Authorship &amp; reference</a><br>
+<a href="#disclaimer">Disclaimer</a><br>
+<a href="#contents">What this package contains</a><br>
+<a href="#install">Installation
+instructions</a><br>
+<a href="#history">History</a><br>
+<a href="#platform">Platform &amp; organization</a><br>
+<a href="#user">A word for the user</a><br>
+<a href="#programmer">A word for the programmer</a><br>
+<a href="#bugs">Bugs</a><br>
+<a href="#contact">Contact</a><br>
+<br>
+<hr style="width: 100%; height: 2px;"><big><a name="ref"></a>Authorship
+&amp; reference</big><br>
+<br>
+The MultiRNAFold package is copyrighted under GNU General Public
+Licence, by Mirela Andronescu, Zhi Chuan Zhang and Anne Condon,
+Computer Science UBC.<br>
+<br>
+If you use this package to get results in your publications, please
+include the following reference:<br>
+Mirela Andronescu, Zhi Chuan Zhang and Anne Condon, "Secondary
+Structure
+Prediction of Interacting RNA Molecules"<i>, Journal of Molecular
+Biology, Vol 345/5
+pp 987-1001. </i><br>
+<br>
+<span style="color: rgb(204, 0, 0);">If you use the new energy
+parameters provided with version 1.6+, please also cite:</span><br>
+M Andronescu, A Condon, H Hoos, D Mathews, K Murphy, "Efficient
+parameter estimation for
+RNA secondary structure prediction", <span style="font-style: italic;">Bioinformatics</span>, 
+23(13): i19-i28.<br>
+<br>
+Web page: www.rnasoft.ca/download.html<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<p><a name="disclaimer"></a><big>Disclaimer</big></p>
+Although
+the authors have made every effort to ensure that MultiRNAFold
+correctly implements the underlying models and fullfills the
+functions described in the documentation, neither the authors nor the
+University of British Columbia guarantee its correctness, fitness for a
+particular purpose, or future availability.<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="contents"></a><big>What this package contains<br>
+<br>
+</big>The MultiRNAFold package contains software for secondary
+structure
+prediction of one, two, or many interacting RNA or DNA molecules. It is
+composed of three pieces of software: SimFold, PairFold and MultiFold.<br>
+<br>
+SimFold predicts the minimum free energy (MFE) secondary structure of a
+given input RNA or DNA sequence. The current implementation include
+suboptimal folding calculations, as well as partition functions, base
+pair probabilities and gradient computations. <br>
+<br>
+PairFold predicts the MFE secondary structure of two interacting RNA or
+DNA molecules, and suboptimal structures. All suboptimal structures up
+to a specified free energy, or the first k suboptimal structures can be
+computed. Currently we have NOT implemented a way to return the
+suboptimal structures which differ significantly from each other, but
+all suboptimal structures in the specified range are returned. PairFold
+can be used to predict the MFE of a single given sequence, but it is
+slower than SimFold.<br>
+<big><br>
+<small>MultiFold predicts the MFE secondary structure of three or more
+RNA/DNA input sequences. </small></big>The current implementation does
+NOT
+include suboptimal folding calculations, however it can be adapted from
+PairFold's implementation. MultiFold can be used with two or one
+sequences as input, but it is slower than PairFold or SimFold. <br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<big> <a name="install"></a>Installation instructions</big><br>
+<br>
+For Linux, you just have to type "make" to compile. <br>
+<br>
+If you get something like: <br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; "make: *** No rule to make target
+`/usr/lib/gcc-lib/i386-redhat-linux/3.3.3/include/stddef.h', needed by
+`src/common/common.o'.&nbsp; Stop.",<br>
+type "make depend", and then "make". <br>
+<br>
+If you want to use only SimFold, PairFold, or MultiFold, run "csh
+get_code.csh", and it will tell you what arguments to type exactly,
+depending on what you want.<br>
+Then go to that new directory, and type "make".<br><br><span style="color: rgb(255, 22, 57); font-weight: bold;">NOTE (added on March 21, 2009)</span><span style="font-weight: bold;">:</span>
+Since a lot of variables&nbsp;use the stack, you might get
+"Segmentation fault" when you try to run simple commands, particularly
+when you use suboptimals. If you get that, you can edit the file
+"include/constants.h" and set the constants MAXSUBSTR and/or MAXSLEN to
+a lower value. In a future version, I might reimplement parts of the
+code to use the heap instead of the stack, but I can't promise it. <br>
+<br>
+<hr style="width: 100%; height: 2px;"><big><br>
+<a name="history"></a>History<br>
+<br>
+</big>
+<ul>
+  <li>March 21st, 2009, version 2.0 was released.</li><ul><li style="font-weight: bold;">This is the version used in Mirela Andronescu's PhD thesis and subsequent papers from this thesis.</li><li style="font-weight: bold;"><span style="font-weight: normal;">Completed functions on parameter estimation for extended models (for Chapter 6 of Andronescu's PhD thesis). </span></li><li><span style="color: rgb(255, 22, 57); font-weight: bold;">NOTE</span><span style="font-weight: bold;">:</span>
+Since a lot of variables&nbsp;use the stack, you might get "Segmentation
+fault" when you try to run simple commands, particularly when you use
+suboptimals. If you get that, you can edit the file
+"include/constants.h" and set the constants MAXSUBSTR and/or MAXSLEN to
+a lower value. In a future version, I might reimplement parts of the
+code to use the heap instead of the stack, but I can't promise it.</li></ul><li>July 2nd, 2008, version 1.11 was released.</li>
+  <ul>
+    <li>Added a few more options to the simfold and pairfold interfaces.</li>
+    <li>Started functions on parameter estimation of an extended model.</li>
+  </ul>
+  <li>February 29th, 2008, version 1.10 was released.</li>
+  <ul> 
+    <li>Added
+a few new functions in src/common/params.cpp, that compute the energy
+and parameter counts for some restricted cases, to be used by
+pseudoknotted prediction programs.</li>
+    <li>Added a new driver, called test_get_features.cpp, that uses the new functions.</li> 
+  </ul>
+  <li>October 19th, 2007, version 1.9 was released.</li>
+  <ul>
+    <li>Fixed a small bug in the file s_specific_functions.cpp, in the
+function simfold_ordered_suboptimals. This may have affected the energy
+values of suboptimal structures for simfold, which were computed
+without the dangling ends. Now the correct energy model is used, which
+includes the dangling ends.<br>
+    </li>
+  </ul>
+  <li>August 6th, 2007, version 1.8 was released.</li>
+  <ul>
+    <li>Fixed a stupid little bug in simfold.cpp, which gave wrong
+values when folding DNA at any temperature, or RNA at temperatures
+other than 37C.<br>
+    </li>
+  </ul>
+  <li>July 2nd, 2007, version 1.7 was released.</li>
+  <ul>
+    <li>Completed and optimized the partition function calculation for
+simfold. It also include base pair probability and gradient
+computations, for the cases when dangling end energy values are
+completely ignored (reasonably fast), and for the case where dangling
+ends are included in a way consistent with the original model, except
+that the 3' dangling ends are always assumed to be smaller than the 5'
+correcponding ones. This is hairy and slower. <br>
+    </li>
+    <li>Added a new driver: simfold_pf, which shows how you can compute
+the partition function and base pair probabilities.<br>
+    </li>
+  </ul>
+  <li>June 18th, 2007, version 1.6 was released.</li>
+  <ul>
+    <li>Added the <a href="http://www.rnasoft.ca/CG/">ISMB 2007
+thermodynamic parameters</a>. <span style="color: rgb(204, 0, 0);">NOTE!
+We are working hard on improving the quality of the energy parameters,
+so use them with caution! New parameters to come soon!</span> </li>
+    <li>Fixed a few more bugs in the recurrences for
+simfold_restricted. It should be bug free now as far as I know.<br>
+    </li>
+    <li>Made the code compatible with Linux SUSE 10.1 systems.</li>
+    <li>Added a few more options to the simfold driver.</li>
+    <li>The partition function calculation and base pair probabilities
+is functional now, but still under heavy testing.<br>
+    </li>
+  </ul>
+  <li>November 15th, 2006, version 1.5 was released.<br>
+  </li>
+  <ul>
+    <li>Fixed a bug in simfold_restricted: it was not working correctly
+when we had a restricted 0 size hairpin: ().</li>
+    <li>Added better comments to simfold.</li>
+    <li>Fixed a little bug which made some hairpin loops not consider
+the tri and tetra loop bonuses, if the input sequence was in lowercase.</li>
+    <li>Started partition function calculation for simfold - not
+finished yet.<br>
+    </li>
+  </ul>
+  <li>November 1st, 2005, version 1.4 was released.</li>
+  <ul>
+    <li>added the function pairfold_mfe_nointra, which computes only
+intermolecular interactions, and no intramolecular interactions. This
+may be useful for some applications, and it's order (len(seq1)
+len(seq2)).<br>
+    </li>
+  </ul>
+  <li>September 27th, 2005, version 1.3 was released.</li>
+  <ul>
+    <li>fixed a little bug in the script get_code.csh, which wasn't
+copying all header files correctly</li>
+    <li>added a section on Installation in the README file</li>
+    <li>fixed a bug in the file params.cpp which plays with the
+parameters - didn't affect any of the current binaries.<br>
+    </li>
+  </ul>
+  <li>June 23rd, 2005, version 1.2 was released.</li>
+  <ul>
+    <li>solved two more memory leaks that made pairfold with
+suboptimals crash;</li>
+    <li>added the restricted version for SimFold.<br>
+    </li>
+  </ul>
+  <li>Apr 17th, 2005, version 1.1 was released.</li>
+  <ul>
+    <li>several memory leaks have been solved.<br>
+    </li>
+  </ul>
+  <li>Feb 21st, 2005, version 1.0.3 was released.</li>
+  <ul>
+    <li>created Windows DLL version;</li>
+    <li>updated entropy and enthalpy parameters with the values from
+Santalucia 2004, for the function to compute melting temperature
+directly from parameters;<br>
+    </li>
+    <li>renamed this Tm function with a more meaningful name;</li>
+    <li>the "params/" directory is now more flexible, it can be located
+in any place, and the path relative to the executable has to be
+specified in the driver.<br>
+    </li>
+  </ul>
+  <li>Feb 6th, 2005, version 1.0.2 was released. <br>
+  </li>
+  <ul>
+    <li>added a function to compute entropy and enthalpy for perfectly
+complementary pairs, directly from parameters;<br>
+    </li>
+    <li>added a new melting temperature function, to use the above
+entropy and enthalpy;</li>
+    <li>fixed a bug in the melting temperature for
+non-self-complementary sequences with different concentrations;</li>
+    <li>insert an automatic detection of self-complementarity, which
+assumes a sequence is self-complementary if it has an even number of
+bases and if the first half is the perfect reverse complement of the
+second half;</li>
+    <li>added a new driver called melting_temp.cpp, to deal with
+melting temperatures. A good input file is a file which lists a set of
+probes from a paper by Owczarzy 2004 (one probe per line).<br>
+    </li>
+  </ul>
+  <li>Jan 29th, 2005, version 1.0.1 was released. For version
+1.0.1, I applied very small modifications, to make the package compile
+and run on Windows (I used Visual C++ 6.0 on Windows 2K).</li>
+  <li><big><small>Jan 21st, 2005, version 1.0 was released.</small><br>
+    </big></li>
+</ul>
+<big><br>
+</big>
+<hr style="width: 100%; height: 2px;"><big><br>
+<a name="platform"></a>Platform &amp; organization<br>
+<br>
+<small>The MultiRNAFold package has been written in C++, on a Linux
+2.6.5 platform, compiler g++&nbsp; 3.3.3. </small></big><big><small>Versions
+1.1 and
+1.0.3 are tested on both Linux and Windows. Version
+1.0.2 has not been tested on Windows yet, however this version contains
+few modifications comparing to the previous one. </small></big><big><small>Version
+1.0.1 is valid for
+both Linux, and Windows (I used Visual C++ 6.0 on Windows 2K). <br>
+<br>
+</small></big>The following files and directories are contained in the
+package:<br>
+<ul>
+  <li>dir <span style="font-weight: bold;">params/</span> contains the
+thermodynamic parameters: Turner's parameters for RNA and Mathews'
+parameters for DNA. Usually you don't need to touch this. <br>
+  </li>
+  <li><span style="color: rgb(204, 0, 0);">(NOTE: the DNA parameters in
+this package are different from the DNA parameters in the online
+version, so you will probably get (slightly) different results. Those
+are SantaLucia parameters and are not freely available).</span> <br>
+  </li>
+  <ul>
+    <li><span style="font-weight: bold;">params/CG_best_parameters_ISMB2007.txt</span>
+includes the parameters obtained in the <a href="http://www.rnasoft.ca/CG/">ISMB 2007 paper</a>.</li>
+    <li><span style="font-weight: bold;">params/turner_partypes_fm363.txt</span>
+includes the features used in the ISMB 2007 paper.</li>
+    <li><span style="font-weight: bold;">params/turner_parameters_fm363_constrdangles.txt</span>
+includes the Turner99 parameters for the same features, where two
+dangling end parameters have been slightly modified to obey the rule:
+3' dangling end parameters are always &lt;= the 5' dangling end
+parameters.<span style="font-weight: bold;"><br>
+      </span></li>
+  </ul>
+  <li>dir <span style="font-weight: bold;">include/ </span>contains a
+few header files which need to be included in the drivers</li>
+  <li>dir <span style="font-weight: bold;">src/</span> contains the
+source codes<br>
+  </li>
+  <li>dir <span style="font-weight: bold;">CVS/</span> is the cvs
+default directory and contains version information. Don't remove it.<br>
+  </li>
+  <li><span style="font-weight: bold;">simfold.cpp </span>- a driver
+for SimFold only, minimum free energy computation</li>
+  <li><span style="font-weight: bold;">simfold_pf.cpp</span> - a driver
+for SimFold partition function and base pair probabilities<span style="font-weight: bold;"><br>
+    </span></li>
+  <li><span style="font-weight: bold;">pairfold.cpp </span>- a
+rudimentary driver for PairFold only</li>
+  <li><span style="font-weight: bold;">multifold.cpp </span>- a
+rudimentary driver for MultiFold only</li>
+  <li><span style="font-weight: bold;">multirnafold.cpp </span>- a
+rudimentary driver for all SimFold, PairFold and MultiFold</li>
+  <li><span style="font-weight: bold;">melting_temp.cpp</span> - a
+driver to test function for melting temperature calculations of
+perfectly complementary strands<br>
+  </li>
+  <li><span style="font-weight: bold;">test_get_counts.cpp</span> - a
+driver to test functions that compute the free energy and parameter counts<br>
+  </li>
+  <li><span style="font-weight: bold;">Makefile</span> (valid only for
+Linux) - run make to
+compile all sources and all drivers. A static library called
+libMultiRNAFold.a is created, which contains all three pieces of
+software. If you want to compile only SimFold, run make -f
+Makefile_simfold. libsimfold.a will be created, and only teh simfold
+driver will be compiled. Same for the other two.</li>
+  <li><span style="font-weight: bold;">get_code.csh</span> is a csh
+script which allows you to get only one of the three pieces of
+software, in case you are not interested in the other two. Run it
+without arguments to see the usage message.</li>
+</ul>
+<big><small>For versions 1.1 and 1.0.3, I'm also providing a built DLL
+(see the
+web page). </small></big><br>
+<big><small>The version 1.0.1 compiles and works well on Windows
+(Visual C++ 6.0). However, I'm not providing a project file, a
+Makefile, a lib file or a dll file for Windows. You can do that very
+easily in Visual C++. Please let me know if I can help.<br>
+<br>
+</small></big>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="user"></a><big>A word for the user</big><br>
+<br>
+At this stage, the drivers are pretty rudimentary. You can
+create your own drivers by using the functions in the library. Please
+let me know if I can help. <br>
+<br>
+To execute a driver in LINUX, first type make and then run simfold,
+pairfold,
+multifold or multirnafold without parameters to see a usage message.<br>
+If you are not interested in the source code, just remove the
+src/ directory, NOT before you typed make to get the library. Then, you
+need the directories params/ and include/, the library
+and the driver.<br>
+<br>
+To compile the DLL on WINDOWS, first download both MultiRNAFold and
+MultiRNAFoldDLL archives for the last version, and place them in the
+same directory. Open the DLL workspace wih Visual C++. It should be
+able to find the source files by itself, in the MultiRNAFold directory.
+If it doesn't, add all the source files in src/, except timer.cpp and
+timer.h (these are specific to Linux, to measure the CPU time - you
+have to use some other way if you really want to measure the time in
+Windows). Then, add all the directories having header files (these are:
+include/, src/comon/, src/simfold/, src/pairfold/, src/multifold/) in
+Tools/Options/Directories/Show directories for include files.<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+<a name="programmer"></a><big>A word for the programmer<br>
+<br>
+<small>This may not be the most efficient/clean/clear/elegant code
+in the world. Also, there are MANY redundancies, especially between
+simfold, pairfold and multifold. However, it should
+work. Please let me know if you find any bugs in the code, which
+would make the programs work improperly.<br>
+<br>
+I placed comments in the code wherever I thought it's necessary. The
+classes, functions and variables should be pretty self-explanatory.
+Please let me know if you need help with understanding the code.<br>
+<br>
+</small></big>
+<hr style="width: 100%; height: 2px;"><br>
+<big><a name="bugs"></a>Bugs<br>
+<br>
+<small>I found and fixed so many bugs in this package that I can't find
+any more, while I'm pretty sure there still are :D. Please contact me
+if you find any. <br>
+The versions 1.0.x had several memory leaks. These have been fixed (as
+far as I know) in version 1.1.<br>
+</small><br>
+</big>
+<hr style="width: 100%; height: 2px;"><br>
+<big><a name="contact"></a>Contact<br>
+<br>
+<small>We would like to know who is using our package, for what, if you
+think it's useful, and any other feedback you may have. We will
+appreciate you sending this information to us.</small><br>
+</big><br>
+If you have any questions/suggestions/comments/concerns or you find
+bugs, please contact Mirela Andronescu: andrones at cs dot ubc dot ca.
+<br>
+<br>
+<hr style="width: 100%; height: 2px;"><br>
+Thanks for your interest in MultiRNAFold package!<br>
+<br>
+<br>
+
+</body></html>

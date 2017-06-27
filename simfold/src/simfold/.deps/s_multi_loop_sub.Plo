@@ -1,0 +1,80 @@
+src/simfold/s_multi_loop_sub.lo: src/simfold/s_multi_loop_sub.cpp \
+ /usr/include/stdc-predef.h /usr/include/stdio.h /usr/include/features.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stddef.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio.h include/externs.h include/structs.h \
+ include/constants.h src/common/common.h include/structs.h \
+ src/simfold/s_partition_function.h src/simfold/s_hairpin_loop.h \
+ src/simfold/s_internal_loop.h include/constants.h \
+ src/simfold/s_energy_matrix.h src/simfold/s_stacked_pair.h \
+ src/simfold/s_multi_loop.h src/simfold/s_multi_loop_sub.h \
+ src/simfold/s_multi_loop_sub.h src/simfold/s_energy_matrix.h
+
+/usr/include/stdc-predef.h:
+
+/usr/include/stdio.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stddef.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.8.5/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+include/externs.h:
+
+include/structs.h:
+
+include/constants.h:
+
+src/common/common.h:
+
+include/structs.h:
+
+src/simfold/s_partition_function.h:
+
+src/simfold/s_hairpin_loop.h:
+
+src/simfold/s_internal_loop.h:
+
+include/constants.h:
+
+src/simfold/s_energy_matrix.h:
+
+src/simfold/s_stacked_pair.h:
+
+src/simfold/s_multi_loop.h:
+
+src/simfold/s_multi_loop_sub.h:
+
+src/simfold/s_multi_loop_sub.h:
+
+src/simfold/s_energy_matrix.h:

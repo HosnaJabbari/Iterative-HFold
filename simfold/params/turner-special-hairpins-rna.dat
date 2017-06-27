@@ -1,0 +1,42 @@
+# Seq    Energy 
+# ------------- 
+#cGNRAg
+ cGAAAg -3.00
+ cGCAAg -3.00
+ cGGAAg -3.00
+ cGUAAg -3.00
+ cGAGAg -3.00
+ cGCGAg -3.00
+ cGGGAg -3.00
+ cGUGAg -3.00
+# 
+#cUNCGg  
+ cUACGg -2.00
+ cUCCGg -2.00
+ cUGCGg -2.00
+ cUUCGg -2.00
+#
+#cYNMGg that are not cUNCGg
+ cCAAGg -1.00
+ cUAAGg -1.00
+ cCCAGg -1.00
+ cUCAGg -1.00
+ cCGAGg -1.00
+ cUGAGg -1.00
+ cCUAGg -1.00
+ cUUAGg -1.00 
+ cCACGg -1.00
+ cCCCGg -1.00
+ cCGCGg -1.00
+ cCUCGg -1.00
+# 
+ gCUUGc -1.00
+# 
+# hexaloops that appear in IRE 
+ aCAGUGUu -3.00
+ aCAGUGCu -3.00
+ aCAGUACu -3.00
+ aGUCACGu -3.00
+
+# On July 28, 2008, I also added the tetraloops that were in Turner99.
+# To include those, use the file turner-special-hairpins-rna-with-T99.dat

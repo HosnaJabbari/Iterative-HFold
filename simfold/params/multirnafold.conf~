@@ -1,0 +1,78 @@
+# configuration file
+
+STD_DIR         = params/
+
+# RNA thermodynamic parameters
+# files for stacked pairs
+RNA_STACK_ENERGY37_V31      = turner-stack-rna.dat
+RNA_STACK_ENERGY37_V23      = turner-stack-rna.dg
+RNA_STACK_ENTHALPY          = turner-stack-rna.dh
+
+# files for hairpin loops
+RNA_LOOP_ENERGY37_V31       = turner-loop-rna.dat
+RNA_LOOP_ENERGY37_V23       = turner-loop-rna.dg
+RNA_LOOP_ENTHALPY           = turner-loop-rna.dh
+RNA_TRILOOP_ENERGY37_V31    = turner-triloop-rna.dat
+RNA_TRILOOP_ENERGY37_V23    = turner-triloop-rna.dg
+RNA_TRILOOP_ENTHALPY        = turner-triloop-rna.dh
+RNA_TLOOP_ENERGY37_V31      = turner-tloop-rna.dat
+RNA_TLOOP_ENERGY37_V23      = turner-tloop-rna.dg
+RNA_TLOOP_ENTHALPY          = turner-tloop-rna.dh
+RNA_SPECIAL_HL_ENERGY37_V31 = turner-special-hairpins-rna.dat
+RNA_TSTACKH_ENERGY37_V31    = turner-tstackh-rna.dat
+RNA_TSTACKH_ENERGY37_V23    = turner-tstackh-rna.dg
+RNA_TSTACKH_ENTHALPY        = turner-tstackh-rna.dh
+
+# files for internal loops or bulges
+RNA_TSTACKI_ENERGY37_V31    = turner-tstacki-rna.dat
+RNA_TSTACKI_ENERGY37_V23    = turner-tstacki-rna.dg
+RNA_TSTACKI_ENTHALPY        = turner-tstacki-rna.dh
+RNA_INT11_ENERGY37_V31      = turner-sint2-rna.dat
+RNA_INT11_ENERGY37_V23      = turner-sint2-rna.dg
+RNA_INT11_ENTHALPY          = turner-sint2-rna.dh
+RNA_INT21_ENERGY37_V31      = turner-asint1x2-rna.dat
+RNA_INT21_ENERGY37_V23      = turner-asint1x2-rna.dg
+RNA_INT21_ENTHALPY          = turner-asint1x2-rna.dh
+RNA_INT22_ENERGY37_V31      = turner-sint4-rna.dat
+RNA_INT22_ENERGY37_V23      = turner-sint4-rna.dg
+RNA_INT22_ENTHALPY          = turner-sint4-rna.dh
+RNA_MISCLOOP_ENERGY37_V31   = turner-miscloop-rna.dat
+RNA_MISCLOOP_ENERGY37_V23   = turner-miscloop-rna.dg
+RNA_MISCLOOP_ENTHALPY       = turner-miscloop-rna.dh
+
+# files for dangling ends
+RNA_DANGLE_ENERGY37_V31     = turner-dangle-rna.dat
+RNA_DANGLE_ENERGY37_V23     = turner-dangle-rna.dg
+RNA_DANGLE_ENTHALPY         = turner-dangle-rna.dh
+
+
+# DNA thermodynamic parameters
+# files for stacked pairs
+DNA_STACK_ENERGY37      = mathews-stack-dna.dat
+DNA_STACK_ENTHALPY      = mathews-stack-dna.dh
+
+# files for hairpin loops
+DNA_LOOP_ENERGY37       = mathews-loop-dna.dat
+DNA_LOOP_ENTHALPY       = mathews-loop-dna.dh
+DNA_TRILOOP_ENERGY37    = mathews-triloop-dna.dat
+DNA_TRILOOP_ENTHALPY    = mathews-triloop-dna.dh
+DNA_TLOOP_ENERGY37      = mathews-tloop-dna.dat
+DNA_TLOOP_ENTHALPY      = mathews-tloop-dna.dh
+DNA_TSTACKH_ENERGY37    = mathews-tstackh-dna.dat
+DNA_TSTACKH_ENTHALPY    = mathews-tstackh-dna.dh
+
+# files for intednal loops or bulges
+DNA_TSTACKI_ENERGY37    = mathews-tstacki-dna.dat
+DNA_TSTACKI_ENTHALPY    = mathews-tstacki-dna.dh
+DNA_INT11_ENERGY37      = mathews-sint2-dna.dat
+DNA_INT11_ENTHALPY      = mathews-sint2-dna.dh
+DNA_INT21_ENERGY37      = mathews-asint1x2-dna.dat
+DNA_INT21_ENTHALPY      = mathews-asint1x2-dna.dh
+DNA_INT22_ENERGY37      = mathews-sint4-dna.dat
+DNA_INT22_ENTHALPY      = mathews-sint4-dna.dh
+DNA_MISCLOOP_ENERGY37   = mathews-miscloop-dna.dat
+DNA_MISCLOOP_ENTHALPY   = mathews-miscloop-dna.dh
+
+# files for dangling ends
+DNA_DANGLE_ENERGY37     = mathews-dangle-dna.dat
+DNA_DANGLE_ENTHALPY     = mathews-dangle-dna.dh
