@@ -7,7 +7,7 @@
 *nix operating system
 
 #### Steps for installation:
-1. [Download the repository](https://github.com/HosnaJabbari/HFold_iterative.git) and extract the files onto your system.        
+1. [Download the repository](https://github.com/HosnaJabbari/HFold_iterative/archive/master.zip) and extract the files onto your system.        
 2. Install Simfold (if you do not have it installed already) by navigating to the Simfold directory         
 
 Note: To install the library to a custom path, use ./configure --prefix=<custom library path> instead.    
