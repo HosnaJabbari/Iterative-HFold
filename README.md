@@ -18,7 +18,7 @@ autoreconf -i
 make  
 make install
 ```
-3. Install HFold_iterative by navigating to the HFold_iterative directory        
+3. Install HFold_iterative by navigating to the HFold_iterative-master directory        
 
 Note: <path to Simfold installation> is where Simfold was installed. The default path is /usr/local. If you did not specify a custom prefix when installing Simfold, use /usr/local
 ```
