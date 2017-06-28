@@ -431,7 +431,7 @@ Copyright (C) 2012 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/home/hiufungk/Desktop/HFold/simfold'
+ac_pwd='/home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
 MKDIR_P='/usr/bin/mkdir -p'
@@ -522,7 +522,7 @@ _ASBOX
 #
 # INIT-COMMANDS
 #
-AMDEP_TRUE="" ac_aux_dir="./.."
+AMDEP_TRUE="" ac_aux_dir="."
 
 
 # The HP-UX ksh and POSIX shell print the target directory to stdout
@@ -756,7 +756,7 @@ for var in reload_cmds old_postinstall_cmds old_postuninstall_cmds old_archive_c
     esac
 done
 
-ac_aux_dir='./..'
+ac_aux_dir='.'
 xsi_shell='yes'
 lt_shell_append='yes'
 
@@ -915,12 +915,12 @@ S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="/usr/bin/mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]="strip"
-S["install_sh"]="${SHELL} /home/hiufungk/Desktop/HFold/install-sh"
-S["MAKEINFO"]="${SHELL} /home/hiufungk/Desktop/HFold/missing makeinfo"
-S["AUTOHEADER"]="${SHELL} /home/hiufungk/Desktop/HFold/missing autoheader"
-S["AUTOMAKE"]="${SHELL} /home/hiufungk/Desktop/HFold/missing automake-1.13"
-S["AUTOCONF"]="${SHELL} /home/hiufungk/Desktop/HFold/missing autoconf"
-S["ACLOCAL"]="${SHELL} /home/hiufungk/Desktop/HFold/missing aclocal-1.13"
+S["install_sh"]="${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/install-sh"
+S["MAKEINFO"]="${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing makeinfo"
+S["AUTOHEADER"]="${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing autoheader"
+S["AUTOMAKE"]="${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing automake-1.13"
+S["AUTOCONF"]="${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing autoconf"
+S["ACLOCAL"]="${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing aclocal-1.13"
 S["VERSION"]="1.0"
 S["PACKAGE"]="simfold"
 S["CYGPATH_W"]="echo"

@@ -87,11 +87,8 @@ subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/simfold.pc.in $(top_srcdir)/../depcomp \
-	$(libsimfold_include_HEADERS) COPYING \
-	$(top_srcdir)/../config.guess $(top_srcdir)/../config.sub \
-	$(top_srcdir)/../install-sh $(top_srcdir)/../ltmain.sh \
-	$(top_srcdir)/../missing
+	$(srcdir)/simfold.pc.in depcomp $(libsimfold_include_HEADERS) \
+	COPYING config.guess config.sub install-sh missing ltmain.sh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_cxx_compile_stdcxx_11.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -176,7 +173,7 @@ am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
 am__v_at_1 = 
 DEFAULT_INCLUDES = -I.
-depcomp = $(SHELL) $(top_srcdir)/../depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -246,16 +243,16 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /home/hiufungk/Desktop/HFold/missing aclocal-1.13
+ACLOCAL = ${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing aclocal-1.13
 AMTAR = $${TAR-tar}
 AM_CXXFLAGS =  -I$(srcdir)/include \
 	-I$(srcdir)/src/simfold -I$(srcdir)/src/common
 AM_DEFAULT_VERBOSITY = 1
 AM_LDFLAGS = 
 AR = ar
-AUTOCONF = ${SHELL} /home/hiufungk/Desktop/HFold/missing autoconf
-AUTOHEADER = ${SHELL} /home/hiufungk/Desktop/HFold/missing autoheader
-AUTOMAKE = ${SHELL} /home/hiufungk/Desktop/HFold/missing automake-1.13
+AUTOCONF = ${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing autoconf
+AUTOHEADER = ${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing autoheader
+AUTOMAKE = ${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing automake-1.13
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -293,7 +290,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
 LTLIBOBJS = 
-MAKEINFO = ${SHELL} /home/hiufungk/Desktop/HFold/missing makeinfo
+MAKEINFO = ${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = /usr/bin/mkdir -p
 NM = /usr/bin/nm -B
@@ -316,10 +313,10 @@ SET_MAKE =
 SHELL = /bin/sh
 STRIP = strip
 VERSION = 1.0
-abs_builddir = /home/hiufungk/Desktop/HFold/simfold
-abs_srcdir = /home/hiufungk/Desktop/HFold/simfold
-abs_top_builddir = /home/hiufungk/Desktop/HFold/simfold
-abs_top_srcdir = /home/hiufungk/Desktop/HFold/simfold
+abs_builddir = /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold
+abs_srcdir = /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold
+abs_top_builddir = /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold
+abs_top_srcdir = /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold
 ac_ct_AR = ar
 ac_ct_CC = gcc
 ac_ct_CXX = g++
@@ -349,7 +346,7 @@ host_vendor = unknown
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /home/hiufungk/Desktop/HFold/install-sh
+install_sh = ${SHELL} /home/hiufungk/Desktop/Hfold_iterative/hfold_iterative_min3/simfold/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
