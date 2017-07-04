@@ -11,7 +11,6 @@
 2. Install Simfold ~~(if you do not have it installed already)~~ (install this into another directory if you already have simfold installed, this might be different then what you currently have) by navigating to the Simfold directory         
 
 Note: To install the library to a custom path, use ./configure --prefix=<custom library path> instead.    
-   Default path is /usr/local
 ```
 autoreconf -i 
 ./configure  or ./configure --prefix=/path/you/want/to/install/simfold
@@ -20,7 +19,7 @@ make install
 ```
 3. Install HFold_iterative by navigating to the HFold_iterative-master directory        
 
-Note: <path to Simfold installation> is where Simfold was installed. The default path is /usr/local. If you did not specify a custom prefix when installing Simfold, use /usr/local
+Note: \<path to Simfold installation\> is where Simfold was installed. If you did not specify a custom prefix when installing Simfold, type which Simfold to locate the path 
 ```
 autoreconf -i     
 ./configure SIMFOLD_HOME=<path to Simfold installation>    
