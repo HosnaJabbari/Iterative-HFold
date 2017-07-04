@@ -8,7 +8,7 @@
 
 #### Steps for installation:
 1. [Download the repository](https://github.com/HosnaJabbari/HFold_iterative/archive/master.zip) and extract the files onto your system.        
-2. Install Simfold (if you do not have it installed already) by navigating to the Simfold directory         
+2. Install Simfold ~~(if you do not have it installed already)~~ (install this into another directory if you already have simfold installed, this might be different then what you currently have) by navigating to the Simfold directory         
 
 Note: To install the library to a custom path, use ./configure --prefix=<custom library path> instead.    
    Default path is /usr/local
