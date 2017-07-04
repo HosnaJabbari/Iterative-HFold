@@ -1,10 +1,12 @@
 # HFold_iterative
 
 #### Description:
-
+This software is still under development
 
 #### Supported OS: 
-*nix operating system
+~~*nix operating system~~
+Linux (tested on Centos7)
+macOS (still testing)
 
 #### Steps for installation:
 1. Make sure you have automake, libtool installed by 
