@@ -4,9 +4,8 @@
 This software is still under development
 
 #### Supported OS: 
-~~*nix operating system~~
-Linux (tested on Centos7)
-macOS (still testing)
+Linux, macOS
+
 
 ### Installation:  
 Requirements: A compiler that supports C++11 standard (tested with g++ version 4.7.2 or higher)  and CMake version 3.1 or greater.    
@@ -41,7 +40,7 @@ make install
 [Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
 
 #### Steps for installation   
-1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
+1. [Download the repository](https://github.com/HosnaJabbari/HFold_iterative.git) and extract the files onto your system.
 2. From a command line in the root directory (where this README.md is) run
 ```
 cmake -H. -Bbuild
