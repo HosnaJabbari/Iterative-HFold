@@ -1,7 +1,12 @@
 # Ian Wark July 6 2017
 
 cmake_minimum_required(VERSION 2.8.12)
-project(HFold)
+project(HFold_iterative)
+
+# enable c++11
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # only continue if we know we already have boost
 # create simfold library
@@ -36,10 +41,6 @@ set(HFold_pkonly_SOURCE
     hfold_validation.h hfold_validation.cpp 
     hfold_pkonly.h HFold_pkonly.cpp
 )
-
-# enable c++11
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # get pthread library
 find_package (Threads)
