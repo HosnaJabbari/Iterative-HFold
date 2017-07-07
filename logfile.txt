@@ -1,4 +1,0 @@
-[Tue Jun 27 09:53:54 2017] Info: Starting Program
-[Tue Jun 27 09:53:55 2017] Error: -s/-r is missing in file 
-[Tue Jun 27 09:53:55 2017] Error: Usage ./HFold -s <sequence> -r <structure> [-o </path/to/file>] in file 
-[Tue Jun 27 09:53:56 2017] Info: Ending Program
