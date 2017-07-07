@@ -247,18 +247,18 @@ int main (int argc, char **argv) {
 	final_energy = 0;
 	numRerunThreads = 0;
 
-	method1_structure[0] = '\0';
-	method2_structure[0] = '\0';
-	method3_structure[0] = '\0';
-	method4_structure[0] = '\0';
-	final_structure[0] = '\0';		
+	method1_structure[0] = NULL;
+	method2_structure[0] = NULL;
+	method3_structure[0] = NULL;
+	method4_structure[0] = NULL;
+	final_structure[0] = NULL;		
 
 	//create thread
 	for (threadNum = 0; threadNum < numThreads; threadNum++) {
 		tinfo[threadNum].thread_num = threadNum + 1;
 		tinfo[threadNum].structure = structure;
 		tinfo[threadNum].sequence = sequence;
-		tinfo[threadNum].method_structure[0] = '\0';
+		tinfo[threadNum].method_structure[0] = NULL;
 		tinfo[threadNum].method_energy = INF;
 		tinfo[threadNum].reattempt_run = true;
 		//tinfo[threadNum].result = result;
@@ -288,7 +288,7 @@ int main (int argc, char **argv) {
 			tinfo[threadNum].thread_num = threadNum + 1;
 			tinfo[threadNum].structure = structure;
 			tinfo[threadNum].sequence = sequence;
-			tinfo[threadNum].method_structure[0] = '\0';
+			tinfo[threadNum].method_structure[0] = NULL;
 			tinfo[threadNum].method_energy = INF;
 			tinfo[threadNum].reattempt_run = false;
 
@@ -739,9 +739,9 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 			token[0] = strtok_r(buf, "\n", &saveptr1); //seq
             token[1] = strtok_r(saveptr1, "\n", &saveptr2); //struct
 
-            if(token[0] != '\0')
+            if(token[0] != NULL)
 				strcpy(sequenceTest, token[0]);
-            if(token[1] != '\0')
+            if(token[1] != NULL)
 				strcpy(restrictedTest, token[1]);
 
             token[2] = strtok_r(sequenceTest, "  ", &saveptr1);
@@ -751,7 +751,7 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
             // A check is added here to ensure that this error is handled correctly.
             //if (token[0][0] == 'S' && token[1] != NULL) {
            
-            if (token[1] != '\0' && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
+            if (token[1] != NULL && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
                 //structureString.assign(token[1], strlen(token[1]));
                 token[0] = strtok_r(token[1], "  ", &saveptr1);
                 token[2] = strtok_r(saveptr1, "  ", &saveptr2);
@@ -940,9 +940,9 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 			token[0] = strtok_r(buf, "\n", &saveptr1); //seq
             token[1] = strtok_r(saveptr1, "\n", &saveptr2); //struct
 
-            if(token[0] != '\0')
+            if(token[0] != NULL)
 				strcpy(sequenceTest, token[0]);
-            if(token[1] != '\0')
+            if(token[1] != NULL)
 				strcpy(restrictedTest, token[1]);
 
             token[2] = strtok_r(sequenceTest, "  ", &saveptr1);
@@ -952,7 +952,7 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
             // A check is added here to ensure that this error is handled correctly.
             //if (token[0][0] == 'S' && token[1] != NULL) {
            
-            if (token[1] != '\0' && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
+            if (token[1] != NULL && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
                 //structureString.assign(token[1], strlen(token[1]));
                 token[0] = strtok_r(token[1], "  ", &saveptr1);
                 token[2] = strtok_r(saveptr1, "  ", &saveptr2);
@@ -1283,8 +1283,8 @@ void find_sub_sequence_structure (char *input_sequence, char *input_structure, c
 	sub_length = *end - *begin + 1;
 	strncpy(output_sequence, &input_sequence[*begin], sub_length);
 	strncpy(output_structure, &input_structure[*begin], sub_length);
-	output_sequence[sub_length] = '\0';
-	output_structure[sub_length] = '\0';
+	output_sequence[sub_length] = NULL;
+	output_structure[sub_length] = NULL;
 }
 
 bool find_new_structure (char *input_structure, char *output_structure) {
