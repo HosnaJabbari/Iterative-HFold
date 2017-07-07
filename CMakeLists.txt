@@ -1,6 +1,6 @@
 # Ian Wark July 6 2017
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.12)
 project(HFold)
 
 # only continue if we know we already have boost
