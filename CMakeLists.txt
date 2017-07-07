@@ -1,6 +1,6 @@
 # Ian Wark July 6 2017
 
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.1)
 project(HFold_iterative)
 
 # enable c++11
