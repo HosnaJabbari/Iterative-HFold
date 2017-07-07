@@ -38,7 +38,8 @@ set(HFold_pkonly_SOURCE
 )
 
 # enable c++11
-add_compile_options(-std=c++11)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # get pthread library
 find_package (Threads)
