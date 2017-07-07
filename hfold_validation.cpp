@@ -1,7 +1,6 @@
 //created by Kevin Chang 19 June 2017
 #define _XOPEN_SOURCE_EXTENDED  1
 #include <libgen.h>
-#include <boost/regex.hpp>
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -14,23 +13,24 @@
 
 
 #include <ctime>
+#include <regex>
 #include <regex.h>
 
 #include "hfold_validation.h"
 
 
 
-static boost::regex structureRegex;
+static std::regex structureRegex;
 
 //change all {} [] to () in structure
 void replaceBrackets(char* structure){
 	std::string temp = structure;
 	std::string replace = "(";
 	structureRegex = "[[{]";
-	temp = boost::regex_replace(temp, structureRegex, replace);
+	temp = std::regex_replace(temp, structureRegex, replace);
 	replace = ")";
 	structureRegex = "[\]}]";
-	temp = boost::regex_replace(temp, structureRegex, replace);
+	temp = std::regex_replace(temp, structureRegex, replace);
 	//std::cout <<  temp << '\n' << std::flush;
 	temp.copy(structure,temp.length(),0);
 }
@@ -58,10 +58,10 @@ bool validateStructure(char* structure, char* sequence){
 		return false;
 	}
 	
-	boost::regex expr{"([^\\[\\]._{}()])"};
-	//std::cout << boost::regex_search(s, expr) << '\n';
+	std::regex expr{"([^\\[\\]._{}()])"};
+	//std::cout << std::regex_search(s, expr) << '\n';
 
-    if (boost::regex_search(structure, expr) != 0) {
+    if (std::regex_search(structure, expr) != 0) {
 		printf("Structure must only contain ._(){}[] \n");
         return false;      
     }

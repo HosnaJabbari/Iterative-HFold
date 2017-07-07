@@ -1,5 +1,4 @@
 // a simple driver for the HFold
-#include <boost/regex.hpp>
 #include <iostream>
 #include <algorithm>
 #include <iterator>
@@ -32,6 +31,7 @@
 #include "hfold_iterative.h"
 
 #include <ctime>
+#include <regex>
 #include <regex.h>
 
 #include "hfold_validation.h" //kevin June 22 2017
@@ -51,10 +51,10 @@
 FILE *logFile;
 char *file;
 int timeout = 1200;
-static boost::smatch match;
-static boost::regex sequenceRegex;
-static boost::regex structureRegex;
-static boost::regex replacedRegex;
+static std::smatch match;
+static std::regex sequenceRegex;
+static std::regex structureRegex;
+static std::regex replacedRegex;
 static std::string sequenceString;
 static std::string structureString;
 static std::string replacementText;
@@ -767,7 +767,7 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
             }
 
 			// Find the structure
-			/*if(boost::regex_search(structureString, match, structureRegex)) {
+			/*if(std::regex_search(structureString, match, structureRegex)) {
 				structureString = match[1];
 			} else {
 				write_log_file(token[0], programPath, 'E');
@@ -968,7 +968,7 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
             }
 
 			/*// Find the structure
-			if(boost::regex_search(structureString, match, structureRegex)) {
+			if(std::regex_search(structureString, match, structureRegex)) {
 				structureString = match[1];
 			} else {
 				write_log_file(token[0], programPath, 'E');
@@ -1004,7 +1004,7 @@ void replace_simfold_partial_structure_with_original (char *input_structure, cha
 	}
 
 	structureString.assign(replaced_structure, strlen(replaced_structure));
-	std::string regexResult(boost::regex_replace(structureString, replacedRegex, replacementText));
+	std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
 	strcpy(replaced_structure, regexResult.c_str());
 }
 
@@ -1017,7 +1017,7 @@ void replace_simfold_structure_with_original (char *replaced_structure, char *si
 	}
 
 	structureString.assign(replaced_structure, strlen(replaced_structure));
-	std::string regexResult(boost::regex_replace(structureString, replacedRegex, replacementText));
+	std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
 	strcpy(replaced_structure, regexResult.c_str());
 }
 
@@ -1053,11 +1053,11 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
 	}
 
 	// Format sequence
-	sequenceString = boost::regex_replace(sequenceString, sequenceRegex, replacementText);
+	sequenceString = std::regex_replace(sequenceString, sequenceRegex, replacementText);
 	std::cout << "Sequence:  " << sequenceString << " Length: " << sequenceString.length() << '\n' << std::flush;
 
 	// Format structure
-	structureString = boost::regex_replace(structureString, structureRegex, replacementText);
+	structureString = std::regex_replace(structureString, structureRegex, replacementText);
 	std::cout << "Structure: " << structureString << " Length: " << structureString.length() << '\n' << std::flush;
 
 	// Copy strings
@@ -1291,24 +1291,24 @@ bool find_new_structure (char *input_structure, char *output_structure) {
 	structureString.assign(input_structure, strlen(input_structure));
 	structureRegex = "\\[";
 
-	if(!boost::regex_search(structureString, match, structureRegex)) {
+	if(!std::regex_search(structureString, match, structureRegex)) {
 		return false;
 	}
 
 	//substitute all ".()" to "_"
 	replacementText = "_";
 	structureRegex = "(\\.|\\(|\\))";
-	structureString = boost::regex_replace(structureString, structureRegex, replacementText);
+	structureString = std::regex_replace(structureString, structureRegex, replacementText);
 
 	// substitute all [ to (
 	replacementText = "(";
 	structureRegex = "\\[";
-	structureString = boost::regex_replace(structureString, structureRegex, replacementText);
+	structureString = std::regex_replace(structureString, structureRegex, replacementText);
 
 	// substitute all ] to )
 	replacementText = ")";
 	structureRegex = "\\]";
-	structureString = boost::regex_replace(structureString, structureRegex, replacementText);
+	structureString = std::regex_replace(structureString, structureRegex, replacementText);
 
 	strcpy(output_structure, structureString.c_str());
 	//std::cout << "New Structure String: " << structureString << '\n' << std::flush;
