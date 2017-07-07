@@ -8,33 +8,51 @@ This software is still under development
 Linux (tested on Centos7)
 macOS (still testing)
 
-#### Steps for installation:
-1. Make sure you have automake, libtool installed by 
-```
-which <program_name>
-```
-[helpful link](https://stackoverflow.com/questions/9575989/install-autoreconf-on-osx-lion#comment55274804_9782529)        
+### Installation:  
+Requirements: A compiler that supports C++11 standard (tested with g++ version 4.7.2 or higher)  and CMake version 3.1 or greater.    
 
-2. [Download the repository](https://github.com/HosnaJabbari/HFold_iterative/archive/master.zip) and extract the files onto your system.        
-3. Navigate to the Simfold directory to install Simfold ~~(if you do not have it installed already)~~ (install this into another directory if you already have simfold installed, this might be different then what you currently have)          
-
-Note: To install the library to a custom path, use ./configure --prefix=<custom library path> instead.    
+[CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that HFold can find it.    
+To test if your Mac or Linux system already has CMake, you can type into a terminal:      
 ```
-autoreconf -i 
-./configure  or ./configure --prefix=/path/you/want/to/install/Simfold
-make  
+cmake --version
+```
+If it does not print a cmake version greater than or equal to 3.1, you will have to install CMake depending on your operating system.
+
+#### Mac:    
+Easiest way is to install homebrew and use that to install CMake.    
+To do so, run the following from a terminal to install homebrew:      
+```  
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"   
+```    
+When that finishes, run the following from a terminal to install CMake.     
+```   
+brew install cmake   
+``` 
+#### Linux:    
+Run from a terminal     
+```
+wget http://www.cmake.org/files/v3.8/cmake-3.8.2.tar.gz
+tar xzf cmake-3.8.2.tar.gz
+cd cmake-3.8.2
+./configure
+make
 make install
 ```
-4. Navigating to the HFold_iterative-master directory to install HFold_iterative    
+[Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
 
-Note: \<path to Simfold installation\> is where Simfold was installed. If you did not specify a custom prefix when installing Simfold, type which Simfold to locate the path 
+#### Steps for installation   
+1. [Download the repository](https://github.com/HosnaJabbari/CCJ/archive/master.zip) and extract the files onto your system.
+2. From a command line in the root directory (where this README.md is) run
 ```
-autoreconf -i     
-./configure SIMFOLD_HOME=<path to Simfold installation>    
-make  
+cmake -H. -Bbuild
+cmake --build build
+```   
+If you need to specify a specific compiler, such as g++, you can instead run something like   
 ```
-5. Run HFold_iterative by following the usage instructions below.   
-
+cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
+cmake --build build
+```   
+This can be useful if you are getting errors about your compiler not having C++11 features.
 
 #### How to use:
     Arguments:
