@@ -420,7 +420,7 @@ double compute_pf_sensitivity (char *ref_structure, s_partition_function *part, 
 
 
 
-void giveup (char *string1, char *string2)
+void giveup (cosnt char *string1, const char *string2)
 // to add: variable nb of parameters, as in scanf, printf
 {
     char temp[100];

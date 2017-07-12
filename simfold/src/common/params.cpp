@@ -3567,7 +3567,7 @@ void initialize_correct_int22_expadd (int ii, int jj, int kk, int ll, int mm, in
 }
 
 
-int traverse_features_and_do_work (char *calling_function, PARAMTYPE *array, char *filename)
+int traverse_features_and_do_work (char *calling_function, PARAMTYPE *array, const char *filename)
 // This function should be called by create_string_params and other functions, with the name of the calling function as argument
 // The purpose of it is to traverse the model's features in only one function instead of in many fucreate_string_paramsnctions as it was up until now.
 // Make sure the calling_function string is properly dealt with at the beginning of this function
@@ -6471,7 +6471,7 @@ int traverse_features_and_do_work (char *calling_function, PARAMTYPE *array, cha
     return index;
 }
 
-int traverse_features_and_do_work_pmo (char *calling_function, PARAMTYPE *array, char *filename)
+int traverse_features_and_do_work_pmo (char *calling_function, PARAMTYPE *array, const char *filename)
 // This function should be called by create_string_params and other functions, with the name of the calling function as argument
 // The purpose of it is to traverse the model's features in only one function instead of in many functions as it was up until now. (This is not good programming practice and wastes time.)
 // Make sure the calling_function string is properly dealt with at the beginning of this function
@@ -9384,7 +9384,7 @@ int create_string_params ()
     return traverse_features_and_do_work ("create_string_params", NULL, NULL);
 }
 
-void fill_data_structures_with_new_parameters (char *filename)
+void fill_data_structures_with_new_parameters (const char *filename)
   // Mirela: Dec 16, 2003
   // reads parameters from a file, and writes them in the internal data structures
   // PRE: first read the actual standard parameters, to be able to figure out which of them are
@@ -9411,7 +9411,7 @@ int create_string_params_pmo ()
     return traverse_features_and_do_work_pmo ("create_string_params", NULL, NULL);
 }
 
-void fill_data_structures_with_new_parameters_pmo (char *filename)
+void fill_data_structures_with_new_parameters_pmo (const char *filename)
   // Mirela: Dec 16, 2003
   // reads parameters from a file, and writes them in the internal data structures
   // PRE: first read the actual standard parameters, to be able to figure out which of them are
@@ -9499,7 +9499,7 @@ int check_stability_and_size (int k, int l, int o, int p)
 
 // OBSOLETE. Now it's part of traverse_features_and_do_work
 /*
-void fill_data_structures_with_new_parameters (char *filename)
+void fill_data_structures_with_new_parameters (const char *filename)
   // Mirela: Dec 16, 2003
   // reads parameters from a file, and writes them in the internal data structures
   // PRE: first read the actual standard parameters, to be able to figure out which of them are
@@ -10227,7 +10227,7 @@ void fill_data_structures_with_new_parameters (char *filename)
 
 
 
-void save_paramtypes (char *filename)
+void save_paramtypes (const char *filename)
 // PRE: call create_string_params ()
 // save all parameter types in the given file
 {
@@ -10249,7 +10249,7 @@ void save_paramtypes (char *filename)
 }
 
 
-void save_paramtypes_machine_readable (char *filename)
+void save_paramtypes_machine_readable (const char *filename)
 // PRE: call create_string_params ()
 // save all parameter types in the given file
 {
@@ -10271,7 +10271,7 @@ void save_paramtypes_machine_readable (char *filename)
 }
 
 
-void save_parameters (char *filename)
+void save_parameters (const char *filename)
   // Mirela: Dec 16, 2003
   // save all parameters in the given file
 {
@@ -10286,7 +10286,7 @@ void save_parameters_in_array (PARAMTYPE *array)
     traverse_features_and_do_work ("save_parameters_in_array", array, NULL);
 }
 
-void save_parameters_pmo (char *filename)
+void save_parameters_pmo (const char *filename)
   // Mirela: Dec 16, 2003
   // save all parameters in the given file
 {
@@ -11909,7 +11909,7 @@ void search_bb (char *sequence, double *old_counts, int threshold, int num_param
 
 
 /*
-void fill_data_structures_with_new_parameters_fixed_dangles (char *filename, char *dangfilename)
+void fill_data_structures_with_new_parameters_fixed_dangles (const char *filename, char *dangfilename)
 // reads all params from filename, except the dangling parameters, which reads from a different file
 // assumes the fm363 model  
 
