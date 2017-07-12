@@ -8,7 +8,7 @@ Linux, macOS
 
 
 ### Installation:  
-Requirements: A compiler that supports C++11 standard (tested with g++ version 4.7.2 or higher)  and CMake version 3.1 or greater.    
+Requirements: A compiler that supports C++11 standard (tested with g++ version 4.9.0 or higher)  and CMake version 3.1 or greater.    
 
 [CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that HFold can find it.    
 To test if your Mac or Linux system already has CMake, you can type into a terminal:      
