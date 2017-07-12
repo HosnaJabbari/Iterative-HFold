@@ -159,7 +159,7 @@ enum bases {A=0,C=1,G=2,T=3,U=3,X=4};
 #define OLIGO	"AO"
 #define GENE	"GE"
 
-#define PARAMS_BASE_PATH "../params/"
+#define PARAMS_BASE_PATH "params/"
 
 #endif
 
