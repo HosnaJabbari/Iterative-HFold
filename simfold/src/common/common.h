@@ -75,7 +75,7 @@ double compute_pf_ppv (char *ref_structure, s_partition_function *part, double t
 void giveup (const char *string1,const char *string2);
 // to add: variable nb of parameters, as in scanf, printf
 
-void giveup2 (constchar *string1,const char *string2, FILE *file);
+void giveup2 (const char *string1,const char *string2, FILE *file);
 // to add: variable nb of parameters, as in scanf, printf
 
 void create_random_sequence (int length, char *sequence);
