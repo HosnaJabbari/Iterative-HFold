@@ -67,7 +67,7 @@ struct thread_info {
 	pthread_t thread_id;
 	long      thread_num;
 	char     *structure;
-	char     *sequence; 
+	const char     *sequence; 
 	char      method_structure[MAXSLEN];
 	double    method_energy;
 	int     **result;
@@ -257,7 +257,7 @@ int main (int argc, char **argv) {
 		tinfo[threadNum].thread_num = threadNum + 1;
 		tinfo[threadNum].structure = structure;
 		tinfo[threadNum].sequence = sequence;
-		tinfo[threadNum].method_structure[0] = NULL;
+		tinfo[threadNum].method_structure[0] = '\0';
 		tinfo[threadNum].method_energy = INF;
 		tinfo[threadNum].reattempt_run = true;
 		//tinfo[threadNum].result = result;
@@ -287,7 +287,7 @@ int main (int argc, char **argv) {
 			tinfo[threadNum].thread_num = threadNum + 1;
 			tinfo[threadNum].structure = structure;
 			tinfo[threadNum].sequence = sequence;
-			tinfo[threadNum].method_structure[0] = NULL;
+			tinfo[threadNum].method_structure[0] = '\0';
 			tinfo[threadNum].method_energy = INF;
 			tinfo[threadNum].reattempt_run = false;
 
@@ -429,7 +429,7 @@ static void *threadFunction(void *arg) {
 	}
 }
 
-void method1_calculation (char *sequence, char *structure, char *method1_structure, double *method1_energy) {
+void method1_calculation (const char *sequence, char *structure, char *method1_structure, double *method1_energy) {
 	char new_input_structure[MAXSLEN] = "\0";	
 	char hfold_structure[MAXSLEN] = "\0";	
 	char hfold_pkonly_structure[MAXSLEN] = "\0";	
@@ -468,7 +468,7 @@ void method1_calculation (char *sequence, char *structure, char *method1_structu
 	}
 }
 
-void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy) {
+void method2_calculation (const char *sequence, char *structure, char *method2_structure, double *method2_energy) {
 	char hfold_structure[MAXSLEN] = "\0";	
 	
 	double hfold_energy = 0;	
@@ -487,7 +487,7 @@ void method2_calculation (char *sequence, char *structure, char *method2_structu
 	}
 }
 
-void method3_calculation (char *sequence, char *structure, char *method3_structure, double *method3_energy) {
+void method3_calculation (const char *sequence, char *structure, char *method3_structure, double *method3_energy) {
 	char sub_sequence[MAXSLEN] = "\0";
 	char sub_structure[MAXSLEN] = "\0";
 	
@@ -541,7 +541,7 @@ void method3_calculation (char *sequence, char *structure, char *method3_structu
 	}
 }
 
-void method4_calculation (char *sequence, char *structure, char *method4_structure, double *method4_energy, int **result) {
+void method4_calculation (const char *sequence, char *structure, char *method4_structure, double *method4_energy, int **result) {
 	// we know the beginning and end of the given input substructure in the structure
 	// now we need to run simfold restricted with the given structure, find the stem which contains the given substructure
 	// then only include this structure as input structure, and do as we did in method 3
@@ -612,7 +612,7 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 	}
 }
 
-bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
+bool call_HFold (const char *programPath, const char *input_sequence, const char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
 	int status = 0;
 	int pipefd[2];
 	pipe(pipefd);
@@ -719,7 +719,7 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 						} else {
 							write_log_file("Child will not run", "", 'I');
 							
-							return false
+							return false;
 						}
 				    }
 				}
@@ -805,7 +805,7 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 	}
 }
 
-bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
+bool call_simfold (const char *programPath, const char *input_sequence, const char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
 	int status = 0;
 	int pipefd[2];
 	pipe(pipefd);
@@ -1098,7 +1098,7 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
 	return true;
 }
 
-bool save_file (char *fileName, char *outputPath, char *sequence, char *restricted, char *structure, double energy, int chosen_method) {
+bool save_file (const char *fileName, char *outputPath, const char *sequence, char *restricted, char *structure, double energy, int chosen_method) {
 	FILE *ioFile;
 	char filePath[MAXSLEN];
 	strcpy(filePath, outputPath);
@@ -1120,7 +1120,7 @@ bool save_file (char *fileName, char *outputPath, char *sequence, char *restrict
 	return true;
 } 
 
-void write_log_file(const char *message, const char *fileName, char option) {
+void write_log_file(const char *message, const char *fileName, const char option) {
 	time_t now = time(0);
 	struct tm tstruct = *localtime(&now);
 	char buf[80];
@@ -1283,7 +1283,7 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 
 }
 
-void find_sub_sequence_structure (char *input_sequence, char *input_structure, char *output_sequence, char *output_structure, int *begin, int *end) {
+void find_sub_sequence_structure (const char *input_sequence, char *input_structure, char *output_sequence, char *output_structure, int *begin, int *end) {
 	int structure_length = strlen(input_structure);	
 	int sub_length = 0;
 	*begin = -1;
@@ -1302,8 +1302,8 @@ void find_sub_sequence_structure (char *input_sequence, char *input_structure, c
 	sub_length = *end - *begin + 1;
 	strncpy(output_sequence, &input_sequence[*begin], sub_length);
 	strncpy(output_structure, &input_structure[*begin], sub_length);
-	output_sequence[sub_length] = NULL;
-	output_structure[sub_length] = NULL;
+	output_sequence[sub_length] = '\0';
+	output_structure[sub_length] = '\0';
 }
 
 bool find_new_structure (char *input_structure, char *output_structure) {
@@ -1357,7 +1357,7 @@ std::string exec(const char* cmd) {
 // runs simfold on the sequence
 // compares the number of base pairs in the simfold_seq with the input sequence
 // returns the ratio of the counts;
-double find_structure_sparsity (char *sequence, char *structure) {
+double find_structure_sparsity (const char *sequence, char *structure) {
 	double ratio = 0.0;
 	char simfold_sequence[MAXSLEN];
 	char simfold_structure[MAXSLEN];
