@@ -24,6 +24,7 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <string>
 
 // Hosna June 20th, 2007
 //#include "W_final.h"
@@ -229,8 +230,6 @@ int main (int argc, char **argv) {
 	}	
 	//kevin: june 22 2017
 	//end of validation for command line arguments
-
-
 
 	write_log_file("Starting Program", "", 'I');
 
@@ -448,8 +447,9 @@ void method1_calculation (char *sequence, char *structure, char *method1_structu
 	has_pk = find_new_structure(hfold_pkonly_structure, new_input_structure);
 	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
 
-	if (has_pk) {
+	if (has_pk) {		
 		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy, true)) {
+			std::cout << "HFold failed " << std::endl;
 			*method1_energy = hfold_energy;
 			return;
 		}
@@ -624,7 +624,8 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 	switch (pid) {
 		case -1: /* Error */
 			write_log_file("Fork failed", file, 'E');
-			return false;		    
+			printf("ERROR in call_HFold: Fork failed\n");
+			exit(5);
 
 		case 0: /* Child process */
 			char functionCall[10000];
@@ -638,7 +639,16 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 			//execl(programPath, "./", input_sequence, input_structure, NULL);
 			
 			// Run HFold_pkonly
-			sprintf(functionCall, "%s %s '%s'", programPath, input_sequence, input_structure);
+			if (programPath == HFOLD) {
+				sprintf(functionCall, "%s -s '%s' -r '%s'", programPath, input_sequence, input_structure);
+			} else 
+			if (programPath == HFOLD_PKONLY) {
+				sprintf(functionCall, "%s %s '%s'", programPath, input_sequence, input_structure);
+			} else {
+				printf("ERROR in call_HFold: calling something other than HFold or HFold_pkonly\n");
+				exit(5);
+			}
+
 			result += exec(functionCall);
 			strcpy(result_array, result.c_str());
 
@@ -708,7 +718,8 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 							return false;
 						} else {
 							write_log_file("Child will not run", "", 'I');
-							return false;
+							
+							return false
 						}
 				    }
 				}
@@ -718,12 +729,13 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 				char error[200];
 				sprintf(error, "status = %d", WEXITSTATUS(status));
 				write_log_file(error, file, 'E');
+				std::cout << "ERROR calling HFold: " << error << std::endl;
 
 				//dup2(stdout_bk, fileno(stdout));
 				close(pipefd[1]);
 				close(pipefd[0]);
 				//close(stdout_bk);
-				return false;
+				exit(5);
 			}
 
 			//restore
@@ -763,6 +775,8 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
             } else {
                 write_log_file(token[0], file, 'E');
                 write_log_file(token[1], file, 'E');
+		std::cout << "ERROR calling HFold: " << token[0] << std::endl;
+		std::cout << "ERROR calling HFold: " << token[1] << std::endl;
                 return false;
             }
 
@@ -803,7 +817,8 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 	switch (pid) {
 		case -1: /* Error */
 		    write_log_file("Fork failed", file, 'E');
-			return false;		    
+			printf("ERROR calling simfold: Fork failed\n");
+			exit(5);	    
 
 		case 0: /* Child process */
 			char functionCall[10000];
@@ -924,6 +939,7 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 				close(pipefd[1]);
 				close(pipefd[0]);
 				//close(stdout_bk);
+				std::cout << "ERROR calling simfold: " << error << std::endl;
 				return false;
 			}
 		
@@ -964,7 +980,10 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
             } else {
                 write_log_file(token[0], file, 'E');
                 write_log_file(token[1], file, 'E');
-                return false;
+
+		std::cout << "ERROR calling simfold: " << token[0] << std::endl;
+		std::cout << "ERROR calling simfold: " << token[1] << std::endl;
+                exit(5);
             }
 
 			/*// Find the structure
@@ -1101,7 +1120,7 @@ bool save_file (char *fileName, char *outputPath, char *sequence, char *restrict
 	return true;
 } 
 
-void write_log_file(char *message, char *fileName, char option) {
+void write_log_file(const char *message, const char *fileName, char option) {
 	time_t now = time(0);
 	struct tm tstruct = *localtime(&now);
 	char buf[80];
