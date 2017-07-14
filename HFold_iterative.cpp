@@ -319,10 +319,13 @@ int main (int argc, char **argv) {
 		}
 	}
 
-	if (final_energy == INF) {
+	if (final_energy == INF || method_chosen = -1) {
 		write_log_file("Could not find energy", "", 'E');
+		printf("ERROR: could not find energy\n");
 		final_energy = 0;
+		exit(6);
 	}
+	
 
 	
 	
