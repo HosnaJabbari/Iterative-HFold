@@ -102,7 +102,8 @@ int main (int argc, char **argv) {
 	double *method4_energy = (double*) malloc(sizeof(double) * INF);
 	double final_energy;
 
-	int files_length, method_chosen;
+	int files_length;
+	int method_chosen = -1;
 	long threadNum;
 	long numThreads = 4;
 	long numRerunThreads = 0;
@@ -319,7 +320,7 @@ int main (int argc, char **argv) {
 		}
 	}
 
-	if (final_energy == INF || method_chosen = -1) {
+	if (final_energy == INF || method_chosen == -1) {
 		write_log_file("Could not find energy", "", 'E');
 		printf("ERROR: could not find energy\n");
 		final_energy = 0;
