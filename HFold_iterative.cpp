@@ -642,17 +642,9 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 			//dup2(pipefd[1], fileno(stdout));
 			//execl(programPath, "./", input_sequence, input_structure, NULL);
 			
-			// Run HFold_pkonly
-			if (programPath == HFOLD) {
-				sprintf(functionCall, "%s -s '%s' -r '%s'", programPath, input_sequence, input_structure);
-			} else 
-			if (programPath == HFOLD_PKONLY) {
-				sprintf(functionCall, "%s %s '%s'", programPath, input_sequence, input_structure);
-			} else {
-				printf("ERROR in call_HFold: calling something other than HFold or HFold_pkonly\n");
-				exit(5);
-			}
-
+			// Run HFold
+			sprintf(functionCall, "%s -s '%s' -r '%s'", programPath, input_sequence, input_structure);
+			
 			result += exec(functionCall);
 			strcpy(result_array, result.c_str());
 
