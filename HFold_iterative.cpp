@@ -450,37 +450,8 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
     exit(si->si_errno);
 }
 
-//static void *threadFunction(void *arg) {
-//	struct thread_info *tinfo = (thread_info *) arg;
-//
-//	switch (tinfo->thread_num) {
-//		case 1:
-//			method1_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
-//			break;
-//		case 2:
-//			method2_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
-//			break;
-//		case 3:
-//			method3_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
-//			break;
-//		case 4:
-//			tinfo->result = (int**) malloc(sizeof(int*) * MAXSLEN);
-//			for (int i=0; i < MAXSLEN; i++) {
-//				tinfo->result[i] = (int*) malloc(sizeof(int) * 2);
-//			}
-//
-//			method4_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy, tinfo->result);
-//
-//			for (int i=0; i < MAXSLEN; i++) {
-//				if (tinfo->result[i])
-//					free(tinfo->result[i]);
-//			}
-//
-//			break;
-//	}
-//}
 
-void method1_calculation (const char *sequence, char *structure, char *method1_structure, double *method1_energy) {
+void method1_calculation (char *sequence, char *structure, char *method1_structure, double *method1_energy) {
 	char new_input_structure[MAXSLEN] = "\0";	
 	char hfold_structure[MAXSLEN] = "\0";	
 	char hfold_pkonly_structure[MAXSLEN] = "\0";	
@@ -490,7 +461,7 @@ void method1_calculation (const char *sequence, char *structure, char *method1_s
 
 	bool has_pk;
 
-	if (!call_HFold(HFOLD_PKONLY, sequence, structure, hfold_pkonly_structure, &hfold_pkonly_energy, true)) {
+	if (!call_HFold(HFOLD_PKONLY, sequence, structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
 		*method1_energy = hfold_pkonly_energy;		
 		return;
 	}
@@ -499,7 +470,7 @@ void method1_calculation (const char *sequence, char *structure, char *method1_s
 	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
 
 	if (has_pk) {		
-		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy, true)) {
+		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy)) {
 			std::cout << "HFold failed " << std::endl;
 			*method1_energy = hfold_energy;
 			return;
@@ -599,7 +570,7 @@ void method3_calculation (char *sequence, char *structure, char *method3_structu
 	replace_simfold_partial_structure_with_original(structure, simfold_structure, replaced_structure, begin, end);
 	//std::cout << "the replaced string is: " << replaced_structure << '\n' << std::flush;
 
-	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy, true)) {
+	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
 		*method3_energy = hfold_pkonly_energy;
 		return;
 	}
@@ -607,7 +578,7 @@ void method3_calculation (char *sequence, char *structure, char *method3_structu
 	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
 
 	if (has_pk) {
-		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy, true)) {
+		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy)) {
 			*method3_energy = hfold_energy;
 			return;
 		}
@@ -669,7 +640,7 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 	
 	//std::cout << "the replaced structure is: " << replaced_structure << '\n' << std::flush;
 
-	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy, true)) {
+	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
 		*method4_energy = hfold_pkonly_energy;
 		return;
 	}
@@ -677,7 +648,7 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
 
 	if (has_pk) {
-		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy, true)) {
+		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy)) {
 			*method4_energy = hfold_energy;
 			return;
 		}
@@ -697,7 +668,9 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 	}
 }
 
-bool call_HFold (const char *programPath, const char *input_sequence, const char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
+//Calling HFold: programPath = HFOLD
+//Calling HFold_PKonly: programPath = HFOLD_PKONLY
+bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
 	char config_file[200];
 	strcpy (config_file, "./simfold/params/multirnafold.conf");
 
@@ -712,7 +685,8 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 	// call init_data only once for the same dna_or_rna and same temperature
 	// if one of them changes, call init_data again
 
-	init_data ("./HFold", config_file, dna_or_rna, temperature);
+	//init_data ("./HFold", config_file, dna_or_rna, temperature);
+	init_data (programPath, config_file, dna_or_rna, temperature);
 	
 	fill_data_structures_with_new_parameters ("./simfold/params/turner_parameters_fm363_constrdangles.txt");
 
@@ -720,20 +694,13 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 	// so we add it here
 	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt"); 
 
-        *method2_energy = hfold(sequence, structure, method2_structure); 
+        *output_energy = hfold(input_sequence, input_structure, output_structure); 
 	return true;
 }
 
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
-//	int status = 0;
-//	int pipefd[2];
-//	pipe(pipefd);
 	std::string result = "";
-	//int stdout_bk = dup(fileno(stdout));
 	
-////////////////////////////////////////////////////////
-//
-//
 	char config_file[200] = "simfold/";
 	strcat(config_file, PARAMS_BASE_PATH);
 	strcat(config_file, "multirnafold.conf");
@@ -742,7 +709,6 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 	init_data ("./simfold", config_file, RNA, temperature);         
 
         fill_data_structures_with_new_parameters ("simfold/params/turner_parameters_fm363_constrdangles.txt");
-	// Hosna, Sep 10, 2012
 	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
 	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt, 
 	// but still getting seg fault!
@@ -752,209 +718,7 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 
 	*output_energy = simfold_restricted (input_sequence, input_structure, output_structure);
 //	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
-////////////////////////////////////////////////////////
-
-
-
-
-//	pid_t pid = fork(); /* Create a child process */
-/*	
-	switch (pid) {
-		case -1: // Error 
-		    write_log_file("Fork failed", file, 'E');
-			printf("ERROR calling simfold: Fork failed\n");
-			exit(5);	    
-
-		case 0: // Child process
-			char functionCall[10000];
-			char result_array[10000];
-			close(pipefd[0]);
-
-			// Child changes directory so the parent doesnt have to move back.
-			if (chdir(programPath) == -1) {
-				char error[200];
-				sprintf(error, "Could not find directory with error: %s", strerror(errno));
-				write_log_file(error, file, 'E');
-				exit(4);
-			}
-
-			// Create function call
-			strcpy(functionCall, SIMFOLD);
-			strcat(functionCall, " -s ");
-			strcat(functionCall, input_sequence);
-	
-			if (input_structure != NULL) {
-				strcat(functionCall, " -r \"");
-				strcat(functionCall, input_structure);
-				strcat(functionCall, "\"");
-			}
-
-			result += exec(functionCall);
-			strcpy(result_array, result.c_str());
-
-			if (!result.empty()){
-				write(pipefd[1], result_array, 10000); 
-				exit(5);
-			} else {
-				write_log_file("popen() failed!", file, 'E');
-				close(pipefd[1]);
-				exit(5);
-			}
-
-			//std::cout << "Calling: " << functionCall << '\n' << std::flush;
-
-			// Create a pipe to get the result through stdout
-			//dup2(pipefd[1], fileno(stdout));
-			//execl(SIMFOLD, "./", "-s", input_sequence, "-r", input_structure, NULL);
-
-			//char error[200];
-			//sprintf(error, "System call failed with error: %s", strerror(errno));
-			//write_log_file(error, programPath, 'E');
-		    //exit(1);
-
-		default: //Parent process
-			char buf[10001];
-			char *token[4];
-            char sequenceTest[2000];   
-            char restrictedTest[2000];
-			char *saveptr1, *saveptr2;
-			pid_t wpid;
-			int waittime = 0;
-
-			//if (input_structure == NULL) {
-			//	structureRegex = "MFE:\\s+([^\\s+]*)\\s+([^\\n+]*)";
-			//} else {
-			//	structureRegex = "RES:\\s+([^\\s+]*)\\s+([^\\n+]*)";
-			//}
-
-			// Make child process the leader of its own process group. This allows
-   			// signals to also be delivered to processes forked by the child process.
-   			setpgid(pid, 0);
-
-		    //waitpid(pid, &status, 0); // Wait for the process to complete 
-			//sprintf(error, "The pid of the child is: %d", pid);
-			//write_log_file(error, "", 'I');
-			do {
-				wpid = waitpid(pid, &status, WNOHANG);
-				if (wpid == 0) {
-				    if (waittime < timeout) {
-						//sprintf(error, "Parent waiting %d second(s).", waittime);
-				        //write_log_file(error, "", 'I');
-				        sleep(1);
-				        waittime ++;
-				    }
-				    else {
-						write_log_file("Killing child process", file, 'E');
-				        //kill(pid, SIGKILL); 
-
-						kill((-1*pid), SIGTERM); 	
-						bool died = false;
-						for (int loop = 0; !died && loop < 5; loop++) {
-							sleep(1);
-							if (waitpid(pid, &status, WNOHANG) == pid) died = true;
-						}
-
-						if (!died) {
-							kill((-1*pid), SIGKILL);		
-						}					
-
-						//dup2(stdout_bk, fileno(stdout));
-						close(pipefd[1]);
-						close(pipefd[0]);
-						//close(stdout_bk);
-						
-						if (reattempt_run) {
-							*output_energy = INF + 1;
-							return false;
-						} else {
-							write_log_file("Child will not run", "", 'I');
-							return false;
-						}
-				    }
-				}
-			} while (wpid == 0 && waittime <= timeout);
-
-			if (WEXITSTATUS(status) == 2) { 
-				char error[200];
-				sprintf(error, "status = %d", WEXITSTATUS(status));
-				write_log_file(error, file, 'E');
-
-				//dup2(stdout_bk, fileno(stdout));
-				close(pipefd[1]);
-				close(pipefd[0]);
-				//close(stdout_bk);
-				std::cout << "ERROR calling simfold: " << error << std::endl;
-				return false;
-			}
-		
-			//restore
-			//fflush(stdout);
-			close(pipefd[1]);
-			//dup2(stdout_bk, fileno(stdout));
-
-			// Read result from HFold_pkonly
-   			read(pipefd[0], buf, 10000);
-			close(pipefd[0]);
-			//close(stdout_bk);
-
-			token[0] = strtok_r(buf, "\n", &saveptr1); //seq
-            token[1] = strtok_r(saveptr1, "\n", &saveptr2); //struct
-
-            if(token[0] != NULL)
-				strcpy(sequenceTest, token[0]);
-            if(token[1] != NULL)
-				strcpy(restrictedTest, token[1]);
-
-            token[2] = strtok_r(sequenceTest, "  ", &saveptr1);
-            token[3] = strtok_r(restrictedTest, "  ", &saveptr2);
-           
-            // Error messages can be in token [0] where the program used printf once then exited.
-            // A check is added here to ensure that this error is handled correctly.
-            //if (token[0][0] == 'S' && token[1] != NULL) {
-           
-            if (token[1] != NULL && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
-                //structureString.assign(token[1], strlen(token[1]));
-                token[0] = strtok_r(token[1], "  ", &saveptr1);
-                token[2] = strtok_r(saveptr1, "  ", &saveptr2);
-                strcpy(output_structure, token[2]);       
-
-                token[2] = strtok_r(saveptr2, "\n", &saveptr2);
-                energyString.assign(token[2], strlen(token[2]));
-                *output_energy = stod(energyString);
-            } else {
-                write_log_file(token[0], file, 'E');
-                write_log_file(token[1], file, 'E');
-
-		std::cout << "ERROR calling simfold: " << token[0] << std::endl;
-		std::cout << "ERROR calling simfold: " << token[1] << std::endl;
-                exit(5);
-            }
-
-*/
-
-			/*// Find the structure
-			if(std::regex_search(structureString, match, structureRegex)) {
-				structureString = match[1];
-			} else {
-				write_log_file(token[0], programPath, 'E');
-				return false;
-			}
-			
-			token[0] = strtok_r(token[1], "  ", &saveptr1);
-			token[2] = strtok_r(saveptr1, "  ", &saveptr2); 
-			token[2] = strtok_r(saveptr2, "\n", &saveptr2); 
-			
-			energyString.assign(token[2], strlen(token[2]));*/
-
-			//Print result
-			//std::cout << "Result: " << structureString << " " << energyString << '\n' << std::flush;
-	
-			// Copy strings
-			//strcpy(output_structure, structureString.c_str());
-			//*output_energy = stod(energyString);
-			//write_log_file("hfold struct", output_structure, 'E');
-			return true;
-//	}
+	return true;
 }
 
 void replace_simfold_partial_structure_with_original (char *input_structure, char *simfold_structure, char *replaced_structure, int begin, int end) {
@@ -1285,19 +1049,6 @@ int find_no_base_pairs (char *structure) {
 	return std::count(structureString.begin(), structureString.end(), '(');
 }
 
-
-std::string exec(const char* cmd) {
-    char buffer[128];
-    std::string result = "";
-    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
-    if (!pipe)
-		return "";
-    while (!feof(pipe.get())) {
-        if (fgets(buffer, 128, pipe.get()) != NULL)
-            result += buffer;
-    }
-    return result;
-}
 
 // gets a seq and structure
 // runs simfold on the sequence
