@@ -63,16 +63,16 @@ static std::string energyString;
 static std::stack<int> customStack;
 
 
-struct thread_info {
-	pthread_t thread_id;
-	long      thread_num;
-	char     *structure;
-	const char     *sequence; 
-	char      method_structure[MAXSLEN];
-	double    method_energy;
-	int     **result;
-	bool      reattempt_run;
-};
+//struct thread_info {
+//	pthread_t thread_id;
+//	long      thread_num;
+//	char     *structure;
+//	const char     *sequence; 
+//	char      method_structure[MAXSLEN];
+//	double    method_energy;
+//	int     **result;
+//	bool      reattempt_run;
+//};
 
 
 /* I am changing iterative HFold so that we run 4 methods and choose the structure with the lowest energy as the winner
@@ -83,7 +83,7 @@ struct thread_info {
 int main (int argc, char **argv) {
 
 	//pthread_t *thread_id;
-	struct thread_info *tinfo;
+//	struct thread_info *tinfo;
 	void *res;
 
 	char sequence[MAXSLEN];
@@ -100,17 +100,23 @@ int main (int argc, char **argv) {
 	double *method2_energy = (double*) malloc(sizeof(double) * INF);
 	double *method3_energy = (double*) malloc(sizeof(double) * INF);
 	double *method4_energy = (double*) malloc(sizeof(double) * INF);
-	double final_energy;
+	double final_energy = INF;
 
-	int files_length;
-	int method_chosen = -1;
-	long threadNum;
-	long numThreads = 4;
-	long numRerunThreads = 0;
+	int files_length = -1;
+        int method_chosen = -1;
+//	long threadNum;
+//	long numThreads = 4;
+//	long numRerunThreads = 0;
 	 
-	//int **result;
+	int **result;
 	char **files_found;
 	
+        result  = (int**) malloc(sizeof(int*) * MAXSLEN);
+        for (int i=0; i < MAXSLEN; i++) {
+                result[i] = (int*) malloc(sizeof(int) * 2);
+        }
+
+
 
 	output_path = (char*) malloc(sizeof(char) * 1000);
 	file = (char*) malloc(sizeof(char) * 1000);
@@ -234,18 +240,18 @@ int main (int argc, char **argv) {
 
 	write_log_file("Starting Program", "", 'I');
 
-	tinfo = (thread_info *) calloc(numThreads, sizeof(struct thread_info));
-	if (tinfo == NULL) {
-        write_log_file("Could not calloc thread_info", "", 'I');
-		exit(3);
-	}
+//	tinfo = (thread_info *) calloc(numThreads, sizeof(struct thread_info));
+//	if (tinfo == NULL) {
+//        write_log_file("Could not calloc thread_info", "", 'I');
+//		exit(3);
+//	}
 
 	*method1_energy = INF;
 	*method2_energy = INF;
 	*method3_energy = INF;
 	*method4_energy = INF;
-	final_energy = 0;
-	numRerunThreads = 0;
+//	final_energy = 0;
+//	numRerunThreads = 0;
 
 	method1_structure[0] = NULL;
 	method2_structure[0] = NULL;
@@ -254,76 +260,117 @@ int main (int argc, char **argv) {
 	final_structure[0] = NULL;		
 
 	//create thread
-	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-		tinfo[threadNum].thread_num = threadNum + 1;
-		tinfo[threadNum].structure = structure;
-		tinfo[threadNum].sequence = sequence;
-		tinfo[threadNum].method_structure[0] = '\0';
-		tinfo[threadNum].method_energy = INF;
-		tinfo[threadNum].reattempt_run = true;
-		//tinfo[threadNum].result = result;
+//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
+//		tinfo[threadNum].thread_num = threadNum + 1;
+//		tinfo[threadNum].structure = structure;
+//		tinfo[threadNum].sequence = sequence;
+//		tinfo[threadNum].method_structure[0] = '\0';
+//		tinfo[threadNum].method_energy = INF;
+//		tinfo[threadNum].reattempt_run = true;
+//		//tinfo[threadNum].result = result;
 
-		if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunction, &tinfo[threadNum]) != 0) {
-			write_log_file("Could not create thread", "", 'I');
-			exit(3);
-		}
-	}
+//		if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunction, &tinfo[threadNum]) != 0) {
+//			write_log_file("Could not create thread", "", 'I');
+//			exit(3);
+//		}
+//	}
 
 	//join thread
-	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-		if (pthread_join(tinfo[threadNum].thread_id, &res) != 0){
-			write_log_file("Could not join threads", "", 'I');
-			exit(3);
-		}
+//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
+//		if (pthread_join(tinfo[threadNum].thread_id, &res) != 0){
+//			write_log_file("Could not join threads", "", 'I');
+//			exit(3);
+//		}
 		
-		//if (res)
-		//	free(res);      /* Free memory allocated by thread */
-	}
+//		//if (res)
+//		//	free(res);      /* Free memory allocated by thread */
+//	}
 
 	//re-run thread
-	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-		if ((strcmp(tinfo[threadNum].method_structure, "") == 0) && (tinfo[threadNum].method_energy == INF)) {
-			write_log_file("Rerunning Thread", "", 'I');
-			numRerunThreads++;
-			tinfo[threadNum].thread_num = threadNum + 1;
-			tinfo[threadNum].structure = structure;
-			tinfo[threadNum].sequence = sequence;
-			tinfo[threadNum].method_structure[0] = '\0';
-			tinfo[threadNum].method_energy = INF;
-			tinfo[threadNum].reattempt_run = false;
+//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
+//		if ((strcmp(tinfo[threadNum].method_structure, "") == 0) && (tinfo[threadNum].method_energy == INF)) {
+//			write_log_file("Rerunning Thread", "", 'I');
+//			numRerunThreads++;
+//			tinfo[threadNum].thread_num = threadNum + 1;
+//			tinfo[threadNum].structure = structure;
+//			tinfo[threadNum].sequence = sequence;
+//			tinfo[threadNum].method_structure[0] = '\0';
+//			tinfo[threadNum].method_energy = INF;
+//			tinfo[threadNum].reattempt_run = false;
 
 			
-			//if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunctionInteracting, &tinfo[threadNum]) != 0) {
-			//kevin 28 june 2017
-			//changed the pthread_create argument from &threadFunctionInteracting to &threadFunction because threadFunctionInteracting
-			//should be for hfold interacting but not hfold iterative 
-			if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunction, &tinfo[threadNum]) != 0) {
-				write_log_file("Could not create thread", "", 'I');
-				exit(3);
-			}
+//			//if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunctionInteracting, &tinfo[threadNum]) != 0) {
+//			//kevin 28 june 2017
+//			//changed the pthread_create argument from &threadFunctionInteracting to &threadFunction because threadFunctionInteracting
+//			//should be for hfold interacting but not hfold iterative 
+//			if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunction, &tinfo[threadNum]) != 0) {
+//				write_log_file("Could not create thread", "", 'I');
+//				exit(3);
+//			}
+//
+//			if (pthread_join(tinfo[threadNum].thread_id, &res) != 0){
+//				write_log_file("Could not join threads", "", 'I');
+//				exit(3);
+//			}
+//		}	
+//	}
 
-			if (pthread_join(tinfo[threadNum].thread_id, &res) != 0){
-				write_log_file("Could not join threads", "", 'I');
-				exit(3);
-			}
-		}	
-	}
+      
+
+
+        /*************** First Method ***************/
+        method1_calculation(sequence, structure, method1_structure, method1_energy);
+
+
+        /*************** Second Method ***************/
+        method2_calculation(sequence, structure, method2_structure, method2_energy);
+
+        /*************** Third Method ***************/
+        method3_calculation(sequence, structure, method3_structure, method3_energy);
+
+        /*************** Fourth Method ***************/
+        method4_calculation(sequence, structure, method4_structure, method4_energy, result);
+
+
+        if (*method1_energy < final_energy && *method1_energy != 0) {
+                final_energy = *method1_energy;
+                strcpy(final_structure, method1_structure);
+                method_chosen = 1;
+        }
+
+        if (*method2_energy < final_energy && *method2_energy != 0) {
+                final_energy = *method2_energy; 
+                strcpy(final_structure, method2_structure);             
+                method_chosen = 2;
+        }
+
+        if (*method3_energy < final_energy && *method3_energy != 0) {
+                final_energy = *method3_energy; 
+                strcpy(final_structure, method3_structure);             
+                method_chosen = 3;
+        }
+
+        if (*method4_energy < final_energy && *method4_energy != 0) {
+                final_energy = *method4_energy; 
+                strcpy(final_structure, method4_structure);             
+                method_chosen = 4;
+        }
 
 	/*************** Compare Methods ***************/
-	final_energy = INF;
+	//final_energy = INF;
 	
-	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-		if ((strcmp(tinfo[threadNum].method_structure, "") != 0) && (tinfo[threadNum].method_energy < final_energy) && (tinfo[threadNum].method_energy != 0)) {
-			final_energy = tinfo[threadNum].method_energy;
-			strcpy(final_structure, tinfo[threadNum].method_structure);
-			method_chosen = tinfo[threadNum].thread_num;
-		}
-	}
+//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
+//		if ((strcmp(tinfo[threadNum].method_structure, "") != 0) && (tinfo[threadNum].method_energy < final_energy) && (tinfo[threadNum].method_energy != 0)) {
+//			final_energy = tinfo[threadNum].method_energy;
+//			strcpy(final_structure, tinfo[threadNum].method_structure);
+//			method_chosen = tinfo[threadNum].thread_num;
+//		}
+//	}
 
 	if (final_energy == INF || method_chosen == -1) {
 		write_log_file("Could not find energy", "", 'E');
 		printf("ERROR: could not find energy\n");
-		final_energy = 0;
+		final_energy = NULL;
 		exit(6);
 	}
 	
@@ -352,9 +399,9 @@ int main (int argc, char **argv) {
 	// Clean up
 
 	free(file);
-	
-	//free(result);
-	free(tinfo);
+           	
+	free(result);
+	//free(tinfo);
 	free(method1_structure);
 	free(method2_structure);
 	free(method3_structure);
@@ -403,35 +450,35 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
     exit(si->si_errno);
 }
 
-static void *threadFunction(void *arg) {
-	struct thread_info *tinfo = (thread_info *) arg;
-
-	switch (tinfo->thread_num) {
-		case 1:
-			method1_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
-			break;
-		case 2:
-			method2_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
-			break;
-		case 3:
-			method3_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
-			break;
-		case 4:
-			tinfo->result = (int**) malloc(sizeof(int*) * MAXSLEN);
-			for (int i=0; i < MAXSLEN; i++) {
-				tinfo->result[i] = (int*) malloc(sizeof(int) * 2);
-			}
-
-			method4_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy, tinfo->result);
-
-			for (int i=0; i < MAXSLEN; i++) {
-				if (tinfo->result[i])
-					free(tinfo->result[i]);
-			}
-
-			break;
-	}
-}
+//static void *threadFunction(void *arg) {
+//	struct thread_info *tinfo = (thread_info *) arg;
+//
+//	switch (tinfo->thread_num) {
+//		case 1:
+//			method1_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
+//			break;
+//		case 2:
+//			method2_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
+//			break;
+//		case 3:
+//			method3_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy);
+//			break;
+//		case 4:
+//			tinfo->result = (int**) malloc(sizeof(int*) * MAXSLEN);
+//			for (int i=0; i < MAXSLEN; i++) {
+//				tinfo->result[i] = (int*) malloc(sizeof(int) * 2);
+//			}
+//
+//			method4_calculation(tinfo->sequence, tinfo->structure, tinfo->method_structure, &tinfo->method_energy, tinfo->result);
+//
+//			for (int i=0; i < MAXSLEN; i++) {
+//				if (tinfo->result[i])
+//					free(tinfo->result[i]);
+//			}
+//
+//			break;
+//	}
+//}
 
 void method1_calculation (const char *sequence, char *structure, char *method1_structure, double *method1_energy) {
 	char new_input_structure[MAXSLEN] = "\0";	
@@ -472,26 +519,56 @@ void method1_calculation (const char *sequence, char *structure, char *method1_s
 	}
 }
 
-void method2_calculation (const char *sequence, char *structure, char *method2_structure, double *method2_energy) {
-	char hfold_structure[MAXSLEN] = "\0";	
-	
-	double hfold_energy = 0;	
-	
-	if (!call_HFold(HFOLD, sequence, structure, hfold_structure, &hfold_energy, true)) {
-		*method2_energy = hfold_energy;
-		return;
-	}
-	*method2_energy = hfold_energy;
-	strcpy(method2_structure, hfold_structure);
+//void method2_calculation (const char *sequence, char *structure, char *method2_structure, double *method2_energy) {
+//	char hfold_structure[MAXSLEN] = "\0";	
+//	
+//	double hfold_energy = 0;	
+//	
+//	if (!call_HFold(HFOLD, sequence, structure, hfold_structure, &hfold_energy, true)) {
+//		*method2_energy = hfold_energy;
+//		return;
+//	}
+//	*method2_energy = hfold_energy;
+//	strcpy(method2_structure, hfold_structure);
+//
+//	//std::cout << "method2_structure = " << method2_structure << " method2_energy = " << *method2_energy << '\n' << std::flush;
+//
+//	if (method2_structure == "") {
+//		write_log_file("The structure should not be null.", file, 'E');
+//	}
+//}
 
-	//std::cout << "method2_structure = " << method2_structure << " method2_energy = " << *method2_energy << '\n' << std::flush;
 
-	if (method2_structure == "") {
-		write_log_file("The structure should not be null.", file, 'E');
-	}
+
+void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy) {
+
+
+	char config_file[200];
+	strcpy (config_file, "./simfold/params/multirnafold.conf");
+
+	//what to fold: RNA or DNA
+	int dna_or_rna;
+	dna_or_rna = RNA;
+	//temperature: any integer or real number between 0 and 100
+	// represents degrees Celsius
+	double temperature = 37.0;
+
+	// initialize the thermodynamic parameters
+	// call init_data only once for the same dna_or_rna and same temperature
+	// if one of them changes, call init_data again
+
+	init_data ("./HFold", config_file, dna_or_rna, temperature);
+	
+	fill_data_structures_with_new_parameters ("./simfold/params/turner_parameters_fm363_constrdangles.txt");
+
+	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
+	// so we add it here
+	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt"); 
+
+        *method2_energy = hfold(sequence, structure, method2_structure); 
 }
 
-void method3_calculation (const char *sequence, char *structure, char *method3_structure, double *method3_energy) {
+void method3_calculation (char *sequence, char *structure, char *method3_structure, double *method3_energy) {
 	char sub_sequence[MAXSLEN] = "\0";
 	char sub_structure[MAXSLEN] = "\0";
 	
@@ -509,12 +586,16 @@ void method3_calculation (const char *sequence, char *structure, char *method3_s
 	bool has_pk;
 
 	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);
-	//std::cout << "found sub sequence = " << sub_sequence << " and sub structure = " << sub_structure << "  with begin = " << begin << " and end = " << end << '\n' << std::flush;
+
+
+//	std::cout << "found sub sequence = " << sub_sequence << " and sub structure = " << sub_structure << "  with begin = " << begin << " and end = " << end << '\n' << std::flush;
 
 	if (!call_simfold(SIMFOLD, sub_sequence, sub_structure, simfold_structure, &simfold_energy, true)) {
+//                printf("TEST, method3_calculation's calling simfold result: %lf\n", simfold_energy);
 		*method3_energy = simfold_energy;		
 		return;
 	}
+
 	replace_simfold_partial_structure_with_original(structure, simfold_structure, replaced_structure, begin, end);
 	//std::cout << "the replaced string is: " << replaced_structure << '\n' << std::flush;
 
@@ -545,7 +626,7 @@ void method3_calculation (const char *sequence, char *structure, char *method3_s
 	}
 }
 
-void method4_calculation (const char *sequence, char *structure, char *method4_structure, double *method4_energy, int **result) {
+void method4_calculation (char *sequence, char *structure, char *method4_structure, double *method4_energy, int **result) {
 	// we know the beginning and end of the given input substructure in the structure
 	// now we need to run simfold restricted with the given structure, find the stem which contains the given substructure
 	// then only include this structure as input structure, and do as we did in method 3
@@ -642,9 +723,17 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 			//dup2(pipefd[1], fileno(stdout));
 			//execl(programPath, "./", input_sequence, input_structure, NULL);
 			
-			// Run HFold
-			sprintf(functionCall, "%s -s '%s' -r '%s'", programPath, input_sequence, input_structure);
-			
+			// Run HFold_pkonly
+			if (programPath == HFOLD) {
+				sprintf(functionCall, "%s -s '%s' -r '%s'", programPath, input_sequence, input_structure);
+			} else 
+			if (programPath == HFOLD_PKONLY) {
+				sprintf(functionCall, "%s %s '%s'", programPath, input_sequence, input_structure);
+			} else {
+				printf("ERROR in call_HFold: calling something other than HFold or HFold_pkonly\n");
+				exit(5);
+			}
+
 			result += exec(functionCall);
 			strcpy(result_array, result.c_str());
 
@@ -676,7 +765,7 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
    			// signals to also be delivered to processes forked by the child process.
    			setpgid(pid, 0);
 
-		    //waitpid(pid, &status, 0); /* Wait for the process to complete */
+		    //waitpid(pid, &status, 0); // Wait for the process to complete 
 			//sprintf(error, "The pid of the child is: %d", pid);
 			//write_log_file(error, "", 'I');
 			do {
@@ -801,22 +890,48 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 	}
 }
 
-bool call_simfold (const char *programPath, const char *input_sequence, const char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
-	int status = 0;
-	int pipefd[2];
-	pipe(pipefd);
+bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
+//	int status = 0;
+//	int pipefd[2];
+//	pipe(pipefd);
 	std::string result = "";
 	//int stdout_bk = dup(fileno(stdout));
-
-	pid_t pid = fork(); /* Create a child process */
 	
+////////////////////////////////////////////////////////
+//
+//
+	char config_file[200] = "simfold/";
+	strcat(config_file, PARAMS_BASE_PATH);
+	strcat(config_file, "multirnafold.conf");
+	double temperature;
+	temperature = 37; 
+	init_data ("./simfold", config_file, RNA, temperature);         
+
+        fill_data_structures_with_new_parameters ("simfold/params/turner_parameters_fm363_constrdangles.txt");
+	// Hosna, Sep 10, 2012
+	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
+	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt, 
+	// but still getting seg fault!
+	fill_data_structures_with_new_parameters ("simfold/params/parameters_DP09_chopped.txt");
+
+	printf ("Seq: %s\n", input_sequence);
+
+	*output_energy = simfold_restricted (input_sequence, input_structure, output_structure);
+	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
+////////////////////////////////////////////////////////
+
+
+
+
+//	pid_t pid = fork(); /* Create a child process */
+/*	
 	switch (pid) {
-		case -1: /* Error */
+		case -1: // Error 
 		    write_log_file("Fork failed", file, 'E');
 			printf("ERROR calling simfold: Fork failed\n");
 			exit(5);	    
 
-		case 0: /* Child process */
+		case 0: // Child process
 			char functionCall[10000];
 			char result_array[10000];
 			close(pipefd[0]);
@@ -863,7 +978,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 			//write_log_file(error, programPath, 'E');
 		    //exit(1);
 
-		default: /* Parent process */
+		default: //Parent process
 			char buf[10001];
 			char *token[4];
             char sequenceTest[2000];   
@@ -872,17 +987,17 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 			pid_t wpid;
 			int waittime = 0;
 
-			/*if (input_structure == NULL) {
-				structureRegex = "MFE:\\s+([^\\s+]*)\\s+([^\\n+]*)";
-			} else {
-				structureRegex = "RES:\\s+([^\\s+]*)\\s+([^\\n+]*)";
-			}*/ 
+			//if (input_structure == NULL) {
+			//	structureRegex = "MFE:\\s+([^\\s+]*)\\s+([^\\n+]*)";
+			//} else {
+			//	structureRegex = "RES:\\s+([^\\s+]*)\\s+([^\\n+]*)";
+			//}
 
 			// Make child process the leader of its own process group. This allows
    			// signals to also be delivered to processes forked by the child process.
    			setpgid(pid, 0);
 
-		    //waitpid(pid, &status, 0); /* Wait for the process to complete */
+		    //waitpid(pid, &status, 0); // Wait for the process to complete 
 			//sprintf(error, "The pid of the child is: %d", pid);
 			//write_log_file(error, "", 'I');
 			do {
@@ -915,7 +1030,6 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 						//close(stdout_bk);
 						
 						if (reattempt_run) {
-							write_log_file("Reattempting to run child", "", 'I');
 							*output_energy = INF + 1;
 							return false;
 						} else {
@@ -982,6 +1096,8 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
                 exit(5);
             }
 
+*/
+
 			/*// Find the structure
 			if(std::regex_search(structureString, match, structureRegex)) {
 				structureString = match[1];
@@ -1004,7 +1120,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 			//*output_energy = stod(energyString);
 			//write_log_file("hfold struct", output_structure, 'E');
 			return true;
-	}
+//	}
 }
 
 void replace_simfold_partial_structure_with_original (char *input_structure, char *simfold_structure, char *replaced_structure, int begin, int end) {
@@ -1353,7 +1469,7 @@ std::string exec(const char* cmd) {
 // runs simfold on the sequence
 // compares the number of base pairs in the simfold_seq with the input sequence
 // returns the ratio of the counts;
-double find_structure_sparsity (const char *sequence, char *structure) {
+double find_structure_sparsity (char *sequence, char *structure) {
 	double ratio = 0.0;
 	char simfold_sequence[MAXSLEN];
 	char simfold_structure[MAXSLEN];

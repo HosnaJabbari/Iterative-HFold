@@ -19,12 +19,6 @@
 //#include "W_final.h"
 #include "hfold_pkonly.h"
 
-//kevin July 17 2017
-#include "hfold_validation.h" 
-#include <unistd.h>
-
-void printUsage();
-
 int main (int argc, char *argv[])
 {
     char sequence[MAXSLEN];
@@ -34,7 +28,6 @@ int main (int argc, char *argv[])
     char structures[MAXSUBSTR][MAXSLEN];
     double energies[MAXSUBSTR];
 
-/*
     if (argc != 3)
     {
         printf ("Usage: %s <sequence> <restricted_structure>\n", argv[0]);
@@ -46,126 +39,6 @@ int main (int argc, char *argv[])
     }
     strcpy (sequence, argv[1]);
     strcpy (restricted, argv[2]);
-*/
-
-    //kevin: june 22 2017
-	//validation for command line argument
-    char* inputPath; 
-	inputPath = (char*) malloc(sizeof(char) * 1000);
-
-	char* outputPath;
-	outputPath = (char*) malloc(sizeof(char) * 1000);
-
-	bool sequenceFound = false;
-	bool restrictedFound = false;
-	bool inputPathFound = false;
-	bool outputPathFound = false;
-	bool errorFound = false;
-	int option;
-	//kevin: june 22 2017 https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html#Example-of-Getopt
-	while ((option = getopt (argc, argv, "s:r:i:o:")) != -1){
-		switch (option)
-		{
-		case 's':
-			if(sequenceFound){
-				printf("-s is duplicated\n");
-				errorFound = true;
-				break;
-			}
-			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
-				errorFound = true;
-				break;
-			}
-			strcpy(sequence, optarg);
-			//printf("seq: %s\n",sequence);
-			sequenceFound = true;
-			break;
-		case 'r':
-			if(restrictedFound || inputPathFound){
-				printf("-r is duplicated\n");
-				errorFound = true;
-				break;
-			}
-			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
-				errorFound = true;
-				break;
-			}
-			strcpy(restricted, optarg);
-			//printf("restricted: %s\n",restricted);
-			restrictedFound = true;
-			break;
-		case 'i':
-			if(restrictedFound || sequenceFound){
-				printf("Cannot combine -i with -s/-r \n");
-				errorFound = true;
-				break;
-			}
-			strcpy(inputPath,optarg);
-			//printf("file: %s %d\n", file,access(file, F_OK|R_OK));
-			if(access(inputPath, F_OK) == -1) { //if file does not exist
-				printf("Input file not exist\n");
-				exit(4);
-			}	
-			if (!validateHFOLDInputFile(inputPath, sequence, restricted)) {
-				printf("Input file is invalid\n");
-				errorFound = true;
-				break;
-			}
-			inputPathFound = true;
-			break;
-		case 'o':
-			strcpy(outputPath, optarg);
-			//printf("access: %d\n",access(outputPath, F_OK));
-			if(access(outputPath, F_OK) != -1) { //if file already exist
-				addTimestamp(&outputPath);
-			}	
-			outputPathFound = true;
-			break;
-		default:
-			errorFound = true;
-			break;
-		}
-		//clean up when error
-		if(errorFound){
-            free(inputPath);
-			free(outputPath);
-			printUsage();
-			exit(1);
-		}
-	}
-
-	if(!inputPathFound){
-		//if sequence or restricted is missing when input file is not present
-		if(!(sequenceFound && restrictedFound)){
-			printf("-s/-r is missing\n");
-			printUsage();
-			exit(1);
-		}
-	}
-
-	if(!validateSequence(sequence)){
-		printf("-s is invalid\n");
-		//printUsage();
-		exit(1);
-	}
-
-	if(!validateStructure(restricted, sequence)){
-		printf("-r is invalid\n");
-		//printUsage();
-		exit(1);
-	}else{
-		replaceBrackets(restricted);
-	}
-
-	//kevin: june 22 2017 if we have output path and input path, try to combine both
-	if(outputPathFound && inputPathFound){
-		addPath(&outputPath, inputPath);
-		//printf("out path: %s\n",outputPath);
-	}	
-	//kevin: june 22 2017
-	//end of validation for command line arguments
 
     // Before calling any function in the library, you have to initialize config_file, dna_or_rna, temperature
     //     and to call the function init_data, which loads the thermodynamic parameters into memory
@@ -221,15 +94,5 @@ int main (int argc, char *argv[])
     return 0;
 }
 
-void printUsage(){
-	printf("Usage ./HFold_pkonly -s <sequence> -r <structure> [-o </path/to/file>]\n");
-	printf("or\n");
-	printf("Usage ./HFold_pkonly -i </path/to/file> [-o </path/to/file>]\n");
-	printf ("  Restricted structure symbols:\n");
-	printf ("    () restricted base pair\n");
-	printf ("    _ no restriction\n");
-	printf("Example:\n");
-	printf("./HFold_pkonly -s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -r \"(____________________________)\"\n");
-	printf("./HFold_pkonly -i \"/home/username/Desktop/myinputfile.txt\" -o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
 
-}
+

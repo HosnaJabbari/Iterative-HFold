@@ -188,7 +188,7 @@ int main (int argc, char *argv[])
     // initialize the thermodynamic parameters
     // call init_data only once for the same dna_or_rna and same temperature
     // if one of them changes, call init_data again
-	
+
     init_data (argv[0], config_file, dna_or_rna, temperature);
 
 	// Hosna, July 18, 2012
