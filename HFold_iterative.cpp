@@ -698,196 +698,30 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 }
 
 bool call_HFold (const char *programPath, const char *input_sequence, const char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
-	int status = 0;
-	int pipefd[2];
-	pipe(pipefd);
-	std::string result = "";
-	//int stdout_bk = dup(fileno(stdout));
+	char config_file[200];
+	strcpy (config_file, "./simfold/params/multirnafold.conf");
 
-	pid_t pid = fork(); /* Create a child process */
+	//what to fold: RNA or DNA
+	int dna_or_rna;
+	dna_or_rna = RNA;
+	//temperature: any integer or real number between 0 and 100
+	// represents degrees Celsius
+	double temperature = 37.0;
+
+	// initialize the thermodynamic parameters
+	// call init_data only once for the same dna_or_rna and same temperature
+	// if one of them changes, call init_data again
+
+	init_data ("./HFold", config_file, dna_or_rna, temperature);
 	
-	switch (pid) {
-		case -1: /* Error */
-			write_log_file("Fork failed", file, 'E');
-			printf("ERROR in call_HFold: Fork failed\n");
-			exit(5);
+	fill_data_structures_with_new_parameters ("./simfold/params/turner_parameters_fm363_constrdangles.txt");
 
-		case 0: /* Child process */
-			char functionCall[10000];
-			char result_array[10000];
-			close(pipefd[0]);	
+	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
+	// so we add it here
+	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt"); 
 
-			//std::cout << "Calling: " << programPath << " " << input_sequence << " " << input_structure << '\n' << std::flush;
-	
-			// Create a pipe to get the result through stdout
-			//dup2(pipefd[1], fileno(stdout));
-			//execl(programPath, "./", input_sequence, input_structure, NULL);
-			
-			// Run HFold_pkonly
-			if (programPath == HFOLD) {
-				sprintf(functionCall, "%s -s '%s' -r '%s'", programPath, input_sequence, input_structure);
-			} else 
-			if (programPath == HFOLD_PKONLY) {
-				sprintf(functionCall, "%s %s '%s'", programPath, input_sequence, input_structure);
-			} else {
-				printf("ERROR in call_HFold: calling something other than HFold or HFold_pkonly\n");
-				exit(5);
-			}
-
-			result += exec(functionCall);
-			strcpy(result_array, result.c_str());
-
-			if (!result.empty()){
-				write(pipefd[1], result_array, 10000); 
-				exit(5);
-			} else {
-				write_log_file("popen() failed!", file, 'E');
-				close(pipefd[1]);
-				exit(5);
-			}
-
-			//char error[200];
-			//sprintf(error, "System call failed with error: %s", strerror(errno));
-			//write_log_file(error, programPath, 'E');
-		    //exit(2);
-
-		default: /* Parent process */
-			char buf[10001];
-			char *token[4];
-            char sequenceTest[2000];   
-            char restrictedTest[2000];
-			char *saveptr1, *saveptr2;
-			pid_t wpid;
-			int waittime = 0;
-			//structureRegex = ("RES:\\s+([^\\s+]*)\\s+([^\\n+]*)");
-
-			// Make child process the leader of its own process group. This allows
-   			// signals to also be delivered to processes forked by the child process.
-   			setpgid(pid, 0);
-
-		    //waitpid(pid, &status, 0); // Wait for the process to complete 
-			//sprintf(error, "The pid of the child is: %d", pid);
-			//write_log_file(error, "", 'I');
-			do {
-				wpid = waitpid(pid, &status, WNOHANG);
-				if (wpid == 0) {
-				    if (waittime < timeout) {
-						//sprintf(error, "Parent waiting %d second(s).", waittime);
-				        //write_log_file(error, "", 'I');
-				        sleep(1);
-				        waittime ++;
-				    }
-				    else {
-						write_log_file("Killing child process", file, 'E');
-				        //kill(pid, SIGKILL); 
-
-						kill((-1*pid), SIGTERM); 	
-						bool died = false;
-						for (int loop = 0; !died && loop < 5; loop++) {
-							sleep(1);
-							if (waitpid(pid, &status, WNOHANG) == pid) died = true;
-						}
-
-						if (!died) {
-							kill((-1*pid), SIGKILL);		
-						}					
-
-						//dup2(stdout_bk, fileno(stdout));
-						close(pipefd[1]);
-						close(pipefd[0]);
-						//close(stdout_bk);
-						
-						if (reattempt_run) {
-							write_log_file("Reattempting to run child", "", 'I');
-							*output_energy = INF + 1;
-							return false;
-						} else {
-							write_log_file("Child will not run", "", 'I');
-							
-							return false;
-						}
-				    }
-				}
-			} while (wpid == 0 && waittime <= timeout);
-
-			if (WEXITSTATUS(status) == 2) { 
-				char error[200];
-				sprintf(error, "status = %d", WEXITSTATUS(status));
-				write_log_file(error, file, 'E');
-				std::cout << "ERROR calling HFold: " << error << std::endl;
-
-				//dup2(stdout_bk, fileno(stdout));
-				close(pipefd[1]);
-				close(pipefd[0]);
-				//close(stdout_bk);
-				exit(5);
-			}
-
-			//restore
-			//fflush(stdout);
-			close(pipefd[1]);
-			//dup2(stdout_bk, fileno(stdout));
-
-			// Read result from HFold_pkonly
-   			read(pipefd[0], buf, 10000);
-			close(pipefd[0]);
-			//close(stdout_bk);
-
-			token[0] = strtok_r(buf, "\n", &saveptr1); //seq
-            token[1] = strtok_r(saveptr1, "\n", &saveptr2); //struct
-
-            if(token[0] != NULL)
-				strcpy(sequenceTest, token[0]);
-            if(token[1] != NULL)
-				strcpy(restrictedTest, token[1]);
-
-            token[2] = strtok_r(sequenceTest, "  ", &saveptr1);
-            token[3] = strtok_r(restrictedTest, "  ", &saveptr2);
-           
-            // Error messages can be in token [0] where the program used printf once then exited.
-            // A check is added here to ensure that this error is handled correctly.
-            //if (token[0][0] == 'S' && token[1] != NULL) {
-           
-            if (token[1] != NULL && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
-                //structureString.assign(token[1], strlen(token[1]));
-                token[0] = strtok_r(token[1], "  ", &saveptr1);
-                token[2] = strtok_r(saveptr1, "  ", &saveptr2);
-                strcpy(output_structure, token[2]);       
-
-                token[2] = strtok_r(saveptr2, "\n", &saveptr2);
-                energyString.assign(token[2], strlen(token[2]));
-                *output_energy = stod(energyString);
-            } else {
-                write_log_file(token[0], file, 'E');
-                write_log_file(token[1], file, 'E');
-		std::cout << "ERROR calling HFold: " << token[0] << std::endl;
-		std::cout << "ERROR calling HFold: " << token[1] << std::endl;
-                return false;
-            }
-
-			// Find the structure
-			/*if(std::regex_search(structureString, match, structureRegex)) {
-				structureString = match[1];
-			} else {
-				write_log_file(token[0], programPath, 'E');
-				return false;
-			}
-			
-			token[0] = strtok_r(token[1], "  ", &saveptr1);
-			token[2] = strtok_r(saveptr1, "  ", &saveptr2); 
-			token[2] = strtok_r(saveptr2, "\n", &saveptr2); 
-			
-			energyString.assign(token[2], strlen(token[2]));*/
-
-			//Print result
-			//std::cout << "Result: " << structureString << " " << token[2] << '\n' << std::flush;
-	
-			// Copy strings
-			//strcpy(output_structure, structureString.c_str());
-			//*output_energy = stod(energyString);
-			//write_log_file("hfold struct", output_structure, 'E');
-			return true;
-	}
+        *method2_energy = hfold(sequence, structure, method2_structure); 
+	return true;
 }
 
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
@@ -917,7 +751,7 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 	printf ("Seq: %s\n", input_sequence);
 
 	*output_energy = simfold_restricted (input_sequence, input_structure, output_structure);
-	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
+//	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
 ////////////////////////////////////////////////////////
 
 
