@@ -321,7 +321,6 @@ int main (int argc, char **argv) {
         /*************** First Method ***************/
         method1_calculation(sequence, structure, method1_structure, method1_energy);
 
-
         /*************** Second Method ***************/
         method2_calculation(sequence, structure, method2_structure, method2_energy);
 
@@ -490,29 +489,28 @@ void method1_calculation (char *sequence, char *structure, char *method1_structu
 	}
 }
 
-//void method2_calculation (const char *sequence, char *structure, char *method2_structure, double *method2_energy) {
-//	char hfold_structure[MAXSLEN] = "\0";	
-//	
-//	double hfold_energy = 0;	
-//	
-//	if (!call_HFold(HFOLD, sequence, structure, hfold_structure, &hfold_energy, true)) {
-//		*method2_energy = hfold_energy;
-//		return;
-//	}
-//	*method2_energy = hfold_energy;
-//	strcpy(method2_structure, hfold_structure);
-//
-//	//std::cout << "method2_structure = " << method2_structure << " method2_energy = " << *method2_energy << '\n' << std::flush;
-//
-//	if (method2_structure == "") {
-//		write_log_file("The structure should not be null.", file, 'E');
-//	}
-//}
-
-
-
 void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy) {
+	char hfold_structure[MAXSLEN] = "\0";	
+	
+	double hfold_energy = 0;	
+	
+	if (!call_HFold(HFOLD, sequence, structure, hfold_structure, &hfold_energy)) {
+		*method2_energy = hfold_energy;
+		return;
+	}
+	*method2_energy = hfold_energy;
+	strcpy(method2_structure, hfold_structure);
 
+	//std::cout << "method2_structure = " << method2_structure << " method2_energy = " << *method2_energy << '\n' << std::flush;
+
+	if (method2_structure == "") {
+		write_log_file("The structure should not be null.", file, 'E');
+	}
+}
+
+
+/*
+void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy) {
 
 	char config_file[200];
 	strcpy (config_file, "./simfold/params/multirnafold.conf");
@@ -538,6 +536,8 @@ void method2_calculation (char *sequence, char *structure, char *method2_structu
 
         *method2_energy = hfold(sequence, structure, method2_structure); 
 }
+*/
+
 
 void method3_calculation (char *sequence, char *structure, char *method3_structure, double *method3_energy) {
 	char sub_sequence[MAXSLEN] = "\0";
