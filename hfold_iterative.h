@@ -37,3 +37,4 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg);
 
 
 #endif /*HFOLD_H_*/
+

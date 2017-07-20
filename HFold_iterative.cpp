@@ -63,18 +63,6 @@ static std::string energyString;
 static std::stack<int> customStack;
 
 
-//struct thread_info {
-//	pthread_t thread_id;
-//	long      thread_num;
-//	char     *structure;
-//	const char     *sequence; 
-//	char      method_structure[MAXSLEN];
-//	double    method_energy;
-//	int     **result;
-//	bool      reattempt_run;
-//};
-
-
 /* I am changing iterative HFold so that we run 4 methods and choose the structure with the lowest energy as the winner
 1) run HFold_PKonly on input structure, if pked, keep the pk bases as input structure and run HFold on them and get the result
 2) run HFold on the original input and get the result
@@ -82,8 +70,6 @@ static std::stack<int> customStack;
 4) run simfold restricted with the given input sequence and structure, and get the simfold structure. Only choose part of the structure that contains the original given input structure, then give that to HFold_PKonly as input, get pked bases and run HFold on them and get the result. */
 int main (int argc, char **argv) {
 
-	//pthread_t *thread_id;
-//	struct thread_info *tinfo;
 	void *res;
 
 	char sequence[MAXSLEN];
@@ -104,9 +90,6 @@ int main (int argc, char **argv) {
 
 	int files_length = -1;
         int method_chosen = -1;
-//	long threadNum;
-//	long numThreads = 4;
-//	long numRerunThreads = 0;
 	 
 	int **result;
 	char **files_found;
@@ -240,82 +223,17 @@ int main (int argc, char **argv) {
 
 	write_log_file("Starting Program", "", 'I');
 
-//	tinfo = (thread_info *) calloc(numThreads, sizeof(struct thread_info));
-//	if (tinfo == NULL) {
-//        write_log_file("Could not calloc thread_info", "", 'I');
-//		exit(3);
-//	}
 
 	*method1_energy = INF;
 	*method2_energy = INF;
 	*method3_energy = INF;
 	*method4_energy = INF;
-//	final_energy = 0;
-//	numRerunThreads = 0;
 
 	method1_structure[0] = NULL;
 	method2_structure[0] = NULL;
 	method3_structure[0] = NULL;
 	method4_structure[0] = NULL;
 	final_structure[0] = NULL;		
-
-	//create thread
-//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-//		tinfo[threadNum].thread_num = threadNum + 1;
-//		tinfo[threadNum].structure = structure;
-//		tinfo[threadNum].sequence = sequence;
-//		tinfo[threadNum].method_structure[0] = '\0';
-//		tinfo[threadNum].method_energy = INF;
-//		tinfo[threadNum].reattempt_run = true;
-//		//tinfo[threadNum].result = result;
-
-//		if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunction, &tinfo[threadNum]) != 0) {
-//			write_log_file("Could not create thread", "", 'I');
-//			exit(3);
-//		}
-//	}
-
-	//join thread
-//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-//		if (pthread_join(tinfo[threadNum].thread_id, &res) != 0){
-//			write_log_file("Could not join threads", "", 'I');
-//			exit(3);
-//		}
-		
-//		//if (res)
-//		//	free(res);      /* Free memory allocated by thread */
-//	}
-
-	//re-run thread
-//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-//		if ((strcmp(tinfo[threadNum].method_structure, "") == 0) && (tinfo[threadNum].method_energy == INF)) {
-//			write_log_file("Rerunning Thread", "", 'I');
-//			numRerunThreads++;
-//			tinfo[threadNum].thread_num = threadNum + 1;
-//			tinfo[threadNum].structure = structure;
-//			tinfo[threadNum].sequence = sequence;
-//			tinfo[threadNum].method_structure[0] = '\0';
-//			tinfo[threadNum].method_energy = INF;
-//			tinfo[threadNum].reattempt_run = false;
-
-			
-//			//if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunctionInteracting, &tinfo[threadNum]) != 0) {
-//			//kevin 28 june 2017
-//			//changed the pthread_create argument from &threadFunctionInteracting to &threadFunction because threadFunctionInteracting
-//			//should be for hfold interacting but not hfold iterative 
-//			if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunction, &tinfo[threadNum]) != 0) {
-//				write_log_file("Could not create thread", "", 'I');
-//				exit(3);
-//			}
-//
-//			if (pthread_join(tinfo[threadNum].thread_id, &res) != 0){
-//				write_log_file("Could not join threads", "", 'I');
-//				exit(3);
-//			}
-//		}	
-//	}
-
-      
 
 
         /*************** First Method ***************/
@@ -355,16 +273,6 @@ int main (int argc, char **argv) {
                 method_chosen = 4;
         }
 
-	/*************** Compare Methods ***************/
-	//final_energy = INF;
-	
-//	for (threadNum = 0; threadNum < numThreads; threadNum++) {
-//		if ((strcmp(tinfo[threadNum].method_structure, "") != 0) && (tinfo[threadNum].method_energy < final_energy) && (tinfo[threadNum].method_energy != 0)) {
-//			final_energy = tinfo[threadNum].method_energy;
-//			strcpy(final_structure, tinfo[threadNum].method_structure);
-//			method_chosen = tinfo[threadNum].thread_num;
-//		}
-//	}
 
 	if (final_energy == INF || method_chosen == -1) {
 		write_log_file("Could not find energy", "", 'E');
@@ -507,36 +415,6 @@ void method2_calculation (char *sequence, char *structure, char *method2_structu
 		write_log_file("The structure should not be null.", file, 'E');
 	}
 }
-
-
-/*
-void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy) {
-
-	char config_file[200];
-	strcpy (config_file, "./simfold/params/multirnafold.conf");
-
-	//what to fold: RNA or DNA
-	int dna_or_rna;
-	dna_or_rna = RNA;
-	//temperature: any integer or real number between 0 and 100
-	// represents degrees Celsius
-	double temperature = 37.0;
-
-	// initialize the thermodynamic parameters
-	// call init_data only once for the same dna_or_rna and same temperature
-	// if one of them changes, call init_data again
-
-	init_data ("./HFold", config_file, dna_or_rna, temperature);
-	
-	fill_data_structures_with_new_parameters ("./simfold/params/turner_parameters_fm363_constrdangles.txt");
-
-	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
-	// so we add it here
-	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt"); 
-
-        *method2_energy = hfold(sequence, structure, method2_structure); 
-}
-*/
 
 
 void method3_calculation (char *sequence, char *structure, char *method3_structure, double *method3_energy) {
@@ -1071,3 +949,4 @@ double find_structure_sparsity (char *sequence, char *structure) {
 
 	return ratio;
 }
+
