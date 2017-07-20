@@ -439,7 +439,7 @@ void method3_calculation (char *sequence, char *structure, char *method3_structu
 
 //	std::cout << "found sub sequence = " << sub_sequence << " and sub structure = " << sub_structure << "  with begin = " << begin << " and end = " << end << '\n' << std::flush;
 
-	if (!call_simfold(SIMFOLD, sub_sequence, sub_structure, simfold_structure, &simfold_energy, true)) {
+	if (!call_simfold(SIMFOLD, sub_sequence, sub_structure, simfold_structure, &simfold_energy)) {
 //                printf("TEST, method3_calculation's calling simfold result: %lf\n", simfold_energy);
 		*method3_energy = simfold_energy;		
 		return;
@@ -499,7 +499,7 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);	
 	strcpy(replaced_structure, structure);
 	
-	if (!call_simfold(SIMFOLD, sequence, structure, simfold_structure, &simfold_energy, true)) {
+	if (!call_simfold(SIMFOLD, sequence, structure, simfold_structure, &simfold_energy)) {
 		*method4_energy = simfold_energy;
 		return;
 	}
@@ -576,7 +576,7 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 	return true;
 }
 
-bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy, bool reattempt_run) {
+bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
 	std::string result = "";
 	
 	char config_file[200] = "simfold/";
@@ -940,7 +940,7 @@ double find_structure_sparsity (char *sequence, char *structure) {
 	int input_structure_basepair_count;
 	int simfold_structure_basepair_count;
 
-	call_simfold(SIMFOLD, sequence, NULL, simfold_structure, &simfold_energy, true);
+	call_simfold(SIMFOLD, sequence, NULL, simfold_structure, &simfold_energy);
 	input_structure_basepair_count = find_no_base_pairs(structure);
 	simfold_structure_basepair_count = find_no_base_pairs(simfold_structure);
 	ratio = (double) input_structure_basepair_count/simfold_structure_basepair_count;
