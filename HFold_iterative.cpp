@@ -363,6 +363,7 @@ int main (int argc, char **argv) {
 	free(method2_energy);
 	free(method3_energy);
 	free(method4_energy);
+        free(output_path);
 
 	// This will cause a seg fault if you have the log file open and are watching it.
 	if (logFile) {

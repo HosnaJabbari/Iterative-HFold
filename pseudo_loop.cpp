@@ -113,8 +113,15 @@ pseudo_loop::~pseudo_loop()
     delete [] weakly_closed;
     delete [] not_paired_all;
 
+    for(int i = 0; i < nb_nucleotides; i++)
+    {
+        delete border_bs[i]; 
+        delete border_bps[i];
+    }
     delete [] border_bs;
     delete [] border_bps;
+
+
     delete [] index;
     delete [] int_sequence;
 }
