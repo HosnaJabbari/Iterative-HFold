@@ -307,7 +307,6 @@ int main (int argc, char **argv) {
 
 	free(file);
            	
-	free(result);
 	//free(tinfo);
 	free(method1_structure);
 	free(method2_structure);
@@ -318,6 +317,11 @@ int main (int argc, char **argv) {
 	free(method3_energy);
 	free(method4_energy);
         free(output_path);
+        for (int i=0; i < MAXSLEN; i++) {
+                free(result[i]);
+        }
+	free(result);
+
 
 	// This will cause a seg fault if you have the log file open and are watching it.
 	if (logFile) {
