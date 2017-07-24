@@ -893,6 +893,7 @@ double hfold(char *sequence, char *restricted, char *structure){
 	if (min_fold == NULL) giveup ("Cannot allocate memory", "HFold");
 	double energy = min_fold->hfold();
     min_fold->return_structure (structure);
+    delete min_fold;
     return energy;
 }
 
