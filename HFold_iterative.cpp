@@ -812,7 +812,7 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 	int found = 0;
 	int unpaired_count = 0;
 	int L_index = *B-1;
-	int R_index = *Bp-1;
+	int R_index = *Bp+1;
 
 	while (L_index >= 0 && R_index < strlen(structure) && !found) {
 		if (structure[L_index] == '(') {
