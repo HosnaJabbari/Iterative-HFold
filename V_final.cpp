@@ -9,7 +9,7 @@
 #include "h_struct.h"
 
 V_final::V_final(){
-	index = new int [MAXSLEN];
+    index = new int [MAXSLEN];
     int total_length = (MAXSLEN *(MAXSLEN+1))/2;
     index[0] = 0;
     int i;

@@ -904,6 +904,7 @@ double hfold_pkonly(char *sequence, char *restricted, char *structure){
 	if (min_fold == NULL) giveup ("Cannot allocate memory", "HFoldPKonly");
 	double energy = min_fold->hfold_pkonly();
     min_fold->return_structure (structure);
+    delete min_fold;
     return energy;
 }
 
@@ -914,6 +915,7 @@ double hfold_interacting(char *sequence, char *restricted, char *structure){
     if (min_fold == NULL) giveup ("Cannot allocate memory", "HFoldInteracting");
     double energy = min_fold->hfold_interacting();
     min_fold->return_structure (structure);
+    delete min_fold;
     return energy;   
 }
 
@@ -922,5 +924,6 @@ double hfold_interacting_pkonly(char *sequence, char *restricted, char *structur
     if (min_fold == NULL) giveup ("Cannot allocate memory", "HFoldInteracting");
     double energy = min_fold->hfold_interacting_pkonly();
     min_fold->return_structure (structure);
+    delete min_fold;
     return energy;
 }
