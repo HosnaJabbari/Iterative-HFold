@@ -576,13 +576,22 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
 	// so we add it here
 	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt"); 
-
-        *output_energy = hfold(input_sequence, input_structure, output_structure); 
+        
+        if (strcmp(programPath, HFOLD) == 0) {
+            *output_energy = hfold(input_sequence, input_structure, output_structure);
+        }
+        else if (strcmp(programPath, HFOLD_PKONLY) == 0){
+                *output_energy = hfold_pkonly(input_sequence, input_structure, output_structure); 
+        }else{
+                printf("Error: invalid arguments are given: %s \nValid aurgumnets are: HFOLD and HFOLD_PKONLY\n");
+                return false;
+         }
 	return true;
+
 }
 
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
-	std::string result = "";
+        std::string result = "";	
 	
 	char config_file[200] = "simfold/";
 	strcat(config_file, PARAMS_BASE_PATH);

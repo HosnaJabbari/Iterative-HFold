@@ -2,6 +2,7 @@
 #define HFOLD_H_
 
 double hfold(char *sequence, char *restricted, char *structure);
+double hfold_pkonly(char *sequence, char *restricted, char *structure);
 double hfold_iterative(char *sequence, char *restricted, char *structure); // April 3, 2012
 
 static void *threadFunction(void *arg);
