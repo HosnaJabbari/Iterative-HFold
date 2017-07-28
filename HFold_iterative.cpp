@@ -67,7 +67,7 @@ struct thread_info {
 	pthread_t thread_id;
 	long      thread_num;
 	char     *structure;
-	const char     *sequence; 
+	const char     *sequence;
 	char      method_structure[MAXSLEN];
 	double    method_energy;
 	int     **result;
@@ -107,14 +107,14 @@ int main (int argc, char **argv) {
 	long threadNum;
 	long numThreads = 4;
 	long numRerunThreads = 0;
-	 
+
 	//int **result;
 	char **files_found;
-	
+
 
 	output_path = (char*) malloc(sizeof(char) * 1000);
 	file = (char*) malloc(sizeof(char) * 1000);
-	
+
 	logFile = fopen(LOGFILEPATH, "w");
 	if (logFile == NULL) {
 		giveup("Could not open logfile", LOGFILEPATH);
@@ -134,7 +134,7 @@ int main (int argc, char **argv) {
 		{
 		case 's':
 			if(sequenceFound){
-				printf("-s is duplicated\n");
+				fprintf(stderr, "-s is duplicated\n");
 				errorFound = true;
 				break;
 			}
@@ -149,12 +149,12 @@ int main (int argc, char **argv) {
 			break;
 		case 'r':
 			if(structureFound || inputPathFound){
-				printf("-r is duplicated\n");
+				fprintf(stderr, "-r is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine -i with -s/-r \n");
 				errorFound = true;
 				break;
 			}
@@ -164,18 +164,18 @@ int main (int argc, char **argv) {
 			break;
 		case 'i':
 			if(structureFound || sequenceFound){
-				printf("Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine -i with -s/-r \n");
 				errorFound = true;
 				break;
 			}
 			strcpy(file,optarg);
 			//printf("file: %s %d\n", file,access(file, F_OK|R_OK));
 			if(access(file, F_OK) == -1) { //if file does not exist
-				printf("Input file not exist\n");
+				fprintf(stderr, "Input file not exist\n");
 				exit(4);
-			}	
+			}
 			if (!get_sequence_structure(file, sequence, structure)) {
-				printf("Input file is invalid\n");
+				fprintf(stderr, "Input file is invalid\n");
 				errorFound = true;
 				break;
 			}
@@ -186,7 +186,7 @@ int main (int argc, char **argv) {
 			//printf("access: %d\n",access(output_path, F_OK));
 			if(access(output_path, F_OK) != -1) { //if file already exist
 				addTimestamp(&output_path);
-			}	
+			}
 			outputPathFound = true;
 			break;
 		default:
@@ -203,20 +203,20 @@ int main (int argc, char **argv) {
 	if(!inputPathFound){
 		//if sequence or structure is missing when input file is not present
 		if(!(sequenceFound && structureFound)){
-			printf("-s/-r is missing\n");
+			fprintf(stderr, "-s/-r is missing\n");
 			printUsage();
 			exit(1);
 		}
 	}
 
 	if(!validateSequence(sequence)){
-		printf("-s is invalid\n");
+		fprintf(stderr, "-s is invalid\n");
 		printUsage();
 		exit(1);
 	}
 
 	if(!validateStructure(structure, sequence)){
-		printf("-r is invalid\n");
+		fprintf(stderr, "-r is invalid\n");
 		printUsage();
 		exit(1);
 	}else{
@@ -227,8 +227,8 @@ int main (int argc, char **argv) {
 	if(outputPathFound && inputPathFound){
 		addPath(&output_path, file);
 		//printf("out path: %s\n",output_path);
-		
-	}	
+
+	}
 	//kevin: june 22 2017
 	//end of validation for command line arguments
 
@@ -251,7 +251,7 @@ int main (int argc, char **argv) {
 	method2_structure[0] = NULL;
 	method3_structure[0] = NULL;
 	method4_structure[0] = NULL;
-	final_structure[0] = NULL;		
+	final_structure[0] = NULL;
 
 	//create thread
 	for (threadNum = 0; threadNum < numThreads; threadNum++) {
@@ -275,7 +275,7 @@ int main (int argc, char **argv) {
 			write_log_file("Could not join threads", "", 'I');
 			exit(3);
 		}
-		
+
 		//if (res)
 		//	free(res);      /* Free memory allocated by thread */
 	}
@@ -292,11 +292,11 @@ int main (int argc, char **argv) {
 			tinfo[threadNum].method_energy = INF;
 			tinfo[threadNum].reattempt_run = false;
 
-			
+
 			//if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunctionInteracting, &tinfo[threadNum]) != 0) {
 			//kevin 28 june 2017
 			//changed the pthread_create argument from &threadFunctionInteracting to &threadFunction because threadFunctionInteracting
-			//should be for hfold interacting but not hfold iterative 
+			//should be for hfold interacting but not hfold iterative
 			if (pthread_create(&tinfo[threadNum].thread_id, NULL, &threadFunction, &tinfo[threadNum]) != 0) {
 				write_log_file("Could not create thread", "", 'I');
 				exit(3);
@@ -306,12 +306,12 @@ int main (int argc, char **argv) {
 				write_log_file("Could not join threads", "", 'I');
 				exit(3);
 			}
-		}	
+		}
 	}
 
 	/*************** Compare Methods ***************/
 	final_energy = INF;
-	
+
 	for (threadNum = 0; threadNum < numThreads; threadNum++) {
 		if ((strcmp(tinfo[threadNum].method_structure, "") != 0) && (tinfo[threadNum].method_energy < final_energy) && (tinfo[threadNum].method_energy != 0)) {
 			final_energy = tinfo[threadNum].method_energy;
@@ -322,19 +322,19 @@ int main (int argc, char **argv) {
 
 	if (final_energy == INF || method_chosen == -1) {
 		write_log_file("Could not find energy", "", 'E');
-		printf("ERROR: could not find energy\n");
+		fprintf(stderr, "ERROR: could not find energy\n");
 		final_energy = 0;
 		exit(6);
 	}
-	
 
-	
-	
+
+
+
 	//kevin: june 22 2017
 	//output to file
 	if(outputPathFound){
 		if(!save_file("", output_path, sequence, structure, final_structure, final_energy, method_chosen)){
-			printf("write to file fail\n");
+			fprintf(stderr, "write to file fail\n");
 			exit(4);
 		}
 	}else{
@@ -345,14 +345,14 @@ int main (int argc, char **argv) {
 		//std::cout << "\nfinal structure: " << final_structure << " final energy: " << final_energy << "\n\n" << std::flush;
 	}
 
-	
+
 
 	write_log_file("Ending Program", "", 'I');
-	
+
 	// Clean up
 
 	free(file);
-	
+
 	//free(result);
 	free(tinfo);
 	free(method1_structure);
@@ -399,7 +399,7 @@ void printUsage(){
 
 void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 	//Need to expand on this.
-    printf("Caught segfault at address %p\n", si->si_addr);
+    fprintf(stderr, "Caught segfault at address %p\n", si->si_addr);
     exit(si->si_errno);
 }
 
@@ -434,24 +434,24 @@ static void *threadFunction(void *arg) {
 }
 
 void method1_calculation (const char *sequence, char *structure, char *method1_structure, double *method1_energy) {
-	char new_input_structure[MAXSLEN] = "\0";	
-	char hfold_structure[MAXSLEN] = "\0";	
-	char hfold_pkonly_structure[MAXSLEN] = "\0";	
-	
-	double hfold_energy = 0;	
+	char new_input_structure[MAXSLEN] = "\0";
+	char hfold_structure[MAXSLEN] = "\0";
+	char hfold_pkonly_structure[MAXSLEN] = "\0";
+
+	double hfold_energy = 0;
 	double hfold_pkonly_energy = 0;
 
 	bool has_pk;
 
 	if (!call_HFold(HFOLD_PKONLY, sequence, structure, hfold_pkonly_structure, &hfold_pkonly_energy, true)) {
-		*method1_energy = hfold_pkonly_energy;		
+		*method1_energy = hfold_pkonly_energy;
 		return;
 	}
 
 	has_pk = find_new_structure(hfold_pkonly_structure, new_input_structure);
 	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
 
-	if (has_pk) {		
+	if (has_pk) {
 		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy, true)) {
 			std::cout << "HFold failed " << std::endl;
 			*method1_energy = hfold_energy;
@@ -473,10 +473,10 @@ void method1_calculation (const char *sequence, char *structure, char *method1_s
 }
 
 void method2_calculation (const char *sequence, char *structure, char *method2_structure, double *method2_energy) {
-	char hfold_structure[MAXSLEN] = "\0";	
-	
-	double hfold_energy = 0;	
-	
+	char hfold_structure[MAXSLEN] = "\0";
+
+	double hfold_energy = 0;
+
 	if (!call_HFold(HFOLD, sequence, structure, hfold_structure, &hfold_energy, true)) {
 		*method2_energy = hfold_energy;
 		return;
@@ -494,17 +494,17 @@ void method2_calculation (const char *sequence, char *structure, char *method2_s
 void method3_calculation (const char *sequence, char *structure, char *method3_structure, double *method3_energy) {
 	char sub_sequence[MAXSLEN] = "\0";
 	char sub_structure[MAXSLEN] = "\0";
-	
+
 	char replaced_structure[MAXSLEN] = "\0";
 	char new_input_structure[MAXSLEN] = "\0";
 	char hfold_structure[MAXSLEN] = "\0";
 	char hfold_pkonly_structure[MAXSLEN] = "\0";
 	char simfold_structure[MAXSLEN] = "\0";
 
-	double hfold_energy = 0;	
+	double hfold_energy = 0;
 	double hfold_pkonly_energy = 0;
 	double simfold_energy = 0;
-	
+
 	int begin = -1, end = 0;
 	bool has_pk;
 
@@ -512,7 +512,7 @@ void method3_calculation (const char *sequence, char *structure, char *method3_s
 	//std::cout << "found sub sequence = " << sub_sequence << " and sub structure = " << sub_structure << "  with begin = " << begin << " and end = " << end << '\n' << std::flush;
 
 	if (!call_simfold(SIMFOLD, sub_sequence, sub_structure, simfold_structure, &simfold_energy, true)) {
-		*method3_energy = simfold_energy;		
+		*method3_energy = simfold_energy;
 		return;
 	}
 	replace_simfold_partial_structure_with_original(structure, simfold_structure, replaced_structure, begin, end);
@@ -551,24 +551,24 @@ void method4_calculation (const char *sequence, char *structure, char *method4_s
 	// then only include this structure as input structure, and do as we did in method 3
 	char sub_sequence[MAXSLEN] = "\0";
 	char sub_structure[MAXSLEN] = "\0";
-	
+
 	char replaced_structure[MAXSLEN] = "\0";
 	char new_input_structure[MAXSLEN] = "\0";
 	char hfold_structure[MAXSLEN] = "\0";
 	char hfold_pkonly_structure[MAXSLEN] = "\0";
 	char simfold_structure[MAXSLEN] = "\0";
 
-	double hfold_energy = 0;	
+	double hfold_energy = 0;
 	double hfold_pkonly_energy = 0;
 	double simfold_energy = 0;
-	
+
 	int begin = -1, end = 0, B = 0, Bp = 0;
 	int result_length = 0;
-	bool has_pk;	
+	bool has_pk;
 
-	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);	
+	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);
 	strcpy(replaced_structure, structure);
-	
+
 	if (!call_simfold(SIMFOLD, sequence, structure, simfold_structure, &simfold_energy, true)) {
 		*method4_energy = simfold_energy;
 		return;
@@ -585,7 +585,7 @@ void method4_calculation (const char *sequence, char *structure, char *method4_s
 		//std::cout << "found B = " << B << " and Bp = " << Bp << '\n' << std::flush;
 		replace_simfold_structure_with_original(replaced_structure, simfold_structure, B, Bp);
 	}
-	
+
 	//std::cout << "the replaced structure is: " << replaced_structure << '\n' << std::flush;
 
 	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy, true)) {
@@ -624,32 +624,32 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 	//int stdout_bk = dup(fileno(stdout));
 
 	pid_t pid = fork(); /* Create a child process */
-	
+
 	switch (pid) {
 		case -1: /* Error */
 			write_log_file("Fork failed", file, 'E');
-			printf("ERROR in call_HFold: Fork failed\n");
+			fprintf(stderr, "ERROR in call_HFold: Fork failed\n");
 			exit(5);
 
 		case 0: /* Child process */
 			char functionCall[10000];
 			char result_array[10000];
-			close(pipefd[0]);	
+			close(pipefd[0]);
 
 			//std::cout << "Calling: " << programPath << " " << input_sequence << " " << input_structure << '\n' << std::flush;
-	
+
 			// Create a pipe to get the result through stdout
 			//dup2(pipefd[1], fileno(stdout));
 			//execl(programPath, "./", input_sequence, input_structure, NULL);
-			
+
 			// Run HFold
 			sprintf(functionCall, "%s -s '%s' -r '%s'", programPath, input_sequence, input_structure);
-			
+
 			result += exec(functionCall);
 			strcpy(result_array, result.c_str());
 
 			if (!result.empty()){
-				write(pipefd[1], result_array, 10000); 
+				write(pipefd[1], result_array, 10000);
 				exit(5);
 			} else {
 				write_log_file("popen() failed!", file, 'E');
@@ -665,7 +665,7 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 		default: /* Parent process */
 			char buf[10001];
 			char *token[4];
-            char sequenceTest[2000];   
+            char sequenceTest[2000];
             char restrictedTest[2000];
 			char *saveptr1, *saveptr2;
 			pid_t wpid;
@@ -690,9 +690,9 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 				    }
 				    else {
 						write_log_file("Killing child process", file, 'E');
-				        //kill(pid, SIGKILL); 
+				        //kill(pid, SIGKILL);
 
-						kill((-1*pid), SIGTERM); 	
+						kill((-1*pid), SIGTERM);
 						bool died = false;
 						for (int loop = 0; !died && loop < 5; loop++) {
 							sleep(1);
@@ -700,32 +700,32 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 						}
 
 						if (!died) {
-							kill((-1*pid), SIGKILL);		
-						}					
+							kill((-1*pid), SIGKILL);
+						}
 
 						//dup2(stdout_bk, fileno(stdout));
 						close(pipefd[1]);
 						close(pipefd[0]);
 						//close(stdout_bk);
-						
+
 						if (reattempt_run) {
 							write_log_file("Reattempting to run child", "", 'I');
 							*output_energy = INF + 1;
 							return false;
 						} else {
 							write_log_file("Child will not run", "", 'I');
-							
+
 							return false;
 						}
 				    }
 				}
 			} while (wpid == 0 && waittime <= timeout);
 
-			if (WEXITSTATUS(status) == 2) { 
+			if (WEXITSTATUS(status) == 2) {
 				char error[200];
 				sprintf(error, "status = %d", WEXITSTATUS(status));
 				write_log_file(error, file, 'E');
-				std::cout << "ERROR calling HFold: " << error << std::endl;
+				std::cerr << "ERROR calling HFold: " << error << std::endl;
 
 				//dup2(stdout_bk, fileno(stdout));
 				close(pipefd[1]);
@@ -754,16 +754,16 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 
             token[2] = strtok_r(sequenceTest, "  ", &saveptr1);
             token[3] = strtok_r(restrictedTest, "  ", &saveptr2);
-           
+
             // Error messages can be in token [0] where the program used printf once then exited.
             // A check is added here to ensure that this error is handled correctly.
             //if (token[0][0] == 'S' && token[1] != NULL) {
-           
+
             if (token[1] != NULL && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
                 //structureString.assign(token[1], strlen(token[1]));
                 token[0] = strtok_r(token[1], "  ", &saveptr1);
                 token[2] = strtok_r(saveptr1, "  ", &saveptr2);
-                strcpy(output_structure, token[2]);       
+                strcpy(output_structure, token[2]);
 
                 token[2] = strtok_r(saveptr2, "\n", &saveptr2);
                 energyString.assign(token[2], strlen(token[2]));
@@ -771,8 +771,8 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
             } else {
                 write_log_file(token[0], file, 'E');
                 write_log_file(token[1], file, 'E');
-		std::cout << "ERROR calling HFold: " << token[0] << std::endl;
-		std::cout << "ERROR calling HFold: " << token[1] << std::endl;
+		std::cerr << "ERROR calling HFold: " << token[0] << std::endl;
+		std::cerr << "ERROR calling HFold: " << token[1] << std::endl;
                 return false;
             }
 
@@ -783,16 +783,16 @@ bool call_HFold (const char *programPath, const char *input_sequence, const char
 				write_log_file(token[0], programPath, 'E');
 				return false;
 			}
-			
+
 			token[0] = strtok_r(token[1], "  ", &saveptr1);
-			token[2] = strtok_r(saveptr1, "  ", &saveptr2); 
-			token[2] = strtok_r(saveptr2, "\n", &saveptr2); 
-			
+			token[2] = strtok_r(saveptr1, "  ", &saveptr2);
+			token[2] = strtok_r(saveptr2, "\n", &saveptr2);
+
 			energyString.assign(token[2], strlen(token[2]));*/
 
 			//Print result
 			//std::cout << "Result: " << structureString << " " << token[2] << '\n' << std::flush;
-	
+
 			// Copy strings
 			//strcpy(output_structure, structureString.c_str());
 			//*output_energy = stod(energyString);
@@ -809,12 +809,12 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 	//int stdout_bk = dup(fileno(stdout));
 
 	pid_t pid = fork(); /* Create a child process */
-	
+
 	switch (pid) {
 		case -1: /* Error */
 		    write_log_file("Fork failed", file, 'E');
 			printf("ERROR calling simfold: Fork failed\n");
-			exit(5);	    
+			exit(5);
 
 		case 0: /* Child process */
 			char functionCall[10000];
@@ -833,7 +833,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 			strcpy(functionCall, SIMFOLD);
 			strcat(functionCall, " -s ");
 			strcat(functionCall, input_sequence);
-	
+
 			if (input_structure != NULL) {
 				strcat(functionCall, " -r \"");
 				strcat(functionCall, input_structure);
@@ -844,7 +844,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 			strcpy(result_array, result.c_str());
 
 			if (!result.empty()){
-				write(pipefd[1], result_array, 10000); 
+				write(pipefd[1], result_array, 10000);
 				exit(5);
 			} else {
 				write_log_file("popen() failed!", file, 'E');
@@ -866,7 +866,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 		default: /* Parent process */
 			char buf[10001];
 			char *token[4];
-            char sequenceTest[2000];   
+            char sequenceTest[2000];
             char restrictedTest[2000];
 			char *saveptr1, *saveptr2;
 			pid_t wpid;
@@ -876,7 +876,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 				structureRegex = "MFE:\\s+([^\\s+]*)\\s+([^\\n+]*)";
 			} else {
 				structureRegex = "RES:\\s+([^\\s+]*)\\s+([^\\n+]*)";
-			}*/ 
+			}*/
 
 			// Make child process the leader of its own process group. This allows
    			// signals to also be delivered to processes forked by the child process.
@@ -896,9 +896,9 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 				    }
 				    else {
 						write_log_file("Killing child process", file, 'E');
-				        //kill(pid, SIGKILL); 
+				        //kill(pid, SIGKILL);
 
-						kill((-1*pid), SIGTERM); 	
+						kill((-1*pid), SIGTERM);
 						bool died = false;
 						for (int loop = 0; !died && loop < 5; loop++) {
 							sleep(1);
@@ -906,14 +906,14 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 						}
 
 						if (!died) {
-							kill((-1*pid), SIGKILL);		
-						}					
+							kill((-1*pid), SIGKILL);
+						}
 
 						//dup2(stdout_bk, fileno(stdout));
 						close(pipefd[1]);
 						close(pipefd[0]);
 						//close(stdout_bk);
-						
+
 						if (reattempt_run) {
 							write_log_file("Reattempting to run child", "", 'I');
 							*output_energy = INF + 1;
@@ -926,7 +926,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 				}
 			} while (wpid == 0 && waittime <= timeout);
 
-			if (WEXITSTATUS(status) == 2) { 
+			if (WEXITSTATUS(status) == 2) {
 				char error[200];
 				sprintf(error, "status = %d", WEXITSTATUS(status));
 				write_log_file(error, file, 'E');
@@ -938,7 +938,7 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 				std::cout << "ERROR calling simfold: " << error << std::endl;
 				return false;
 			}
-		
+
 			//restore
 			//fflush(stdout);
 			close(pipefd[1]);
@@ -959,16 +959,16 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 
             token[2] = strtok_r(sequenceTest, "  ", &saveptr1);
             token[3] = strtok_r(restrictedTest, "  ", &saveptr2);
-           
+
             // Error messages can be in token [0] where the program used printf once then exited.
             // A check is added here to ensure that this error is handled correctly.
             //if (token[0][0] == 'S' && token[1] != NULL) {
-           
+
             if (token[1] != NULL && (strcmp(token[2], "Seq:") == 0) && (strcmp(token[3], "RES:") == 0)) {
                 //structureString.assign(token[1], strlen(token[1]));
                 token[0] = strtok_r(token[1], "  ", &saveptr1);
                 token[2] = strtok_r(saveptr1, "  ", &saveptr2);
-                strcpy(output_structure, token[2]);       
+                strcpy(output_structure, token[2]);
 
                 token[2] = strtok_r(saveptr2, "\n", &saveptr2);
                 energyString.assign(token[2], strlen(token[2]));
@@ -977,8 +977,8 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
                 write_log_file(token[0], file, 'E');
                 write_log_file(token[1], file, 'E');
 
-		std::cout << "ERROR calling simfold: " << token[0] << std::endl;
-		std::cout << "ERROR calling simfold: " << token[1] << std::endl;
+		std::cerr << "ERROR calling simfold: " << token[0] << std::endl;
+		std::cerr << "ERROR calling simfold: " << token[1] << std::endl;
                 exit(5);
             }
 
@@ -989,16 +989,16 @@ bool call_simfold (const char *programPath, const char *input_sequence, const ch
 				write_log_file(token[0], programPath, 'E');
 				return false;
 			}
-			
+
 			token[0] = strtok_r(token[1], "  ", &saveptr1);
-			token[2] = strtok_r(saveptr1, "  ", &saveptr2); 
-			token[2] = strtok_r(saveptr2, "\n", &saveptr2); 
-			
+			token[2] = strtok_r(saveptr1, "  ", &saveptr2);
+			token[2] = strtok_r(saveptr2, "\n", &saveptr2);
+
 			energyString.assign(token[2], strlen(token[2]));*/
 
 			//Print result
 			//std::cout << "Result: " << structureString << " " << energyString << '\n' << std::flush;
-	
+
 			// Copy strings
 			//strcpy(output_structure, structureString.c_str());
 			//*output_energy = stod(energyString);
@@ -1013,7 +1013,7 @@ void replace_simfold_partial_structure_with_original (char *input_structure, cha
 
 	strcpy(replaced_structure, input_structure);
 	int j = 0;
-	
+
 	for (int i = begin; i <= end; i++) {
 		replaced_structure[i] = simfold_structure[j++];
 	}
@@ -1054,7 +1054,7 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
 			write_log_file("Could not read the first sequence", fileName, 'E');
 			return false;
 		}
-		sequenceString.assign(sequenceBuffer, read);		
+		sequenceString.assign(sequenceBuffer, read);
 
 		if((read = getline(&structureBuffer, &len, ioFile)) == -1) {
 			write_log_file("Could not read the first structure", fileName, 'E');
@@ -1112,9 +1112,9 @@ bool save_file (const char *fileName, char *outputPath, const char *sequence, ch
 
 	// Clean up
 	fclose(ioFile);
-		
+
 	return true;
-} 
+}
 
 void write_log_file(const char *message, const char *fileName, const char option) {
 	time_t now = time(0);
@@ -1122,7 +1122,7 @@ void write_log_file(const char *message, const char *fileName, const char option
 	char buf[80];
 
 	strftime(buf, sizeof(buf), "%c", &tstruct);
-	
+
 	switch (option) {
 		case 'i':
 		case 'I':
@@ -1137,7 +1137,7 @@ void write_log_file(const char *message, const char *fileName, const char option
 		case 'e':
 		case 'E':
 			fprintf(logFile, "[%s] Error: %s in file %s\n", buf, message, fileName);
-			break;	
+			break;
 	}
 
 	fflush(logFile);
@@ -1148,7 +1148,7 @@ __(((____)))_____((((_____(((____)))_____(((_______)))___))))__
 we have more than on B and Bp to consider
 so we need to find each structure's B and Bp
 the output of this function is an array, the first element of the array gives the number of substructures
-then each pair gives their B and Bp 
+then each pair gives their B and Bp
 output must be allocated first with malloc before this function is used.*/
 bool find_each_substructure (char *input_structure, int begin, int end, int **output) {
 	int B, Bp, ip;
@@ -1163,17 +1163,17 @@ bool find_each_substructure (char *input_structure, int begin, int end, int **ou
 
 		if (input_structure[i] == '(') {
 			if (customStack.empty()) {
-				B = i;	
+				B = i;
 			}
 			customStack.push(i);
 
 		} else if (input_structure[i] == ')') {
 			ip = customStack.top();
 			customStack.pop();
-			
+
 			if (customStack.empty()) {
 				Bp = i;
-		
+
 				if (B != ip) {
 					char error[200];
 					sprintf(error, "There is something wrong with finding B=%d and Bp=%d which pairs with %d\n", B, Bp, ip);
@@ -1189,7 +1189,7 @@ bool find_each_substructure (char *input_structure, int begin, int end, int **ou
 			}
 		}
 
-	} 
+	}
 
 	std::copy(&result[0][0], &result[0][0] + num_structure*2, &output[0][0]);
 	return true;
@@ -1197,7 +1197,7 @@ bool find_each_substructure (char *input_structure, int begin, int end, int **ou
 
 /* the structure given to this function is what is returned from simfold restricted, so has . and ( )
 This function gets the beginning and end of the given structure, together with the output structure from simfold restricted when it was given the first structure as input.
-it then goes back from the beginning point till it finds the start of the sequence or 3 unpaired bases, 
+it then goes back from the beginning point till it finds the start of the sequence or 3 unpaired bases,
 and moves forward from the end point till it finds the end f the sequence or 3 unpaired bases.
 it returns the new beginning and end points.*/
 void find_independant_structures (char *structure, int begin, int end, int *B, int *Bp) {
@@ -1225,19 +1225,19 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 					if ((structure[R_index] == '(') || (R_index == strlen(structure))) {
 						found = 1;
 					}
-				
+
 					unpaired_count++;
 					if (unpaired_count == 3) {
 						found = 1;
 					}
-				}	
-			
+				}
+
 				if (!found) {
 					*B = L_index;
 					*Bp = R_index;
 					L_index--;
 					R_index++;
-				} 
+				}
 
 			} else {
 				found = 1;
@@ -1264,7 +1264,7 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 				R_index++;
 				L_index--;
 				unpaired_count++;
-	
+
 				if (unpaired_count == 3) {
 					found = 1;
 				}
@@ -1280,7 +1280,7 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 }
 
 void find_sub_sequence_structure (const char *input_sequence, char *input_structure, char *output_sequence, char *output_structure, int *begin, int *end) {
-	int structure_length = strlen(input_structure);	
+	int structure_length = strlen(input_structure);
 	int sub_length = 0;
 	*begin = -1;
 	*end = 0;

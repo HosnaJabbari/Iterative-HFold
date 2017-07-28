@@ -43,35 +43,35 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
 
     num_internal_in_up = 0;
     num_internal_in_p = 0;
-    
+
     //printf ("%s\n", cseq);
     int i;
     seqlen = strlen (cseq);
-    ignore_dangles = ignore;    
+    ignore_dangles = ignore;
     compute_gradient_dangles = compute_g_dangles;
     num_substructures = 0;
-    
+
     // for the exhaustive calculations
     IFD
         no_dangling_ends = 1;       // not used
     else
         simple_dangling_ends = 1;
-            
+
     // NOTE: valgrind doesn't like if I just do: csequence = cseq
     csequence = cseq;
     //strcpy (csequence, cseq);    // just refer it from where it is in memory
-    
+
     for (i=0; i < seqlen; i++)
     {
         toupper(csequence[i]);
-    }          
+    }
     sequence = new int[seqlen];
     if (sequence == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-    for (i=0; i < seqlen; i++) 
+    for (i=0; i < seqlen; i++)
     {
         sequence[i] = nuc_to_int(csequence[i]);
     }
-    
+
     oneoverRT = -10.0/(1.98717*310.15);
     expOneoverRT = EXP (oneoverRT);
     //oneoverRT = 1000.0/(1.98717*310.15);
@@ -79,7 +79,7 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
     // faster to compute eAU
     eAU = EXP (AU_penalty(A,U)* oneoverRT);
     EXPA = EXP (misc.multi_offset * oneoverRT);
-    
+
     // EXPB is always called as EXPB1 or EXPB2
     PFTYPE scaled_helix_penalty = misc.multi_helix_penalty * oneoverRT; //
     EXPB1 = EXP (scaled_helix_penalty);
@@ -90,7 +90,7 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
     for (int i=0; i < seqlen; i++)
     {
         EXPC[i] = EXP (i * scaled_free_base_penalty);
-    }    
+    }
 
     // now fill the edangle3 and edangle5 arrays
     // it's actually a looot faster (about 5 times on length 200)
@@ -103,7 +103,7 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
                 if (can_pair (i,j))
                 {
                     for (int k=0; k < NUCL; k++)
-                    {                
+                    {
                         edangle5[i][j][k] = EXP (dangle_bot[i][j][k]*oneoverRT);
                         edangle3[i][j][k] = EXP (dangle_top[i][j][k]*oneoverRT);
                     }
@@ -111,7 +111,7 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
             }
         }
     }
-    
+
     index = new int [seqlen];
     // an array with indexes, such that we don't work with a 2D array, but with a 1D array of length (n*(n+1))/2
     int total_length = (seqlen *(seqlen+1))/2;
@@ -123,7 +123,7 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
     if (up == NULL) giveup ("Cannot allocate memory", "s_partition_function");
 
     upm = new PFTYPE [total_length];
-    if (upm == NULL) giveup ("Cannot allocate memory", "s_partition_function");   
+    if (upm == NULL) giveup ("Cannot allocate memory", "s_partition_function");
 
     p = new PFTYPE [total_length];
     if (p == NULL) giveup ("Cannot allocate memory", "s_partition_function");
@@ -151,110 +151,110 @@ s_partition_function::s_partition_function (char *cseq, int ignore, int compute_
     {
         u_ip_jp = new PFTYPE [total_length];
         if (u_ip_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-    
+
         u_ip_ju = new PFTYPE [total_length];
         if (u_ip_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
+
         u_iu_jp = new PFTYPE [total_length];
         if (u_iu_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
+
         u_iu_ju = new PFTYPE [total_length];
-        if (u_iu_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");            
-        
+        if (u_iu_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         s1_jp = new PFTYPE [total_length];
-        if (s1_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");    
-    
+        if (s1_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         s1_ju = new PFTYPE [total_length];
-        if (s1_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");        
-                                    
+        if (s1_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         u1_ip_jp = new PFTYPE [total_length];
         if (u1_ip_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-    
+
         u1_ip_ju_jm1p = new PFTYPE [total_length];
         if (u1_ip_ju_jm1p == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
+
         u1_ip_ju = new PFTYPE [total_length];
         if (u1_ip_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
+
         u1_iu_jp = new PFTYPE [total_length];
         if (u1_iu_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-    
+
         u1_iu_ju_jm1p = new PFTYPE [total_length];
-        if (u1_iu_ju_jm1p == NULL) giveup ("Cannot allocate memory", "s_partition_function");    
-            
+        if (u1_iu_ju_jm1p == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         u1_iu_ju = new PFTYPE [total_length];
-        if (u1_iu_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");            
-    
+        if (u1_iu_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         s2_jp = new PFTYPE [total_length];
         if (s2_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
+
         s2_ju = new PFTYPE [total_length];
-        if (s2_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");    
-        
+        if (s2_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         s3_jp = new PFTYPE [total_length];
         if (s3_jp == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
+
         s3_ju_jm1p = new PFTYPE [total_length];
         if (s3_ju_jm1p == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-            
+
         s3_ju = new PFTYPE [total_length];
         if (s3_ju == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-                               
+
         pmnod3_needmidd3 = new PFTYPE[total_length];
         if (pmnod3_needmidd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-    
+
         pmnod3_noneedmidd3 = new PFTYPE[total_length];
-        if (pmnod3_noneedmidd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");    
-            
+        if (pmnod3_noneedmidd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         pmd3_needmidd3 = new PFTYPE[total_length];
         if (pmd3_needmidd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-    
+
         pmd3_noneedmidd3 = new PFTYPE[total_length];
-        if (pmd3_noneedmidd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");    
-            
+        if (pmd3_noneedmidd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         pm1nod3_needendd3 = new PFTYPE[total_length];
-        if (pm1nod3_needendd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");        
-        
+        if (pm1nod3_needendd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         pm1d3_needendd3 = new PFTYPE[total_length];
-        if (pm1d3_needendd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");            
-                
+        if (pm1d3_needendd3 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         pm2d5_needmidd5 = new PFTYPE[total_length];
-        if (pm2d5_needmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");            
-    
+        if (pm2d5_needmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         pm2d5_noneedmidd5 = new PFTYPE[total_length];
-        if (pm2d5_noneedmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");            
-    
+        if (pm2d5_noneedmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         pm2nod5_needmidd5 = new PFTYPE[total_length];
-        if (pm2nod5_needmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");            
-    
+        if (pm2nod5_needmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
         pm2nod5_noneedmidd5 = new PFTYPE[total_length];
-        if (pm2nod5_noneedmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");            
-    }                        
-    
+        if (pm2nod5_noneedmidd5 == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+    }
+
     // if we want to go the exhaustive way, just for verification
     pexhaustive = new PFTYPE[total_length];
-    if (pexhaustive == NULL) giveup ("Cannot allocate memory", "s_partition_function");        
+    if (pexhaustive == NULL) giveup ("Cannot allocate memory", "s_partition_function");
 
     uexhaustive = new PFTYPE[total_length];
-    if (uexhaustive == NULL) giveup ("Cannot allocate memory", "s_partition_function");                        
-        
+    if (uexhaustive == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
     upexhaustive = new PFTYPE[total_length];
-    if (upexhaustive == NULL) giveup ("Cannot allocate memory", "s_partition_function");                    
-    
+    if (upexhaustive == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
     // TODO: to erase in the final version
     num_params = create_string_params();
-    
+
     //printf ("num_params=%d\n", num_params);
     GlogZ = new PFTYPE[num_params];
-    if (GlogZ == NULL) giveup ("Cannot allocate memory", "s_partition_function");                        
-    
+    if (GlogZ == NULL) giveup ("Cannot allocate memory", "s_partition_function");
+
     GlogZexhaustive = new PFTYPE[num_params];
     if (GlogZexhaustive == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
+
     GlogZ_finite_differences = new PFTYPE[num_params];
     if (GlogZ_finite_differences == NULL) giveup ("Cannot allocate memory", "s_partition_function");
-        
-    initialize_arrays ();    
+
+    initialize_arrays ();
 }
 
 
@@ -263,12 +263,12 @@ s_partition_function::~s_partition_function ()
 {
     //delete [] csequence;
     delete [] sequence;
-    delete [] index;     
-    
+    delete [] index;
+
     delete [] up;
     delete [] upm;
     delete [] p;
-        
+
     IFD
     {
         delete [] u;
@@ -281,13 +281,13 @@ s_partition_function::~s_partition_function ()
         delete [] pm2;
     }
     else
-    {        
+    {
         delete [] u_ip_jp;
         delete [] u_iu_jp;
         delete [] u_ip_ju;
-        delete [] u_iu_ju;        
+        delete [] u_iu_ju;
         delete [] s1_jp;
-        delete [] s1_ju;    
+        delete [] s1_ju;
         delete [] u1_ip_jp;
         delete [] u1_ip_ju_jm1p;
         delete [] u1_iu_jp;
@@ -295,11 +295,11 @@ s_partition_function::~s_partition_function ()
         delete [] u1_ip_ju;
         delete [] u1_iu_ju;
         delete [] s2_jp;
-        delete [] s2_ju;    
+        delete [] s2_ju;
         delete [] s3_jp;
         delete [] s3_ju_jm1p;
         delete [] s3_ju;
-        
+
         delete [] pmnod3_needmidd3;
         delete [] pmnod3_noneedmidd3;
         delete [] pmd3_needmidd3;
@@ -310,16 +310,16 @@ s_partition_function::~s_partition_function ()
         delete [] pm2d5_needmidd5;
         delete [] pm2d5_noneedmidd5;
         delete [] pm2nod5_needmidd5;
-        delete [] pm2nod5_noneedmidd5;        
+        delete [] pm2nod5_noneedmidd5;
     }
-        
+
     delete [] EXPC;
-    delete [] GlogZ;    
-        
+    delete [] GlogZ;
+
     // if we go the exhaustive way
     delete [] pexhaustive;
     delete [] uexhaustive;
-    delete [] upexhaustive;   
+    delete [] upexhaustive;
     delete [] GlogZexhaustive;
     delete [] GlogZ_finite_differences;
 }
@@ -337,7 +337,7 @@ void s_partition_function::initialize_arrays ()
             up[ij] = 0;
             upm[ij] = 0;
             p[ij] = 0;
-            
+
             IFD
             {
                 u[ij] = 1;
@@ -357,33 +357,33 @@ void s_partition_function::initialize_arrays ()
                 u_iu_ju[ij] = 1;
                 s1_jp[ij] = 0;
                 s1_ju[ij] = 0;
-                            
+
                 u1_ip_jp[ij] = 0;
                 u1_ip_ju_jm1p[ij] = 0;
                 u1_ip_ju[ij] = 0;
                 u1_iu_jp[ij] = 0;
                 u1_iu_ju_jm1p[ij] = 0;
                 u1_iu_ju[ij] = 0;
-                
+
                 s2_jp[ij] = 0;
                 s2_ju[ij] = 0;
-                
+
                 s3_jp[ij] = 0;
                 s3_ju_jm1p[ij] = 0;
                 s3_ju[ij] = 0;
-                
+
                 pmnod3_needmidd3[ij] = 0;
                 pmnod3_noneedmidd3[ij] = 0;
                 pmd3_needmidd3[ij] = 0;
                 pmd3_noneedmidd3[ij] = 0;
                 pm1nod3_needendd3[ij] = 0;
                 pm1d3_needendd3[ij] = 0;
-    
+
                 pm2d5_needmidd5[ij] = 0;
                 pm2d5_noneedmidd5[ij] = 0;
                 pm2nod5_needmidd5[ij] = 0;
-                pm2nod5_noneedmidd5[ij] = 0;        
-            }    
+                pm2nod5_noneedmidd5[ij] = 0;
+            }
             // if we go the exhaustive way
             pexhaustive[ij] = 0;
             uexhaustive[ij] = 1;
@@ -395,7 +395,7 @@ void s_partition_function::initialize_arrays ()
 
 PFTYPE s_partition_function::compute_partition_function ()
 // the recursions are taken from Ding and Lawrence, "A statistical sampling algorithm for RNA secondary structure prediction", NAR 2003
-{ 
+{
     int i, j, ij;
     for (j=TURN+1; j < seqlen; j++)
     {
@@ -406,38 +406,38 @@ PFTYPE s_partition_function::compute_partition_function ()
             IFD
             {
                 compute_upm_nodangles (i, j);    // doesn't matter where it is, all dependencies have been computed at previous steps
-                compute_up (i, j);    // must be after upm            
-                compute_s1 (i,j);   
+                compute_up (i, j);    // must be after upm
+                compute_s1 (i,j);
                 compute_u (i,j);    // must be after s1
                 compute_s3 (i,j);   // Mirela: moved this before u1 on Aug 17, 2007
-                compute_u1 (i,j);   // must be after s3!! 
-                compute_s2 (i,j);                
+                compute_u1 (i,j);   // must be after s3!!
+                compute_s2 (i,j);
             }
             else
-            {            
+            {
                 compute_upm(i, j);    // doesn't matter where it is, all dependencies have been computed at previous steps
-                compute_up (i, j);    // must be after upm                
+                compute_up (i, j);    // must be after upm
                 compute_u_ip_jp (i, j);    // must be after up
                 compute_u_ip_ju (i, j);    // must be after up
                 compute_u_iu_jp (i, j);    // must be after up
                 compute_u_iu_ju (i, j);    // must be after up
                 compute_s1_jp (i, j);    // must be after up
                 compute_s1_ju (i, j);    // must be after up
-                            
+
                 compute_u1_ip_jp (i, j);    // must be after up
                 compute_u1_ip_ju_jm1p (i, j);    // must be after up
                 compute_u1_ip_ju (i, j);    // must be after up
                 compute_u1_iu_jp (i, j);    // must be after up
                 compute_u1_iu_ju_jm1p (i, j);    // must be after up
                 compute_u1_iu_ju (i, j);    // must be after up
-                
+
                 compute_s2_jp (i, j);    // must be after up
                 compute_s2_ju (i, j);    // must be after up
-                
+
                 compute_s3_jp (i, j);    // must be after up
                 compute_s3_ju_jm1p (i, j);    // must be after up
                 compute_s3_ju (i, j);    // must be after up
-                
+
                 //printf ("u[%d,%d] = %g\n", i, j, u_ip_jp[ij] + u_ip_ju[ij] + u_iu_jp[ij] + u_iu_ju[ij]);
     //                 printf ("u_ip_jp[%d,%d] = %g\n", i, j, u_ip_jp[ij]);
     //                 printf ("u_ip_ju[%d,%d] = %g\n", i, j, u_ip_ju[ij]);
@@ -445,9 +445,9 @@ PFTYPE s_partition_function::compute_partition_function ()
     //                 printf ("u_iu_ju[%d,%d] = %g\n", i, j, u_iu_ju[ij]);
             }
         }
-    }    
+    }
 
-    int firstlast = index[0]+seqlen-1;                    
+    int firstlast = index[0]+seqlen-1;
 //     Z = u[firstlast];
 //     return u[firstlast];
     IFD
@@ -478,7 +478,7 @@ void s_partition_function::print_u()
 
 
 PFTYPE s_partition_function::exp_AUpenalty (int i, int j)
-{    
+{
     //PFTYPE AUpen = AU_penalty (sequence[i], sequence[j]);
     //return (PFTYPE)(exp (AUpen* oneoverRT));
     // Note: doing exp(sum log) is much slower than doing exp(product)
@@ -492,7 +492,7 @@ PFTYPE s_partition_function::exp_AUpenalty (int i, int j)
 
 PFTYPE s_partition_function::exp_dangle5 (int i, int j, int k)
 // dangle_bot
-{    
+{
     // added the next lines on Oct 7, 2006
     // make sure we are not out of bounds
     if (i < 0 || i >= seqlen || j < 0 || j >= seqlen || k < 0 || k >= seqlen)
@@ -514,7 +514,7 @@ PFTYPE s_partition_function::exp_dangle3 (int i, int j, int k)
         return 1.0;
     // make sure this dangling end makes sense
     if (dangle_top[sequence[i]][sequence[j]][sequence[k]] == INF)
-        return 1.0;       
+        return 1.0;
     // try calling the arrays directly, it's actually a looot faster (about 5 times on length 200)
     return edangle3[sequence[i]][sequence[j]][sequence[k]];
     //PFTYPE dang = dangle_top[sequence[i]][sequence[j]][sequence[k]];
@@ -555,7 +555,7 @@ void s_partition_function::compute_s1 (int h, int j)
         lp1j = index[l+1]+j-l-1;
         s1[hj] += up[hl] * exp_AUpenalty (h, l) * u[lp1j];
     }
-    
+
     for (l = j-2; l <= j; l++)        // (...)---
     {
         hl = index[h] + l - h;
@@ -576,7 +576,7 @@ void s_partition_function::compute_s1 (int h, int j)
 //             s1[hj] += up[hl] * exp_AUpenalty (h, l);
 //         }
 //     }
-    
+
 }
 
 
@@ -604,13 +604,13 @@ void s_partition_function::compute_s3 (int h, int j)
     if (h < 1) return;
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
-    s3[hj] = 0;   
-    
+    s3[hj] = 0;
+
     for (l = h+1; l <= j; l++)
     {
-        hl = index[h] + l - h;        
-        
-        if (l+2 < j)                  
+        hl = index[h] + l - h;
+
+        if (l+2 < j)
         {
             lp1j = index[l+1]+j-l-1;
             s3[hj] += up[hl] * exp_AUpenalty (h, l) * (u1[lp1j] + EXPC[j-l]);
@@ -630,7 +630,7 @@ void s_partition_function::compute_upm_nodangles (int i, int j)
     int l, h;
     int ip1l, ip2l, lp2jm1, lp1jm1, lp2jm2, lp1jm2, lp2jm3, lp1jm3, hj;
     PFTYPE upm_temp;
-    
+
     if (!can_pair(sequence[i], sequence[j]))
         return;
     upm[ij] = 0;
@@ -655,7 +655,7 @@ void s_partition_function::compute_upm_nodangles (int i, int j)
         upm[ij] += up[ip2l] * EXPC[1] * exp_AUpenalty (i+2, l) * u1[lp1jm1];
     }
     */
-    
+
     for (h=i+1; h < j-TURN-2; h++)
     //for (h=i+3; h < j-TURN-2; h++)    // case (....(...)--(--)-)
     {
@@ -677,7 +677,7 @@ void s_partition_function::compute_s2 (int h, int j)
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
     s2[hj] = 0;
-    
+
     for (l = h+1; l < j-3; l++)    // .(...)
     {
         hl = index[h] + l - h;
@@ -694,23 +694,23 @@ void s_partition_function::compute_u_ip_jp (int i, int j)
 {
     int ij = index[i]+j-i;
     int hj, il, lp2j, lp1j;
-    int h, l;    
+    int h, l;
     int ijm1 = index[i]+j-1-i;
 
     u_ip_jp[ij] = up[ij] * exp_AUpenalty (i,j);    // case (...)
     u_ip_jp[ij] += up[ijm1] * exp_AUpenalty (i, j-1) * exp_dangle3 (j-1, i, j);    // case (...).
-    
+
     for (l = i+1; l < j-2; l++)                    // case (...)-(--)
     {
         il = index[i]+l-i;
         lp2j = index[l+2]+j-l-2;
         lp1j = index[l+1]+j-l-1;
         u_ip_jp[ij] += up[il] * exp_AUpenalty (i, l) * (u_ip_jp[lp1j] + exp_dangle3 (l, i, l+1) * (u_ip_jp[lp2j] + u_iu_jp[lp2j]));
-        //if (u_ip_jp[lp2j] != 1)            
+        //if (u_ip_jp[lp2j] != 1)
         //    u_ip_jp[ij] += up[il] * exp_AUpenalty (i, l) * exp_dangle3 (l, i, l+1) * u_ip_jp[lp2j];
         //if (u_iu_jp[lp2j] != 1)
         //    u_ip_jp[ij] += up[il] * exp_AUpenalty (i, l) * exp_dangle3 (l, i, l+1) * u_iu_jp[lp2j];
-    }                                   
+    }
 }
 
 
@@ -720,24 +720,24 @@ void s_partition_function::compute_u_ip_ju (int i, int j)
 {
     int ij = index[i]+j-i;
     int hj, il, lp2j, lp1j;
-    int h, l;    
-    
+    int h, l;
+
     u_ip_ju[ij] = 0;
-    
-    
+
+
     l=j-2;
     il = index[i]+l-i;
     u_ip_ju[ij] += up[il] * exp_AUpenalty (i, l) * exp_dangle3 (l, i, l+1);
-    
+
     for (l = i+1; l < j-2; l++)                    // case (...)...---
     {
         il = index[i]+l-i;
         lp2j = index[l+2]+j-l-2;
-        lp1j = index[l+1]+j-l-1;    
+        lp1j = index[l+1]+j-l-1;
         u_ip_ju[ij] += up[il] * exp_AUpenalty (i, l) *
-            (u_ip_ju[lp1j] + exp_dangle3 (l, i, l+1) *(u_ip_ju[lp2j]+u_iu_ju[lp2j]));   // put them together to be faster        
-    }                                   
-    
+            (u_ip_ju[lp1j] + exp_dangle3 (l, i, l+1) *(u_ip_ju[lp2j]+u_iu_ju[lp2j]));   // put them together to be faster
+    }
+
 }
 
 
@@ -747,8 +747,8 @@ void s_partition_function::compute_u_iu_jp (int i, int j)
 {
     int ij = index[i]+j-i;
     int hj, il, lp2j, lp1j, hjm1;
-    int h, l;    
-    
+    int h, l;
+
     u_iu_jp[ij] = 0;
     //for (h = i+1; h < j-1; h++)                    // case ...(...) or ...(...).
     //{
@@ -756,7 +756,7 @@ void s_partition_function::compute_u_iu_jp (int i, int j)
     //    hjm1 = index[h]+j-1-h;
         //u_iu_jp[ij] += up[hj] * exp_dangle5 (j, h, h-1) * exp_AUpenalty (h, j);
         //u_iu_jp[ij] += up[hjm1] * exp_dangle5 (j-1, h, h-1) * exp_AUpenalty (h, j-1) * exp_dangle3(j-1,h,j);
-    //}                    
+    //}
     for (h = i+1; h < j-1; h++)                 // case ...(...)...---
     {
         hj = index[h]+j-h;
@@ -770,13 +770,13 @@ void s_partition_function::compute_u_iu_ju (int i, int j)
 {
     int ij = index[i]+j-i;
     int hj, il, lp2j, lp1j;
-    int h, l;    
-    
+    int h, l;
+
     u_iu_ju[ij] = 1;
     for (h = i+1; h < j-1; h++)                 // case ...(...)...---
     {
         hj = index[h]+j-h;
-        u_iu_ju[ij] += s1_ju[hj];                      
+        u_iu_ju[ij] += s1_ju[hj];
     }
 }
 
@@ -789,12 +789,12 @@ void s_partition_function::compute_s1_jp (int h, int j)
     hj = index[h]+j-h;
     int hjm1 = index[h]+j-1-h;
     s1_jp[hj] = 0;
-    
+
     // case .(...)
-    s1_jp[hj] += up[hj] * exp_dangle5 (j, h, h-1) * exp_AUpenalty (h, j);        
+    s1_jp[hj] += up[hj] * exp_dangle5 (j, h, h-1) * exp_AUpenalty (h, j);
     // case .(...).
-    s1_jp[hj] += up[hjm1] * exp_dangle5 (j-1, h, h-1) * exp_AUpenalty (h, j-1) * exp_dangle3 (j-1, h, j);        
-    
+    s1_jp[hj] += up[hjm1] * exp_dangle5 (j-1, h, h-1) * exp_AUpenalty (h, j-1) * exp_dangle3 (j-1, h, j);
+
     for (l = h+1; l < j-2; l++)        // .(...)---
     {
         hl = index[h] + l - h;
@@ -814,11 +814,11 @@ void s_partition_function::compute_s1_ju (int h, int j)
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
     s1_ju[hj] = 0;
-    
+
     l=j-2;
     hl = index[h] + l - h;
     s1_ju[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) * exp_dangle3 (l, h, l+1);
-    
+
     for (l = h+1; l < j-2; l++)        // .(...)---
     {
         hl = index[h] + l - h;
@@ -826,7 +826,7 @@ void s_partition_function::compute_s1_ju (int h, int j)
         lp1j = index[l+1]+j-l-1;
         // put them together to be faster
         s1_ju[hj] += up[hl] * exp_dangle5(l,h,h-1) * exp_AUpenalty(h,l) *
-            (u_ip_ju[lp1j] + exp_dangle3(l,h,l+1) * (u_ip_ju[lp2j] + u_iu_ju[lp2j]));      
+            (u_ip_ju[lp1j] + exp_dangle3(l,h,l+1) * (u_ip_ju[lp2j] + u_iu_ju[lp2j]));
     }
 }
 
@@ -840,12 +840,12 @@ void s_partition_function::compute_up (int i, int j)
     PARAMTYPE en_hairpin, en_stack, en_internal;
 
     up[ij] = 0;
-    
+
     if (! can_pair (sequence[i], sequence[j]))
     {
         return;
-    }    
-    
+    }
+
     // hairpin loop
     en_hairpin = s_hairpin_loop::get_energy (i, j, sequence, csequence);
     //printf ("REAL   en_hairpin=%Lg, size=%d, en_hairpin norm= %Lg, exp=%Lg\n", en_hairpin, j-i-1, en_hairpin * oneoverRT, EXP (en_hairpin * oneoverRT));
@@ -860,7 +860,7 @@ void s_partition_function::compute_up (int i, int j)
             en_hairpin -= misc.hairpin_GGG;
     }
     */
-    
+
     if (en_hairpin >= INF/2)
     {
         //printf ("** Infinite hairpin (%d, %d) !\n", i, j);
@@ -868,11 +868,11 @@ void s_partition_function::compute_up (int i, int j)
     else
         up[ij] += EXP (en_hairpin * oneoverRT);
         // tried to get a better precision, but it doesn't seem to help
-        //up[ij] += pow(exp (en_hairpin * oneoverRT/10.0), 10.0);    
+        //up[ij] += pow(exp (en_hairpin * oneoverRT/10.0), 10.0);
 
 //     if (i==0 && j==8)    printf ("r1 up[0,8] = %g\n", up[ij]);
     // stack pair
-    if (can_pair (sequence[i+1], sequence[j-1]))    
+    if (can_pair (sequence[i+1], sequence[j-1]))
     {
         en_stack = s_stacked_pair::get_energy (i, j, sequence);
         //printf ("REAL    i=%d, j=%d, en_stack=%g, %d%d%d%d\n", i, j, en_stack, sequence[i], sequence[j], sequence[i+1], sequence[j-1]);
@@ -880,23 +880,23 @@ void s_partition_function::compute_up (int i, int j)
         {
             //printf ("** Infinite stack   (%d, %d) !\n", i, j);
         }
-        else            
+        else
             up[ij] += EXP (en_stack * oneoverRT) * up [ip1jm1];
-    }             
+    }
 //     if (i==0 && j==8)    printf ("r2 up[0,8] = %g\n", up[ij]);
 
     // TODO: remove return;
     if (!ignore_internal)
     {
-            
+
         // internal loop/bulge
         for (ip = i+1; ip <= MIN(j-2-TURN,i+MAXLOOP+1) ; ip++)  // j-2-TURN
         {
             minq = MAX (j-i+ip-MAXLOOP-2, ip+1+TURN);    // ip+1+TURN);
             for (jp = minq; jp < j; jp++)
-            {        
+            {
                 if (sequence[ip]+sequence[jp] == 3 ||
-                    sequence[ip]+sequence[jp] == 5)        
+                    sequence[ip]+sequence[jp] == 5)
                 {
                     if (ip == i+1 && jp == j-1) continue;    // we don't want stacked pairs here
                     int ipjp = index[ip] + jp - ip;
@@ -912,13 +912,13 @@ void s_partition_function::compute_up (int i, int j)
     //                     if (i==0 && j==8)    printf ("r3, ip=%d, jp=%d, up[0,8] = %g, en_internal=%d\n", ip, jp, up[ij], en_internal);
                     }
                 }
-            }        
-        }    
+            }
+        }
     }
 
     if (ignore_multi)
         return;
-    
+
     // multi-loop
     up[ij] += upm[ij];
 }
@@ -932,7 +932,7 @@ void s_partition_function::compute_upm (int i, int j)
     int l, h;
     int ip1l, ip2l, lp2jm1, lp1jm1, lp2jm2, lp1jm2, lp2jm3, lp1jm3, hj;
     PFTYPE upm_temp;
-    
+
     if (!can_pair(sequence[i], sequence[j]))
         return;
     upm[ij] = 0;
@@ -946,9 +946,9 @@ void s_partition_function::compute_upm (int i, int j)
         lp1jm1 = index[l+1]+j-1-l-1;
 
         upm[ij] += up[ip1l] * exp_AUpenalty (i+1,l) *
-                    (  u1_ip_jp[lp1jm1]      // [(...)(.-..)] or [(...)(.-..).]                    
+                    (  u1_ip_jp[lp1jm1]      // [(...)(.-..)] or [(...)(.-..).]
                        + exp_dangle3 (l, i+1, l+1) * EXPC[1] *
-                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [(...).-(...)] or [(...).-(...).] 
+                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [(...).-(...)] or [(...).-(...).]
                                 exp_dangle5(i,j,j-1) * (u1_ip_ju[lp2jm1] + u1_iu_ju[lp2jm1])) +    // [(...).-(...)-..]
                        + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);    // [(...)(...)-..]
     }
@@ -958,17 +958,17 @@ void s_partition_function::compute_upm (int i, int j)
         lp2jm1 = index[l+2]+j-1-l-2;
         lp1jm1 = index[l+1]+j-1-l-1;
         lp2jm2 = index[l+2]+j-2-l-2;
-        lp1jm2 = index[l+1]+j-2-l-1;        
+        lp1jm2 = index[l+1]+j-2-l-1;
         lp2jm3 = index[l+2]+j-3-l-2;
-        lp1jm3 = index[l+1]+j-3-l-1;      
-        
+        lp1jm3 = index[l+1]+j-3-l-1;
+
         upm[ij] += up[ip2l] * EXPC[1] *
-                    exp_dangle3 (i, j, i+1) * exp_AUpenalty (i+2, l) * 
-                    (  u1_ip_jp[lp1jm1]      // [.(...)(.-..)] or [.(...)(.-..).]                    
+                    exp_dangle3 (i, j, i+1) * exp_AUpenalty (i+2, l) *
+                    (  u1_ip_jp[lp1jm1]      // [.(...)(.-..)] or [.(...)(.-..).]
                        + exp_dangle3 (l, i+2, l+1) * EXPC[1] *
-                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [.(...).-(...)] or [.(...).-(...).] 
+                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [.(...).-(...)] or [.(...).-(...).]
                                 exp_dangle5(i,j,j-1) * (u1_ip_ju[lp2jm1] + u1_iu_ju[lp2jm1])) +    // [.(...).-(...)-..]
-                       + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);    // [.(...)(...)-..] 
+                       + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);    // [.(...)(...)-..]
     }
     upm_temp = 0;
     for (h=i+3; h < j-TURN-2; h++)    // case (....(...)--(--)-)
@@ -977,11 +977,11 @@ void s_partition_function::compute_upm (int i, int j)
         int hjm1 = index[h] + j-1 -h;
         int hjm2 = index[h] + j-2 -h;
         int hjm3 = index[h] + j-3 -h;
-            
+
         upm_temp += EXPC[h-i-1] *
-                ( s2_jp[hjm1]    // --(...)) or --(...).) 
+                ( s2_jp[hjm1]    // --(...)) or --(...).)
                   + s2_ju[hjm1]* exp_dangle5(i,j,j-1));    // --(...)..)
-    }   
+    }
     upm[ij] += exp_dangle3 (i, j, i+1) * upm_temp;
     upm[ij] *= upm_common;
     //printf ("i=%d, j=%d, upm=%g\n", i, j, upm[ij]);
@@ -996,13 +996,13 @@ void s_partition_function::compute_s2_jp (int h, int j)
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
     s2_jp[hj] = 0;
-    
+
     for (l = h+1; l < j-3; l++)    // .(...)
     {
         hl = index[h] + l - h;
         lp2j = index[l+2]+j-l-2;
         lp1j = index[l+1]+j-l-1;
-        s2_jp[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) * 
+        s2_jp[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) *
                 ( u1_ip_jp[lp1j] + exp_dangle3 (l, h, l+1) * EXPC[1]*(u1_ip_jp[lp2j] + u1_iu_jp[lp2j]));
     }
 }
@@ -1017,13 +1017,13 @@ void s_partition_function::compute_s2_ju (int h, int j)
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
     s2_ju[hj] = 0;
-    
+
     for (l = h+1; l < j-3; l++)    // .(...)
     {
         hl = index[h] + l - h;
         lp2j = index[l+2]+j-l-2;
         lp1j = index[l+1]+j-l-1;
-        s2_ju[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) * 
+        s2_ju[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) *
                 ( u1_ip_ju[lp1j] + exp_dangle3 (l, h, l+1) * EXPC[1]*(u1_ip_ju[lp2j] + u1_iu_ju[lp2j]));
     }
 }
@@ -1039,18 +1039,18 @@ void s_partition_function::compute_u1_ip_jp (int i, int j)
     u1_ip_jp[ij] = 0;
 
 
-            
+
     for (l=j-1; l <= j; l++)    // (...) or (...).
     {
-        il = index[i]+l-i;        
+        il = index[i]+l-i;
         u1_ip_jp[ij] += up[il] * exp_AUpenalty(i,l) * fd3(j+1,i,l) * EXPC[j-l+1];
     }
-                
+
     for (l=i+1; l < j-2; l++)    // (...)-(---) or (...)-(---).
     {
         lp1j = index[l+1]+j-l-1;
-        lp2j = index[l+2]+j-l-2;                      
-        il = index[i]+l-i;        
+        lp2j = index[l+2]+j-l-2;
+        il = index[i]+l-i;
         u1_ip_jp[ij] += up[il] * exp_AUpenalty(i,l) *
                     (u1_ip_jp[lp1j] + exp_dangle3 (l,i,l+1)*EXPC[1]*(u1_ip_jp[lp2j] + u1_iu_jp[lp2j]));
     }
@@ -1066,14 +1066,14 @@ void s_partition_function::compute_u1_ip_ju_jm1p (int i, int j)
     int ij, il, l, h, lp1j, lp2j, ip1l, hj;
     ij = index[i]+j-i;
     u1_ip_ju_jm1p[ij] = 0;
-    int ijm1 = index[i]+j-1-i;       
+    int ijm1 = index[i]+j-1-i;
     u1_ip_ju_jm1p[ij] += up[ijm1] * exp_AUpenalty(i,j-1)* fd3(j+1,i,j-1) * EXPC[1];
-                
+
     for (l=i+1; l < j-2; l++)    // (...)-(---).
     {
         lp1j = index[l+1]+j-l-1;
-        lp2j = index[l+2]+j-l-2;                      
-        il = index[i]+l-i;        
+        lp2j = index[l+2]+j-l-2;
+        il = index[i]+l-i;
         u1_ip_ju_jm1p[ij] += up[il] * exp_AUpenalty(i,l) *
                     (u1_ip_ju_jm1p[lp1j] + exp_dangle3 (l,i,l+1)*EXPC[1]*(u1_ip_ju_jm1p[lp2j] + u1_iu_ju_jm1p[lp2j]));
     }
@@ -1097,18 +1097,18 @@ void s_partition_function::compute_u1_ip_ju (int i, int j)
 
         temp = up[il] * exp_AUpenalty(i,l);
         u1_ip_ju[ij] +=  temp * fd3(j+1,i,l) * EXPC[j-l];
-                  
+
         if (l+2 < j)            // (...)-(--)-
-        {          
+        {
             lp1j = index[l+1]+j-l-1;
-            lp2j = index[l+2]+j-l-2;                  
+            lp2j = index[l+2]+j-l-2;
             u1_ip_ju[ij] += temp * (u1_ip_ju[lp1j] + exp_dangle3 (l,i,l+1)*EXPC[1]*(u1_ip_ju[lp2j] + u1_iu_ju[lp2j]));
-        }                        
+        }
     }
     u1_ip_ju[ij] *= EXPB1;
 }
 
-    
+
 void s_partition_function::compute_u1_iu_jp (int i, int j)
 // contains at least one branch of a multi-loop
 // i must be unpaired
@@ -1120,16 +1120,16 @@ void s_partition_function::compute_u1_iu_jp (int i, int j)
 
     for (l=j-1; l <= j; l++)    // .(...) or .(...).
     {
-        ip1l = index[i+1]+l-i-1;        
+        ip1l = index[i+1]+l-i-1;
         u1_iu_jp[ij] += up[ip1l] * exp_AUpenalty(i+1,l) * exp_dangle5 (l, i+1, i) * // EXPC[1] * (added it to the end
                 fd3(j+1,i+1,l) * EXPC[j-l+1];
     }
-    
+
     for (l=i+2; l < j-2; l++)    // .(...)-(---) or .(...)-(---).
     {
         ip1l = index[i+1]+l-i-1;
         lp1j = index[l+1]+j-l-1;
-        lp2j = index[l+2]+j-l-2;  
+        lp2j = index[l+2]+j-l-2;
         u1_iu_jp[ij] += up[ip1l] * exp_AUpenalty(i+1,l) * exp_dangle5 (l, i+1, i) * EXPC[1] *
                     (u1_ip_jp[lp1j] + exp_dangle3 (l,i+1,l+1)*EXPC[1]*(u1_ip_jp[lp2j] + u1_iu_jp[lp2j]));
     }
@@ -1137,7 +1137,7 @@ void s_partition_function::compute_u1_iu_jp (int i, int j)
     for (h=i+2; h <= j-1; h++)    // ..-(...)-(--) or ..-(...)-(--).
     {
         hj = index[h]+j-h;
-        // d5 is included in s3, but helix penalty is not 
+        // d5 is included in s3, but helix penalty is not
         u1_iu_jp[ij] += EXPC[h-i] * s3_jp[hj];
     }
     u1_iu_jp[ij] *= EXPB1;
@@ -1155,12 +1155,12 @@ void s_partition_function::compute_u1_iu_ju_jm1p (int i, int j)
 
     int ip1jm1 = index[i+1]+j-1-i-1;        // .(...).
     u1_iu_ju_jm1p[ij] += up[ip1jm1] * exp_AUpenalty(i+1,j-1) * exp_dangle5 (j-1, i+1, i) * fd3(j+1,i+1,j-1) * EXPC[2];
-    
+
     for (l=i+2; l < j-2; l++)    // .(...)-(---) or .(...)-(---).
     {
         ip1l = index[i+1]+l-i-1;
         lp1j = index[l+1]+j-l-1;
-        lp2j = index[l+2]+j-l-2;  
+        lp2j = index[l+2]+j-l-2;
         u1_iu_ju_jm1p[ij] += up[ip1l] * exp_AUpenalty(i+1,l) * exp_dangle5 (l, i+1, i) * EXPC[1] *
                     (u1_ip_ju_jm1p[lp1j] + exp_dangle3 (l,i+1,l+1)*EXPC[1]*(u1_ip_ju_jm1p[lp2j] + u1_iu_ju_jm1p[lp2j]));
     }
@@ -1168,7 +1168,7 @@ void s_partition_function::compute_u1_iu_ju_jm1p (int i, int j)
     for (h=i+2; h <= j-1; h++)    // ..-(...)-(--) or ..-(...)-(--).
     {
         hj = index[h]+j-h;
-        // d5 is included in s3, but helix penalty is not 
+        // d5 is included in s3, but helix penalty is not
         u1_iu_ju_jm1p[ij] += EXPC[h-i] * s3_ju_jm1p[hj];
     }
     u1_iu_ju_jm1p[ij] *= EXPB1;
@@ -1187,16 +1187,16 @@ void s_partition_function::compute_u1_iu_ju (int i, int j)
 
     for (l=i+2; l < j-1; l++)    // .(...)-..
     {
-        ip1l = index[i+1]+l-i-1;        
+        ip1l = index[i+1]+l-i-1;
         u1_iu_ju[ij] += up[ip1l] * exp_AUpenalty(i+1,l) * exp_dangle5 (l, i+1, i) * // EXPC[1] * // added it to the end
                 fd3(j+1,i+1,l) * EXPC[j-l+1];
     }
-        
+
     for (l=i+2; l < j-2; l++)    // .(...)-(--)-..
     {
         ip1l = index[i+1]+l-i-1;
         lp1j = index[l+1]+j-l-1;
-        lp2j = index[l+2]+j-l-2;                 
+        lp2j = index[l+2]+j-l-2;
         u1_iu_ju[ij] += up[ip1l] * exp_AUpenalty(i+1,l) * exp_dangle5 (l, i+1, i) * EXPC[1] *
                     (u1_ip_ju[lp1j] + exp_dangle3 (l,i+1,l+1)*EXPC[1]*(u1_ip_ju[lp2j] + u1_iu_ju[lp2j]));
     }
@@ -1204,7 +1204,7 @@ void s_partition_function::compute_u1_iu_ju (int i, int j)
     for (h=i+2; h <= j-1; h++)    // ..-(...)-(--)-..
     {
         hj = index[h]+j-h;
-        // d5 is included in s3, but helix penalty is not 
+        // d5 is included in s3, but helix penalty is not
         u1_iu_ju[ij] += EXPC[h-i] * s3_ju[hj];
     }
     u1_iu_ju[ij] *= EXPB1;
@@ -1217,7 +1217,7 @@ PFTYPE s_partition_function::fd3 (int jplus1, int h, int l)
     if (l > jplus1-1)    giveup ("Error, l > j", "f function, partition_function");
     if (l == jplus1-1)
         return 1.0;
-    return exp_dangle3 (l, h, l+1);    
+    return exp_dangle3 (l, h, l+1);
 }
 
 
@@ -1228,12 +1228,12 @@ void s_partition_function::compute_s3_jp (int h, int j)
     if (h < 1) return;
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
-    s3_jp[hj] = 0;   
+    s3_jp[hj] = 0;
 
     for (l = j-1; l <= j; l++)
     {
         hl = index[h] + l - h;
-        s3_jp[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) * 
+        s3_jp[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) *
                     fd3 (j+1, h, l) * EXPC[j-l];
     }
     for (l = h+1; l < j-2; l++)
@@ -1254,7 +1254,7 @@ void s_partition_function::compute_s3_ju_jm1p (int h, int j)
     if (h < 1) return;
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
-    s3_ju_jm1p[hj] = 0;   
+    s3_ju_jm1p[hj] = 0;
 
     int hjm1 = index[h]+j-1-h;
     s3_ju_jm1p[hj] += up[hjm1] * exp_dangle5 (j-1, h, h-1) * exp_AUpenalty (h, j-1) * fd3 (j+1, h, j-1) * EXPC[1];
@@ -1277,15 +1277,15 @@ void s_partition_function::compute_s3_ju (int h, int j)
     if (h < 1) return;
     int hj, hl, l, lp2j, lp1j;
     hj = index[h]+j-h;
-    s3_ju[hj] = 0;   
-    
+    s3_ju[hj] = 0;
+
     for (l = h+1; l < j-1; l++)
     {
         hl = index[h] + l - h;
-        s3_ju[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) * 
+        s3_ju[hj] += up[hl] * exp_dangle5 (l, h, h-1) * exp_AUpenalty (h, l) *
                       fd3 (j+1, h, l) * EXPC[j-l];
     }
-    
+
     for (l = h+1; l < j-2; l++)
     {
         hl = index[h] + l - h;
@@ -1302,11 +1302,11 @@ void s_partition_function::compute_base_pair_probabilities ()
 // PRE: the partition function arrays have been filled
 {
     int h, l;
-    for (h=0; h < seqlen; h++)   
+    for (h=0; h < seqlen; h++)
     {
         for (l=seqlen-1; l > h+TURN; l--)
         {
-            if (can_pair (sequence[h], sequence[l]))    
+            if (can_pair (sequence[h], sequence[l]))
             {
                 compute_p (h, l);
             }
@@ -1324,10 +1324,10 @@ void s_partition_function::compute_base_pair_probabilities ()
                 compute_pmd3_needmidd3 (h, l);
                 compute_pmd3_noneedmidd3 (h, l);
                 compute_pm1nod3_needendd3 (h, l);
-                compute_pm1d3_needendd3 (h, l);            
-                
+                compute_pm1d3_needendd3 (h, l);
+
                 // the next 4 are only needed to compute the partial derivative wrt multi_free_base_penalty
-                // moved to the gradient                
+                // moved to the gradient
 //                 compute_pm2d5_needmidd5 (h, l);
 //                 compute_pm2d5_noneedmidd5 (h, l);
 //                 compute_pm2nod5_needmidd5 (h, l);
@@ -1366,7 +1366,7 @@ void s_partition_function::compute_p (int h, int l)
     int i,j;
     PARAMTYPE en_internal;
     PFTYPE term1, term2;
-    
+
     hl = index[h]+l-h;
     // intialize, just in case
     p[hl] = 0;
@@ -1374,7 +1374,7 @@ void s_partition_function::compute_p (int h, int l)
     //exterior base pair
     // first, 5' end
     term1 = 0.0;
-    
+
     IFD
     {
         if (h > 0)      term1 = u[h-1];
@@ -1386,13 +1386,13 @@ void s_partition_function::compute_p (int h, int l)
         {
             term1 +=  (u_ip_jp[h-1] + u_iu_jp[h-1] + exp_dangle5(l,h,h-1)*(u_ip_ju[h-1] + u_iu_ju[h-1]));
         }
-        else if (h > 0)       
+        else if (h > 0)
         {
             term1 += exp_dangle5(l,h,h-1);  //-.[...]
         }
-        else                  term1 = 1;  
+        else                  term1 = 1;
     }
-    
+
     // then, 3' end
     term2 = 0.0;
     IFD
@@ -1405,18 +1405,18 @@ void s_partition_function::compute_p (int h, int l)
         if (l < seqlen-3)
         {
             int lp1n = index[l+1]+seqlen-1-(l+1);
-            int lp2n = index[l+2]+seqlen-1-(l+2);            
-            term2 += (u_ip_jp[lp1n] + u_ip_ju[lp1n] + 
+            int lp2n = index[l+2]+seqlen-1-(l+2);
+            term2 += (u_ip_jp[lp1n] + u_ip_ju[lp1n] +
                         exp_dangle3(l,h,l+1)*(u_ip_jp[lp2n] + u_ip_ju[lp2n] + u_iu_jp[lp2n] + u_iu_ju[lp2n]));
         }
-        else if (l < seqlen-1) 
-        {    
+        else if (l < seqlen-1)
+        {
             term2 += exp_dangle3(l,h,l+1);
             //printf ("Add4 d3(%d,%d,%d)\n", l, h, l+1);
         }
         else                  term2 = 1;
     }
-    
+
     zeronminus1 = index[0] + seqlen-1;
     IFD
     {
@@ -1427,19 +1427,19 @@ void s_partition_function::compute_p (int h, int l)
         p[hl] = term1 * up[hl] * term2 * exp_AUpenalty (h, l) /
             (u_ip_jp[zeronminus1] + u_ip_ju[zeronminus1] + u_iu_jp[zeronminus1] + u_iu_ju[zeronminus1]);
     }
-    
+
     // case stacking energies
     if (h > 0 && l < seqlen-1)
     {
         hm1lp1 = index[h-1] + l+1 - h+1;
-        if (can_pair (sequence[h-1], sequence[l+1]))    
+        if (can_pair (sequence[h-1], sequence[l+1]))
         {
-            en_stack = s_stacked_pair::get_energy (h-1, l+1, sequence);    
+            en_stack = s_stacked_pair::get_energy (h-1, l+1, sequence);
             if (en_stack >= INF/2)
             {
                 //printf ("** Infinite stack   (%d, %d) !\n", h-1, l+1);
             }
-            else            
+            else
                 p[hl] += p[hm1lp1] * up[hl] / up[hm1lp1] * EXP (en_stack * oneoverRT);
         }
     }
@@ -1452,9 +1452,9 @@ void s_partition_function::compute_p (int h, int l)
         {
             // Nov 19, 2007: FIXED a very stupid bug. It was -2 below when it should be +2. That screwed up the calculation of the gradient values.
             for (j = l+1; j <= MIN(MAXLOOP+l-h+i+2, seqlen-1); j++)
-            {        
+            {
                 if (sequence[i]+sequence[j] == 3 ||
-                    sequence[i]+sequence[j] == 5)        
+                    sequence[i]+sequence[j] == 5)
                 {
                     if (i == h-1 && j == l+1) continue;    // we don't want stacked pairs here
                     int ij = index[i] + j - i;
@@ -1469,7 +1469,7 @@ void s_partition_function::compute_p (int h, int l)
                         num_internal_in_p++;
                     }
                 }
-            }        
+            }
         }
     }
 
@@ -1477,15 +1477,15 @@ void s_partition_function::compute_p (int h, int l)
         return;
 
     // case multi-loop
-    //     u1 has multi_helix_penalty                    
-        
+    //     u1 has multi_helix_penalty
+
 
     PFTYPE pml = 0.0;
     for (i=0; i < h; i++)
     {
         int il = index[i] + l - i;
-                
-        // the case when h-l is the first branch of the multi-loop    //  (-[...] ..      
+
+        // the case when h-l is the first branch of the multi-loop    //  (-[...] ..
         IFD
             pml += EXPC[h-i-1] * pm[il];
         else
@@ -1494,19 +1494,19 @@ void s_partition_function::compute_p (int h, int l)
             {
                  pml += EXPC[h-i-1] * (i<h-2?exp_dangle5(l,h,h-1):1) *
                     (pmd3_noneedmidd3[il] + pmd3_needmidd3[il]  * exp_dangle3(l,h,l+1) * EXPC[1]);
-                    // (.-[...](---)-)    i.-h...l(---)-j 
+                    // (.-[...](---)-)    i.-h...l(---)-j
                     // (.-[...].-(---)-)    i.-h...l.-(---)-j
             }
             else    // case ((... , no dangling end
             {
                 pml += pmnod3_noneedmidd3[il] + pmnod3_needmidd3[il] * exp_dangle3(l,h,l+1) * EXPC[1];
-                    // ([...](---)-)    ih...l(---)-j 
+                    // ([...](---)-)    ih...l(---)-j
                     // ([...].-(---)-)    ih...l.-(---)-j
             }
         }
-                
+
         if (i < h - TURN -2)    // only now we can have a branch to the left
-        {      
+        {
             int ip1hm1 = index[i+1] + h-1 - (i+1);
             IFD
             {
@@ -1515,7 +1515,7 @@ void s_partition_function::compute_p (int h, int l)
                 // branch to the left and to the right of h-l
             }
             else
-            {   
+            {
                 int ip2hm1 = index[i+2] + h-1 - (i+2);
                 int ilp1 = index[i] + l+1 - i;
                 PFTYPE term1 = 0.0;
@@ -1524,23 +1524,23 @@ void s_partition_function::compute_p (int h, int l)
                     term1 = p[ilp1] / up[ilp1] * exp_AUpenalty (i,l+1) *
                                 (  // first, the case ((..-)-[...])
                                   ( u1_ip_jp[ip1hm1]    // ((..-)[...]) or ((..-).[...])
-                                    + exp_dangle5(l,h,h-1)*u1_ip_ju[ip1hm1] )   // ((..-).-[...])  
+                                    + exp_dangle5(l,h,h-1)*u1_ip_ju[ip1hm1] )   // ((..-).-[...])
                                         // no need to add EXPC[1], it's in u1_ip_ju
-                                        
+
                                     // next, the case (.-(...)-[...])      i..-(...)h...lj
                                   + exp_dangle3(i,l+1,i+1) * EXPC[1] *
-                                    ( u1_ip_jp[ip2hm1] + u1_iu_jp[ip2hm1] 
-                                            + exp_dangle5(l,h,h-1)*(u1_ip_ju[ip2hm1]+u1_iu_ju[ip2hm1]) ) 
-                                        // (..-(..-).-[...])     
+                                    ( u1_ip_jp[ip2hm1] + u1_iu_jp[ip2hm1]
+                                            + exp_dangle5(l,h,h-1)*(u1_ip_ju[ip2hm1]+u1_iu_ju[ip2hm1]) )
+                                        // (..-(..-).-[...])
                                 );
                 }
-                
+
                 pml +=
-                
+
                 // first, when h-l is the last branch to the right
-                ( term1 + 
-                
-                // case ((..-)-[...].-)  
+                ( term1 +
+
+                // case ((..-)-[...].-)
                 pm1nod3_needendd3[il] * exp_dangle3(l,h,l+1) *    // EXPC added in pm1nod3
                     (u1_ip_jp[ip1hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[ip1hm1])
                             // c is added in pm1nod3_needendd3
@@ -1549,13 +1549,13 @@ void s_partition_function::compute_p (int h, int l)
                 + pm1d3_needendd3[il] * exp_dangle3(l,h,l+1) *     // don't need EXPC[1]
                     (u1_ip_jp[ip2hm1] + exp_dangle5(l,h,h-1)* u1_ip_ju[ip2hm1])
                             // (.(...).-[...].-)        i.(...)h...l.-j
-                            
-                // case (..-(..-)-[...].-)            
+
+                // case (..-(..-)-[...].-)
                 + pm1d3_needendd3[il]  * exp_dangle3(l,h,l+1) *     // don't need EXPC[1]
                     (u1_iu_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_iu_ju[ip2hm1])
                             // (..-(...)..-[...].-)      i..-(...)h...l.-j
 
-                            
+
                 // we have branches to the left and to the right of h-l
                 // let's do same as above, but with pm instead of pm1
                                 // case ((..-)-[...].-(--)-) or  ((..-)-[...](--)-)
@@ -1567,13 +1567,13 @@ void s_partition_function::compute_p (int h, int l)
                 + EXPC[1] * (pmd3_needmidd3[il] * exp_dangle3(l,h,l+1) * EXPC[1] + pmd3_noneedmidd3[il]) *
                         (u1_ip_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[ip2hm1])
                             // (.(...).-[...].-)        i.(...)h...l.-j
-                            
+
                 // case (..-(..-)-[...].-(--)-) or (..-(..-)-[...](--)-)
                 + EXPC[1] * (pmd3_needmidd3[il]  * exp_dangle3(l,h,l+1) * EXPC[1] + pmd3_noneedmidd3[il])*
-                    (u1_iu_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_iu_ju[ip2hm1]) ); 
-                            
+                    (u1_iu_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_iu_ju[ip2hm1]) );
+
             }    // end if-else ignore_dangles
-        }      // end if (i < h - TURN -2)  
+        }      // end if (i < h - TURN -2)
     }
     p[hl] +=  up[hl] * EXPA * EXPB2 * exp_AUpenalty (h,l) * pml;
 }
@@ -1594,11 +1594,11 @@ void s_partition_function::compute_pm (int i, int l)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             lp1jm1 = index[l+1] + j-1 - l-1;
-            pm[il] += exp_AUpenalty (i,j) * p[ij] / up[ij] * u1[lp1jm1];            
+            pm[il] += exp_AUpenalty (i,j) * p[ij] / up[ij] * u1[lp1jm1];
         }
-    }    
+    }
 }
 
 
@@ -1613,18 +1613,18 @@ void s_partition_function::compute_pmd3_needmidd3 (int i, int l)
     il = index[i]+l-i;
     // intialize, just in case
     pmd3_needmidd3[il] = 0;
-    
+
     for (j = l+TURN+3; j < seqlen; j++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             lp2jm1 = index[l+2] + j-1 - l-2;
             lp2jm2 = index[l+2] + j-2 - l-2;
-            lp2jm3 = index[l+2] + j-3 - l-2;            
+            lp2jm3 = index[l+2] + j-3 - l-2;
             pmd3_needmidd3[il] += exp_AUpenalty (i,j) * exp_dangle3(i,j,i+1) * p[ij] / up[ij] * // don't need to add EXPC[1] here, it's added in the calling function
                             ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1]      // ..))  or ..).)
-                                + exp_dangle5(i,j,j-1) * (u1_ip_ju[lp2jm1] + u1_iu_ju[lp2jm1])  );    //)-..)            
+                                + exp_dangle5(i,j,j-1) * (u1_ip_ju[lp2jm1] + u1_iu_ju[lp2jm1])  );    //)-..)
         }
     }
 }
@@ -1642,22 +1642,22 @@ void s_partition_function::compute_pmd3_noneedmidd3 (int i, int l)
     il = index[i]+l-i;
     // intialize, just in case
     pmd3_noneedmidd3[il] = 0;
-    
+
     for (j = l+TURN+3; j < seqlen; j++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             lp1jm1 = index[l+1] + j-1 - l-1;
             lp1jm2 = index[l+1] + j-2 - l-1;
-            lp1jm3 = index[l+1] + j-3 - l-1;            
+            lp1jm3 = index[l+1] + j-3 - l-1;
             lp2jm1 = index[l+2] + j-1 - l-2;
             lp2jm2 = index[l+2] + j-2 - l-2;
             lp2jm3 = index[l+2] + j-3 - l-2;
 
             pmd3_noneedmidd3[il] += exp_AUpenalty (i,j) * exp_dangle3(i,j,i+1) * p[ij] / up[ij] * // shouldn't add EXPC[1] here because it's in the calling function
-                            (u1_ip_jp[lp1jm1] + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);  
-                                // ..))  or ..).),  and then )-..)            
+                            (u1_ip_jp[lp1jm1] + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);
+                                // ..))  or ..).),  and then )-..)
         }
     }
 }
@@ -1673,12 +1673,12 @@ void s_partition_function::compute_pmnod3_needmidd3 (int i, int l)
     il = index[i]+l-i;
     // intialize, just in case
     pmnod3_needmidd3[il] = 0;
-    
+
     for (j = l+TURN+3; j < seqlen; j++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             lp2jm1 = index[l+2] + j-1 - l-2;
             lp2jm2 = index[l+2] + j-2 - l-2;
             lp2jm3 = index[l+2] + j-3 - l-2;
@@ -1701,21 +1701,21 @@ void s_partition_function::compute_pmnod3_noneedmidd3 (int i, int l)
     il = index[i]+l-i;
     // intialize, just in case
     pmnod3_noneedmidd3[il] = 0;
-    
+
     for (j = l+TURN+3; j < seqlen; j++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             lp1jm1 = index[l+1] + j-1 - l-1;
             lp1jm2 = index[l+1] + j-2 - l-1;
             lp1jm3 = index[l+1] + j-3 - l-1;
             lp2jm1 = index[l+2] + j-1 - l-2;
             lp2jm2 = index[l+2] + j-2 - l-2;
-            lp2jm3 = index[l+2] + j-3 - l-2;            
+            lp2jm3 = index[l+2] + j-3 - l-2;
 
-            pmnod3_noneedmidd3[il] += p[ij] / up[ij] * exp_AUpenalty (i,j) * 
-                            (u1_ip_jp[lp1jm1] + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);                               
+            pmnod3_noneedmidd3[il] += p[ij] / up[ij] * exp_AUpenalty (i,j) *
+                            (u1_ip_jp[lp1jm1] + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);
         }
     }
 }
@@ -1725,7 +1725,7 @@ void s_partition_function::compute_pm1 (int i, int l)
 // called only when no dangling ends
 // the pm1 from McCaskill, no dangling ends
 // region l+1 ... j-1 is unpaired
-//  i h    l.-j   
+//  i h    l.-j
 //  ( (    ).-)
 {
     int j;
@@ -1733,13 +1733,13 @@ void s_partition_function::compute_pm1 (int i, int l)
     il = index[i]+l-i;
     // intialize, just in case
     pm1[il] = 0;
-    
+
     // the case j=l+1 is dealt with separately, directly in compute_p
-    for (j = l+1; j < seqlen; j++)    
+    for (j = l+1; j < seqlen; j++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;           
+            ij = index[i]+j-i;
             pm1[il] += p[ij] / up[ij] * exp_AUpenalty (i,j) * EXPC[j-l-1];
         }
     }
@@ -1758,14 +1758,14 @@ void s_partition_function::compute_pm1nod3_needendd3 (int i, int l)
     il = index[i]+l-i;
     // intialize, just in case
     pm1nod3_needendd3[il] = 0;
-        
+
     // the case j=l+1 is dealt with separately, directly in compute_p
-    for (j = l+2; j < seqlen; j++)    
+    for (j = l+2; j < seqlen; j++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;           
-            pm1nod3_needendd3[il] += p[ij] / up[ij] * exp_AUpenalty (i,j) * 
+            ij = index[i]+j-i;
+            pm1nod3_needendd3[il] += p[ij] / up[ij] * exp_AUpenalty (i,j) *
                                      EXPC[j-l-1] * (l+2<j?exp_dangle5(i,j,j-1):1);
         }
     }
@@ -1784,13 +1784,13 @@ void s_partition_function::compute_pm1d3_needendd3 (int i, int l)
     il = index[i]+l-i;
     // intialize, just in case
     pm1d3_needendd3[il] = 0;
-    
+
     // the case j=l+1 is dealt with separately, directly in compute_p
-    for (j = l+2; j < seqlen; j++)    
+    for (j = l+2; j < seqlen; j++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;           
+            ij = index[i]+j-i;
             pm1d3_needendd3[il] += exp_dangle3(i,j,i+1) * EXPC[1] * p[ij] / up[ij] * exp_AUpenalty (i,j) *
                                    EXPC[j-l-1] * (l+2<j?exp_dangle5(i,j,j-1):1);
         }
@@ -1807,16 +1807,16 @@ void s_partition_function::compute_pm2 (int h, int j)
 {
     int i, ij;
     int hj, ip1;
-    hj = index[h]+j-h;   
-    
+    hj = index[h]+j-h;
+
     // intialize, just in case
     pm2[hj] = 0;
-    
+
     for (i=0; i < h-TURN-2; i++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             int ip1hm1 = index[i+1] + h-1 - (i+1);
             pm2[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) * u1[ip1hm1];
         }
@@ -1832,15 +1832,15 @@ void s_partition_function::compute_pm2d5_needmidd5 (int h, int j)
 {
     int i, ij;
     int hj, ip1;
-    hj = index[h]+j-h;   
+    hj = index[h]+j-h;
     // intialize, just in case
     pm2d5_needmidd5[hj] = 0;
-    
+
     for (i=0; i < h-TURN-3; i++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             int ip1hm1 = index[i+1] + h-1 - (i+1);
             int ip2hm1 = index[i+2] + h-1 - (i+2);
             pm2d5_needmidd5[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) * exp_dangle5(i,j,j-1) *
@@ -1861,18 +1861,18 @@ void s_partition_function::compute_pm2d5_noneedmidd5 (int h, int j)
 {
     int i, ij;
     int hj, ip1;
-    hj = index[h]+j-h;   
+    hj = index[h]+j-h;
     // intialize, just in case
     pm2d5_noneedmidd5[hj] = 0;
-    
+
     for (i=0; i < h-TURN-2; i++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             int ip1hm1 = index[i+1] + h-1 - (i+1);
             int ip2hm1 = index[i+2] + h-1 - (i+2);
-            pm2d5_noneedmidd5[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) * exp_dangle5(i,j,j-1) * 
+            pm2d5_noneedmidd5[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) * exp_dangle5(i,j,j-1) *
                 // first, ((---)[...].-.) or ((---).[...].-.)
                 ( u1_ip_jp[ip1hm1] + exp_dangle3(i,j,i+1) * EXPC[1] * (u1_ip_jp[ip2hm1] + u1_iu_jp[ip2hm1]));
         }
@@ -1889,18 +1889,18 @@ void s_partition_function::compute_pm2nod5_needmidd5 (int h, int j)
 {
     int i, ij;
     int hj, ip1;
-    hj = index[h]+j-h;   
+    hj = index[h]+j-h;
     // intialize, just in case
     pm2nod5_needmidd5[hj] = 0;
-    
+
     for (i=0; i < h-TURN-2; i++)
     {
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             int ip1hm1 = index[i+1] + h-1 - (i+1);
             int ip2hm1 = index[i+2] + h-1 - (i+2);
-            pm2nod5_needmidd5[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) * 
+            pm2nod5_needmidd5[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) *
                 // we have to make sure the middle d3 is included
                 // first, ((---)-..[...]) or ((---)-..[...].)
                 ( u1_ip_ju[ip1hm1] + exp_dangle3(i,j,i+1) * EXPC[1] * (u1_ip_ju[ip2hm1] + u1_iu_ju[ip2hm1]));
@@ -1918,19 +1918,19 @@ void s_partition_function::compute_pm2nod5_noneedmidd5 (int h, int j)
 {
     int i;
     int hj, ip1, ij;
-    hj = index[h]+j-h;   
+    hj = index[h]+j-h;
     // intialize, just in case
     pm2nod5_noneedmidd5[hj] = 0;
-    
+
     for (i=0; i < h-TURN-2; i++)
     {
-    
+
         if (can_pair (sequence[i], sequence[j]))
         {
-            ij = index[i]+j-i;   
+            ij = index[i]+j-i;
             int ip1hm1 = index[i+1] + h-1 - (i+1);
             int ip2hm1 = index[i+2] + h-1 - (i+2);
-            pm2nod5_noneedmidd5[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) * 
+            pm2nod5_noneedmidd5[hj] += p[ij] / up[ij] * exp_AUpenalty (i,j) *
                 // first, ((---)[...].-.) or ((---).[...].-.)
                 ( u1_ip_jp[ip1hm1] + exp_dangle3(i,j,i+1) * EXPC[1] * (u1_ip_jp[ip2hm1] + u1_iu_jp[ip2hm1]));
         }
@@ -1941,16 +1941,16 @@ void s_partition_function::compute_pm2nod5_noneedmidd5 (int h, int j)
 /*---------------------------------------------------------------------------*/
 #define PMIN 0.00001
 void s_partition_function::PS_dot_plot(char *wastlfile)
-// taken from Vienna package 1.4 
+// taken from Vienna package 1.4
 // plots a matrix with the square root of probabilities (for better visibility)
 {
   /* produce PostScript dot plot from probabilities in p[] array */
-   
+
   FILE *wastl;
   char name[31], *c;
   int i, j, length;
   PFTYPE tmp;
-   
+
   length= strlen(csequence);
   wastl = fopen(wastlfile,"w");
   if (wastl==NULL) {
@@ -1972,7 +1972,7 @@ void s_partition_function::PS_dot_plot(char *wastlfile)
   fprintf(wastl,"%%This file contains the square roots "
       "of the base pair probabilities in the form\n");
   fprintf(wastl,"%% i  j  sqrt(p(i,j)) ubox\n");
-   
+
   fprintf(wastl,"100 dict begin\n");  /* DSC says EPS should create a dict */
   fprintf(wastl,"\n/logscale false def\n\n");
   fprintf(wastl,"%%delete next line to get rid of title\n"
@@ -1991,7 +1991,7 @@ void s_partition_function::PS_dot_plot(char *wastlfile)
   }
   fprintf(wastl,") } def\n");
   fprintf(wastl,"/len { sequence length } def\n\n");
-   
+
   fprintf(wastl,"/ubox {\n"     /* upper triangle matrix */
       "   logscale {\n"
       "      log dup add lpmin div 1 exch sub dup 0 lt { pop 0 } if\n"
@@ -2068,7 +2068,7 @@ void s_partition_function::PS_dot_plot(char *wastlfile)
       "   dup dup 20 div dup 2 array astore exch 40 div setdash\n"
       "} { [0.3 0.7] 0.1 setdash } ifelse\n"
       "0 exch len {\n"      /* for (i=0; i<=len; i++) */
-      "   dup dup\n"        
+      "   dup dup\n"
       "   0 moveto\n"                     /* i 0 moveto   */
       "   len lineto \n"                  /* i len lineto */
       "   dup\n"
@@ -2086,14 +2086,14 @@ void s_partition_function::PS_dot_plot(char *wastlfile)
       // Mirela: changed into lf -- not sure it makes a difference
       fprintf(wastl,"%d %d %1.5lf ubox\n", i+1, j+1, tmp);
     }
-    // come back to this later    
+    // come back to this later
   /* do mfe */
   /*
   if (base_pair)
-    for(i=1; i<=base_pair[0].i; i++) 
+    for(i=1; i<=base_pair[0].i; i++)
       fprintf(wastl,"%d %d 0.95 lbox\n",
-          base_pair[i].i, base_pair[i].j); 
-  */  
+          base_pair[i].i, base_pair[i].j);
+  */
   fprintf(wastl,"showpage\n");
   fprintf(wastl,"end\n");
   fprintf(wastl,"%%%%EOF\n");
@@ -2106,10 +2106,10 @@ int s_partition_function::has_base_pair (int i, int j, char *structure)
 // returns 1 if structure contains base pair (i,j)
 {
     int ptable[MAXSLEN];
-    detect_original_pairs (structure, ptable); 
+    detect_original_pairs (structure, ptable);
     if (ptable[i] == j)
     {
-        //printf ("Structure %s has base pair %d-%d\n", structure, i, j);    
+        //printf ("Structure %s has base pair %d-%d\n", structure, i, j);
         return 1;
     }
     return 0;
@@ -2149,7 +2149,7 @@ PFTYPE s_partition_function::exp_free_energy_partial (int i, int j, char *seq, c
     if (removeAU)
     {
         if (has_AU_penalty(nuc_to_int(seq[i]), nuc_to_int(seq[j])))    // remove the AU penalty, because we don't know if this is going to be an exterior loop or not
-        { 
+        {
             energy -= AU_penalty (nuc_to_int(seq[i]), nuc_to_int(seq[j]))/100.0;
         }
     }
@@ -2172,27 +2172,27 @@ PFTYPE s_partition_function::compute_partition_function_exhaustively ()
     //R = 0.00198717;
     //temp = 310.15;
     beta = (PFTYPE)1000.0/(1.98717*310.15);
-    //beta = 1; 
+    //beta = 1;
 
 
     int ptable[MAXSLEN];
     PFTYPE strprob;
-        
+
     s_min_folding *min_fold = new s_min_folding (csequence);
     min_energy = min_fold->s_simfold ();
     min_fold->return_structure (structure);
-    delete min_fold;      
-    
+    delete min_fold;
+
     //s_sub_folding* sub_fold = new s_sub_folding(sequence, -(int)(min_energy*100.0));
     s_sub_folding* sub_fold = new s_sub_folding(csequence, 10000);
     sub_fold->set_limit (MAXSUBSTR);
     sub_fold->s_simfold (enthalpy);
     actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
     delete sub_fold;
-    
+
     if (actual_num_str >= MAXSUBSTR)
         return -1;
-        
+
     max_energy = tmp_energies[actual_num_str-1];
     Zexhaustive = 0.0;
     for (i=0; i < actual_num_str; i++)
@@ -2205,7 +2205,7 @@ PFTYPE s_partition_function::compute_partition_function_exhaustively ()
         // recompute the free energy, i.e. with the correct dangling ends
         energy = free_energy_simfold (csequence, tmp_structures[i]);
         strprob = (PFTYPE)(EXP (-1.0 * energy * beta)/Z);
-        detect_original_pairs (tmp_structures[i], ptable); 
+        detect_original_pairs (tmp_structures[i], ptable);
         for (ii=0; ii < seqlen; ii++)
         {
             if (ptable[ii] > ii)
@@ -2214,8 +2214,8 @@ PFTYPE s_partition_function::compute_partition_function_exhaustively ()
                 int ind = index[ii] + ptable[ii] - ii;
                 pexhaustive[ind] += strprob;
             }
-        }   
-        
+        }
+
         printf ("Substr %d: %s\ten=%.2lf \tprob=%e\n", i, tmp_structures[i], energy, strprob);
         // NO idea why valgrind doesn't like this printf
         Zexhaustive += EXP (-1.0 * energy * beta);
@@ -2228,12 +2228,12 @@ PFTYPE s_partition_function::compute_partition_function_exhaustively ()
     for (i=0; i < seqlen; i++)
     {
         for (j=i+TURN+1; j < seqlen; j++)
-        {    
+        {
             int ij = index[i] + j - i;
-            for (k=0; k < actual_num_str; k++)                
+            for (k=0; k < actual_num_str; k++)
             {
                 // compute exhaustive u[i,j]
-                // ignore "...." because every u[i,j] 
+                // ignore "...." because every u[i,j]
                 if (valid_structure (i, j, tmp_structures[k]) && is_structured (i, j, tmp_structures[k]))
                 {
                     identical = 0;
@@ -2250,7 +2250,7 @@ PFTYPE s_partition_function::compute_partition_function_exhaustively ()
                 }
                 //else
                 //    printf ("%s not valid from %d to %d\n", tmp_structures[k], i, j);
-                                
+
                 // compute exhaustive up[i,j]
                 if (has_base_pair(i,j, tmp_structures[k]))
                 {
@@ -2266,23 +2266,23 @@ PFTYPE s_partition_function::compute_partition_function_exhaustively ()
                     }
                     //else
                     //    printf ("Str %s identical with other for i=%d, j=%d\n", tmp_structures[k], i, j);
-                }                        
+                }
             }
         }
     }
-    return Zexhaustive;        
+    return Zexhaustive;
 }
 
 
 void s_partition_function::verify_simple_vs_complicated_bpp (s_partition_function *pf)
-// assume this one has ignore_dangles = 1 and otherpf has ignore_dangles=0 
+// assume this one has ignore_dangles = 1 and otherpf has ignore_dangles=0
 // assume that the input parameters for the object with ignore_dangles=0 has dangling ends 0
 // then the p base pair probabilities should be the same
 // this function verifies that
 {
     int i, j;
     int error;
-    
+
     printf ("Verifying p ... ");
     error = 0;
     for (i=0; i < seqlen; i++)
@@ -2305,7 +2305,7 @@ void s_partition_function::verify_simple_vs_complicated_bpp (s_partition_functio
 
 
 void s_partition_function::verify_simple_vs_complicated_recurrences (s_partition_function *pf)
-// assume this one has ignore_dangles = 1 and otherpf has ignore_dangles=0 
+// assume this one has ignore_dangles = 1 and otherpf has ignore_dangles=0
 // assume that the input parameters for the object with ignore_dangles=0 has dangling ends 0
 // then the equivalent data structures should have the same values
 // this function verifies that
@@ -2331,7 +2331,7 @@ void s_partition_function::verify_simple_vs_complicated_recurrences (s_partition
         }
     }
     if (!error) printf (" GOOD!\n");
-    
+
     printf ("Verifying s1 ... ");
     error = 0;
     for (i=0; i < seqlen; i++)
@@ -2369,7 +2369,7 @@ void s_partition_function::verify_simple_vs_complicated_recurrences (s_partition
         }
     }
     if (!error) printf (" GOOD!\n");
-    
+
     printf ("Verifying upm ... ");
     error = 0;
     for (i=0; i < seqlen; i++)
@@ -2424,8 +2424,8 @@ void s_partition_function::verify_simple_vs_complicated_recurrences (s_partition
             }
         }
     }
-    if (!error) printf (" GOOD!\n");    
-    
+    if (!error) printf (" GOOD!\n");
+
     printf ("Verifying s3 ... ");
     error = 0;
     for (i=0; i < seqlen; i++)
@@ -2443,14 +2443,14 @@ void s_partition_function::verify_simple_vs_complicated_recurrences (s_partition
             }
         }
     }
-    if (!error) printf (" GOOD!\n");    
-    
+    if (!error) printf (" GOOD!\n");
+
 }
 
 
 void s_partition_function::verify_partition_function()
 {
-    //#define PREC 0.0000000001    
+    //#define PREC 0.0000000001
     int i,j,ij;
     int error = 0;
     if (num_substructures == 0 || num_substructures >= MAXSUBSTR)
@@ -2463,7 +2463,7 @@ void s_partition_function::verify_partition_function()
     if (isnan(Z) || isnan(Zexhaustive))     error = 1;
     // actually check the ratio, not the difference
     // the difference depends on the scale of Z , so then one Z is large, the difference becomes large too, but it's good
-    // example: Z = 270.721, Ze = 270.721, diff = -2.35534e-13, ratio = -8.70025e-16    
+    // example: Z = 270.721, Ze = 270.721, diff = -2.35534e-13, ratio = -8.70025e-16
     if ((Z - Zexhaustive)/Z < PREC && (Zexhaustive - Z)/Z < PREC)
         printf ("\t++++++++++++++++++++++\n\tZ = %g, Ze = %g, diff = %g, ratio = %g\n", Z, Zexhaustive, Z-Zexhaustive, (Z-Zexhaustive)/Z);
     else
@@ -2471,8 +2471,8 @@ void s_partition_function::verify_partition_function()
         printf ("\t----------------------\n\tZ = %g, Ze = %g, diff = %g, ratio = %g\n", Z, Zexhaustive, Z-Zexhaustive, (Z-Zexhaustive)/Z);
         error = 1;
     }
-}        
-        
+}
+
 
 void s_partition_function::verify_recurrences()
 {
@@ -2493,9 +2493,9 @@ void s_partition_function::verify_recurrences()
 //             }
 //             //printf ("\tu[%d,%d] = %g, uex = %g, diff = %g\n", i,j,u[ij],uexhaustive[ij],u[ij]-uexhaustive[ij]);
 //         }
-//     if (ufine) 
+//     if (ufine)
 //         printf ("\t++++++++++++++++++++++\n");
-        
+
     printf ("Checking up .................. ");
     int upfine = 1;
     for (i=0; i < seqlen; i++)
@@ -2518,11 +2518,11 @@ void s_partition_function::verify_recurrences()
             }
             //printf ("\tup[%d,%d] = %g, upex = %g, diff = %g\n", i,j,up[ij],upexhaustive[ij],up[ij]-upexhaustive[ij]);
         }
-    if (upfine) 
+    if (upfine)
         printf ("\t++++++++++++++++++++++\n");
     // NOTE: this will be different when we have the special GGG-U hairpin loop. It's okay to be different, it doesn't affect the partition function.
 
-                
+
     printf ("Checking p ................... ");
     int pfine = 1;
     for (i=0; i < seqlen; i++)
@@ -2546,7 +2546,7 @@ void s_partition_function::verify_recurrences()
             }
             //printf ("\tp[%d,%d] = %g, pex = %g, diff = %g\n", i,j,p[ij],pexhaustive[ij], p[ij]-pexhaustive[ij]);
         }
-    if (pfine) 
+    if (pfine)
         printf ("\t++++++++++++++++++++++\n");
 
 
@@ -2576,11 +2576,11 @@ void s_partition_function::verify_recurrences()
                 //printf ("\t  u_ip_jp=%g, u_ip_ju=%g, u_iu_jp=%g, u_iu_ju=%g\n", u_ip_jp[ij], u_ip_ju[ij], u_iu_jp[ij], u_iu_ju[ij]);
                 ufine = 0;
                 error = 1;
-            }            
+            }
         }
-    if (ufine) 
-        printf ("\t++++++++++++++++++++++\n");    
-        
+    if (ufine)
+        printf ("\t++++++++++++++++++++++\n");
+
     /*
     printf ("Checking s1 ................... ");
     int s1fine = 1;
@@ -2598,10 +2598,10 @@ void s_partition_function::verify_recurrences()
                 s1fine = 0;
             }
         }
-    if (s1fine) 
+    if (s1fine)
         printf ("\t++++++++++++++++++++++\n");
     */
-        
+
 //     printf ("Checking u1 ................... ");
 //     int u1fine = 1;
 //     for (i=0; i < seqlen; i++)
@@ -2619,9 +2619,9 @@ void s_partition_function::verify_recurrences()
 //                 u1fine = 0;
 //             }
 //         }
-//     if (u1fine) 
+//     if (u1fine)
 //         printf ("\t++++++++++++++++++++++\n");
-        
+
 //     printf ("Checking s3 ................... ");
 //     int s3fine = 1;
 //     for (i=0; i < seqlen; i++)
@@ -2638,7 +2638,7 @@ void s_partition_function::verify_recurrences()
 //                 s3fine = 0;
 //             }
 //         }
-//     if (s3fine) 
+//     if (s3fine)
 //         printf ("\t++++++++++++++++++++++\n");
 
 
@@ -2655,7 +2655,7 @@ void s_partition_function::compute_logZ_gradient_finite_differences ()
     PFTYPE f = logl(Z);
     PFTYPE mu = 1e-1;
     PFTYPE RT = -1.98717*310.15/10.0;
-    
+
     // TODO: just do the first parameter for now, to do it for all
     PARAMTYPE old_param = stack[0][3][0][3];
     stack[0][3][0][3] += mu;
@@ -2672,7 +2672,7 @@ void s_partition_function::compute_logZ_gradient_finite_differences ()
 
 
 void s_partition_function::compute_logZ_gradient_exhaustively ()
-{        
+{
     char structure[MAXSLEN];
     double enthalpy, energy;
     char tmp_structures[MAXSUBSTR][MAXSLEN];
@@ -2687,28 +2687,28 @@ void s_partition_function::compute_logZ_gradient_exhaustively ()
     real_str_found = 0;
     double numerator [MAXNUMPARAMS];
     double counter [MAXNUMPARAMS];
-    double denominator;      
-    
+    double denominator;
+
     s_sub_folding* sub_fold = new s_sub_folding(csequence, 10000);
     sub_fold->set_limit (MAXSUBSTR);
     sub_fold->s_simfold (enthalpy);
     actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
     delete sub_fold;
     double f;
-    
+
     for (i=0; i < num_params; i++)
     {
         numerator[i] = 0;
-    }    
-        
+    }
+
     // first compute the denominator, which is the same for all parameters
     denominator = 0;
     for (k=0; k < actual_num_str; k++)
-    {        
+    {
         // recompute the free energy, i.e. with the correct dangling ends
-        energy = free_energy_simfold (csequence, tmp_structures[k]);        
+        energy = free_energy_simfold (csequence, tmp_structures[k]);
         denominator += EXP ((-1) * energy * beta);
-        count_each_structure_type (csequence, tmp_structures[k], counter, f, 1);        
+        count_each_structure_type (csequence, tmp_structures[k], counter, f, 1);
         //printf ("%s, en=%g\n", tmp_structures[k], energy);
         for (i=0; i < num_params; i++)
         {
@@ -2719,13 +2719,13 @@ void s_partition_function::compute_logZ_gradient_exhaustively ()
         //printf ("Sub str %d, counter[317] = %d, numerator[317] = %e\n", k, counter[317], numerator[317]);
     }
     // now the denominator and nominator are computed
-           
+
     for (i=0; i < num_params; i++)
     {
         GlogZexhaustive[i] = numerator[i] / denominator;
     }
     //printf ("Denominator = Z = %g\n", denominator);
-    //printf ("logZ_gradient[317] = %e\n", GlogZexhaustive[317]);    
+    //printf ("logZ_gradient[317] = %e\n", GlogZexhaustive[317]);
 }
 
 
@@ -2764,13 +2764,13 @@ void s_partition_function::compute_logZ_gradient ()
     int tindex;    // type index
     int il_i, il_j, il_ip1, il_jm1;
     int index_should_be;
-    
+
     num_params = create_string_params();
 
     int AUpen_index = structure_type_index ("misc.terminal_AU_penalty");
-   
+
     for (i=0; i < num_params; i++)    GlogZ[i] = 0;
-    
+
     // stacking energies
     index_param = 0;
     for (i=0; i < NUCL; i++)
@@ -2799,12 +2799,12 @@ void s_partition_function::compute_logZ_gradient ()
                                             for (jjp = jj-1; jjp >= jj-2; jjp--)
                                             {
                                                 if (iip == ii+2 && jjp == jj-2)     // this is not stacking energy, is internal loop 1x1
-                                                    continue;                                                
-                                                if (sequence[iip] == k && sequence[jjp] == l) 
-                                                {                                                        
+                                                    continue;
+                                                if (sequence[iip] == k && sequence[jjp] == l)
+                                                {
                                                     iipjjp = index[iip]+jjp-iip;
                                                     if (iip == ii+1 && jjp == jj-1)    // stack pair
-                                                        en_stack = s_stacked_pair::get_energy (ii, jj, sequence);    
+                                                        en_stack = s_stacked_pair::get_energy (ii, jj, sequence);
                                                     else    // bulge
                                                     {
                                                         if (ignore_internal)
@@ -2813,7 +2813,7 @@ void s_partition_function::compute_logZ_gradient ()
                                                     }
                                                     GlogZ[index_param] += p[iijj] * up[iipjjp] / up[iijj] * EXP (en_stack * oneoverRT);
                                                 }
-                                            }                                    
+                                            }
                                         }
                                     }
                                 }
@@ -2829,20 +2829,20 @@ void s_partition_function::compute_logZ_gradient ()
                                         if (sequence[ii] == i && sequence[jj] == j)
                                         {
                                             iijj = index[jj] + ii -jj;
-                                            
+
                                             // stacking energies are also involved in bulges of size 1
                                             for (iip = ii + 1; iip <= MIN(ii+2,seqlen-1); iip++)
                                             {
                                                 for (jjp = jj-1; jjp >= MAX(jj-2,0); jjp--)
                                                 {
                                                     if (iip == ii+2 && jjp == jj-2)     // this is not stacking energy, is internal loop 1x1
-                                                        continue;                                            
-                                                     
-                                                    if(sequence[iip] == k && sequence[jjp] == l)       
-                                                    {                                                        
+                                                        continue;
+
+                                                    if(sequence[iip] == k && sequence[jjp] == l)
+                                                    {
                                                         iipjjp = index[jjp]+iip-jjp;
                                                         if (iip == ii+1 && jjp == jj-1)    // stack pair
-                                                            en_stack = s_stacked_pair::get_energy (jjp, iip, sequence);    
+                                                            en_stack = s_stacked_pair::get_energy (jjp, iip, sequence);
                                                         else    // bulge
                                                         {
                                                             if (ignore_internal)
@@ -2852,27 +2852,27 @@ void s_partition_function::compute_logZ_gradient ()
                                                         GlogZ[index_param] += p[iipjjp] * up[iijj] / up[iipjjp] * EXP (en_stack * oneoverRT);
                                                     }
                                                 }
-                                            
-                                            }       
+
+                                            }
                                         }
                                     }
-                                }                                
-                            }    
-                            index_param++;                                                        
-                        }                        
-                    }                    
+                                }
+                            }
+                            index_param++;
+                        }
+                    }
                 }
 
     // TODO: remove return;
     //return;
-                 
-    index_should_be = structure_type_index("tstackh[0][3][0][0]");                
+
+    index_should_be = structure_type_index("tstackh[0][3][0][0]");
     if (index_param != index_should_be)
     {
-        printf ("Index param after stack = %d, should be %d\n", index_param, index_should_be);
+        fprintf (stderr, "Index param after stack = %d, should be %d\n", index_param, index_should_be);
         exit(1);
-    }                
-    
+    }
+
     // tstackh and hairpin energies
     for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
@@ -2883,13 +2883,13 @@ void s_partition_function::compute_logZ_gradient ()
                     {
                         // no duplicates here
                         for (ii = 0; ii < seqlen; ii++)
-                        {                            
+                        {
                             for (jj = ii+TURN+1; jj < seqlen; jj++)
                             {
-                                if (sequence[ii] == i && sequence[jj] == j && 
+                                if (sequence[ii] == i && sequence[jj] == j &&
                                     sequence[ii+1] == k && sequence[jj-1] == l)
                                 {
-                                
+
                                     // compute the derivative for hairpin penalty by size
                                     char s[100];
                                     sprintf (s, "hairpin_penalty_by_size[%d]", jj-ii-1);
@@ -2900,18 +2900,18 @@ void s_partition_function::compute_logZ_gradient ()
                                     PFTYPE grad = p[iijj] / up[iijj] * EXP (en_hairpin * oneoverRT);
                                     // tried to get a better precision, but it doesn't seem to help
                                     //double grad = p[iijj] / up[iijj] * pow(exp (en_hairpin * oneoverRT/10.0), 10.0);
-                                    GlogZ[sizeindex] += grad;  
-                                    
+                                    GlogZ[sizeindex] += grad;
+
                                     // add the AU_penalty
-                                    
+
                                     if (jj-ii-1 == 3)
                                     {
                                         if (has_AU_penalty (sequence[ii], sequence[jj]))
                                         {
                                             GlogZ[AUpen_index] += grad;
-                                        }                                        
+                                        }
                                     }
-                                    
+
                                     // check to see if it's a special triloop or tetraloop
                                         // check if it is a triloop
                                     if (jj-ii-1 == 3)
@@ -2924,23 +2924,23 @@ void s_partition_function::compute_logZ_gradient ()
                                             {
                                                 sprintf (s, "triloop[%d].energy", kk);
                                                 sizeindex = structure_type_index (s);
-                                                GlogZ[sizeindex] += grad;  
+                                                GlogZ[sizeindex] += grad;
                                             }
                                         }
                                     }
-                                    
+
                                     // check to see it is a tetraloop in tloop
                                     else if (jj-ii-1 == 4)
                                     {
                                         char seq[10];
-                                        substr (csequence, ii, jj, seq);                                        
+                                        substr (csequence, ii, jj, seq);
                                         for (int kk=0; kk < nb_tloops; kk++)
                                         {
                                             if (strcmp (seq, tloop[kk].seq) == 0)
                                             {
                                                 sprintf (s, "tloop[%d].energy", kk);
                                                 sizeindex = structure_type_index (s);
-                                                GlogZ[sizeindex] += grad;  
+                                                GlogZ[sizeindex] += grad;
                                             }
                                         }
                                     }
@@ -2951,10 +2951,10 @@ void s_partition_function::compute_logZ_gradient ()
                                         if (sequence[ii]==G && sequence[ii-1]==G && sequence[ii-2]==G and sequence[jj]==U)
                                         {
                                             sizeindex = structure_type_index ("misc.hairpin_GGG");
-                                            GlogZ[sizeindex] += grad;  
+                                            GlogZ[sizeindex] += grad;
                                         }
                                     }
-                                    
+
                                     // check for the special case of "poly-C" hairpin loop
                                     int is_poly_C = 1;
                                     for (int kk=ii+1; kk<jj; kk++)
@@ -2970,7 +2970,7 @@ void s_partition_function::compute_logZ_gradient ()
                                         if (jj-ii-1 == 3)
                                         {
                                             sizeindex = structure_type_index ("misc.hairpin_c3");
-                                            GlogZ[sizeindex] += grad;  
+                                            GlogZ[sizeindex] += grad;
                                         }
                                         else
                                         {
@@ -2981,7 +2981,7 @@ void s_partition_function::compute_logZ_gradient ()
                                             GlogZ[sizeindex] += grad;
                                         }
                                     }
-                                    
+
                                     // compute the derivatives of tstackh
                                     // tstackh is not added to hairpin loops of size 3
                                     if (jj-ii-1 > 3)
@@ -2993,30 +2993,30 @@ void s_partition_function::compute_logZ_gradient ()
                     }
                 }
 
-    index_should_be = structure_type_index("misc.internal_AU_closure");                
+    index_should_be = structure_type_index("misc.internal_AU_closure");
     if (index_param != index_should_be)
     {
-        printf ("Index param after tstackh = %d, should be %d\n", index_param, index_should_be);
+        fprintf (stderr, "Index param after tstackh = %d, should be %d\n", index_param, index_should_be);
         exit(1);
-    }                
-                                
+    }
+
 
     if (!ignore_internal)
-    {                                    
-        // tstacki energies                
-        // in fact, we only have 3 parameters                            
-        
+    {
+        // tstacki energies
+        // in fact, we only have 3 parameters
+
         char s[100];
         //strcpy (s, "misc.terminal_AU_penalty");
         // this is very slow, it's linear in the number of parameters
-        //int index_terminal_AU_penalty = structure_type_index (s);                        
+        //int index_terminal_AU_penalty = structure_type_index (s);
         strcpy (s, "misc.internal_AU_closure");
-        int index_internal_AU_closure = structure_type_index (s);                        
+        int index_internal_AU_closure = structure_type_index (s);
         strcpy (s, "misc.internal_AG_mismatch");
         int index_internal_AG_mismatch = structure_type_index (s);
         strcpy (s, "misc.internal_UU_mismatch");
-        int index_internal_UU_mismatch = structure_type_index (s);    
-                                    
+        int index_internal_UU_mismatch = structure_type_index (s);
+
         for (i=0; i < NUCL; i++)
             for (j=0; j < NUCL; j++)
                 for (k=0; k < NUCL; k++)
@@ -3033,20 +3033,20 @@ void s_partition_function::compute_logZ_gradient ()
                                     if (sequence[ii] == i && sequence[jj] == j && k==0 && l==0)
                                     {
                                         iijj = index[ii] + jj -ii;
-                                        
+
                                         for (iip = ii+1; iip <= MIN(jj-2-TURN,ii+MAXLOOP+1) ; iip++)  // j-2-TURN
                                         {
                                             int minq = MAX (jj-ii+iip-MAXLOOP-2, iip+1+TURN);    // ip+1+TURN);
                                             for (jjp = minq; jjp < jj; jjp++)
-                                            {        
+                                            {
                                                 if (sequence[iip]+sequence[jjp] == 3 ||
-                                                    sequence[iip]+sequence[jjp] == 5)        
+                                                    sequence[iip]+sequence[jjp] == 5)
                                                 {
                                                     int branch1 = iip-ii-1;
                                                     int branch2 = jj-jjp-1;
                                                     // compute the derivative for internal penalty by size
-                                                        
-                                                    iipjjp = index[iip] + jjp - iip;  
+
+                                                    iipjjp = index[iip] + jjp - iip;
                                                     if (((branch1 == 1 && branch2 > 2) || (branch1 > 2 && branch2 == 1)) && misc.gail_rule)
                                                     {
                                                         //char s[100];
@@ -3054,38 +3054,38 @@ void s_partition_function::compute_logZ_gradient ()
                                                         // this is very slow, it's linear in the number of parameters
                                                         int sizeindex = structure_type_index (s);
                                                         //printf ("sizeindex=%d\n", sizeindex);
-                                                    
+
                                                         en_internal = s_internal_loop::get_energy (ii, jj, iip, jjp, sequence);
                                                         PFTYPE grad = p[iijj] * up[iipjjp] / up[iijj] * EXP (en_internal * oneoverRT);
-                                                        GlogZ[sizeindex] += grad; 
-                                                        
+                                                        GlogZ[sizeindex] += grad;
+
                                                         // now check if any of the 3 internal params is involved
                                                         if (((i == A || i == G) && j == U) ||
                                                             ((j == A || j == G) && i == U))
                                                         {
-                                                            //GlogZ[index_terminal_AU_penalty] += p[iijj] * up[iipjjp] / up[iijj] * exp (en_internal * oneoverRT); 
+                                                            //GlogZ[index_terminal_AU_penalty] += p[iijj] * up[iipjjp] / up[iijj] * exp (en_internal * oneoverRT);
                                                             GlogZ[index_internal_AU_closure] += grad;
                                                         }
                                                         // AG and UU mismatch can't happen here, because k is A and l is A
                                                     }
                                                 }
                                             }
-                                        }                                
+                                        }
                                     }
-    
+
                                     // left tstacki, the right one to be added
-                                    if (sequence[ii] == i && sequence[jj] == j && 
+                                    if (sequence[ii] == i && sequence[jj] == j &&
                                         sequence[ii+1] == k && sequence[jj-1] == l)
                                     {
                                         iijj = index[ii] + jj -ii;
-                                        
+
                                         for (iip = ii+1; iip <= MIN(jj-2-TURN,ii+MAXLOOP+1) ; iip++)  // j-2-TURN
                                         {
                                             int minq = MAX (jj-ii+iip-MAXLOOP-2, iip+1+TURN);    // ip+1+TURN);
                                             for (jjp = minq; jjp < jj; jjp++)
-                                            {        
+                                            {
                                                 if (sequence[iip]+sequence[jjp] == 3 ||
-                                                    sequence[iip]+sequence[jjp] == 5)        
+                                                    sequence[iip]+sequence[jjp] == 5)
                                                 {
                                                     int branch1 = iip-ii-1;
                                                     int branch2 = jj-jjp-1;
@@ -3094,14 +3094,14 @@ void s_partition_function::compute_logZ_gradient ()
                                                     if (branch1 == 0 && branch2 == 0)    // stack pair, not good here
                                                         continue;
                                                     if (branch1 == 1 && branch2 == 1 && !simple_internal_energy)
-                                                        continue;                                                    
+                                                        continue;
                                                     if (branch1 == 1 && branch2 == 2 && !simple_internal_energy)
                                                         continue;
                                                     if (branch1 == 2 && branch2 == 1 && !simple_internal_energy)
                                                         continue;
                                                     if (branch1 == 2 && branch2 == 2 && !simple_internal_energy)
-                                                        continue;                                                
-    
+                                                        continue;
+
                                                     if (branch1 == 0 || branch2 == 0)    // bulge
                                                     {
                                                         // compute the derivative for bulge penalty by size
@@ -3112,10 +3112,10 @@ void s_partition_function::compute_logZ_gradient ()
                                                         en_internal = s_internal_loop::get_energy (ii, jj, iip, jjp, sequence);
                                                         iipjjp = index[iip] + jjp - iip;
                                                         PFTYPE grad = p[iijj] * up[iipjjp] / up[iijj] * EXP (en_internal * oneoverRT);
-                                                        GlogZ[sizeindex] += grad; 
-                                                        
+                                                        GlogZ[sizeindex] += grad;
+
                                                         if (branch1 + branch2 > 1)    // add AU_penalty
-                                                        {                                                        
+                                                        {
                                                             if (has_AU_penalty (sequence[ii], sequence[jj]))
                                                             {
                                                                 GlogZ[AUpen_index] += grad;
@@ -3127,44 +3127,44 @@ void s_partition_function::compute_logZ_gradient ()
                                                         }
                                                         continue;
                                                     }
-                                                        
+
                                                     // compute the derivative for internal penalty by size
                                                     //char s[100];
                                                     sprintf (s, "internal_penalty_by_size[%d]", branch1+branch2);
                                                     // this is very slow, it's linear in the number of parameters
                                                     int sizeindex = structure_type_index (s);
                                                     //printf ("sizeindex=%d\n", sizeindex);
-                                                        
-                                                    iipjjp = index[iip] + jjp - iip;  
+
+                                                    iipjjp = index[iip] + jjp - iip;
                                                     if ((branch1 == 1 || branch2 == 1) && misc.gail_rule)
                                                         continue;
-                                                        
+
                                                     en_internal = s_internal_loop::get_energy (ii, jj, iip, jjp, sequence);
                                                     PFTYPE grad = p[iijj] * up[iipjjp] / up[iijj] * EXP (en_internal * oneoverRT);
-                                                    GlogZ[sizeindex] += grad; 
-                                                    
+                                                    GlogZ[sizeindex] += grad;
+
                                                     // now check if any of the 3 internal params is involved
                                                     if (((i == A || i == G) && j == U) ||
                                                         ((j == A || j == G) && i == U))
                                                     {
-                                                        //GlogZ[index_terminal_AU_penalty] += p[iijj] * up[iipjjp] / up[iijj] * exp (en_internal * oneoverRT); 
+                                                        //GlogZ[index_terminal_AU_penalty] += p[iijj] * up[iipjjp] / up[iijj] * exp (en_internal * oneoverRT);
                                                         GlogZ[index_internal_AU_closure] += grad;
                                                     }
                                                     if ((k == A && l == G) ||
                                                         (l == A && k == G))
                                                     {
-                                                        GlogZ[index_internal_AG_mismatch] += grad; 
+                                                        GlogZ[index_internal_AG_mismatch] += grad;
                                                     }
                                                     if (k == U && l == U)
                                                     {
-                                                        GlogZ[index_internal_UU_mismatch] += grad; 
-                                                    }  
+                                                        GlogZ[index_internal_UU_mismatch] += grad;
+                                                    }
                                                 }
                                             }
-                                        }                                    
+                                        }
                                     }
                                 }
-                            }           
+                            }
                             // the upside down orientation
                             // no duplicates here
                             for (ii = seqlen-2; ii > TURN; ii--)
@@ -3176,40 +3176,40 @@ void s_partition_function::compute_logZ_gradient ()
                                     {
                                         // jj < ii
                                         iijj = index[jj] + ii -jj;
-                                        
+
                                         for (iip = ii+1; iip <= MIN(seqlen-1,ii+MAXLOOP+1) ; iip++)  // j-2-TURN
                                         {
                                             int minq = MAX (jj-ii+iip-MAXLOOP-2, 0);    // ip+1+TURN);
                                             for (jjp = minq; jjp < jj; jjp++)
-                                            {        
+                                            {
                                                 if (sequence[iip]+sequence[jjp] == 3 ||
-                                                    sequence[iip]+sequence[jjp] == 5)        
+                                                    sequence[iip]+sequence[jjp] == 5)
                                                 {
                                                     int branch1 = iip-ii-1;
                                                     int branch2 = jj-jjp-1;
                                                     // compute the derivative for internal penalty by size
-                                                        
-                                                    iipjjp = index[jjp] + iip - jjp; 
+
+                                                    iipjjp = index[jjp] + iip - jjp;
                                                     if (((branch1 == 1 && branch2 > 2) || (branch1 > 2 && branch2 == 1)) && misc.gail_rule)
-                                                    {                                                
-                                                        en_internal = s_internal_loop::get_energy (jjp, iip, jj, ii, sequence);               
+                                                    {
+                                                        en_internal = s_internal_loop::get_energy (jjp, iip, jj, ii, sequence);
                                                         // now check if any of the 3 internal params is involved
                                                         if (((i == A || i == G) && j == U) ||
                                                             ((j == A || j == G) && i == U))
                                                         {
-                                                            //GlogZ[index_terminal_AU_penalty] += p[iipjjp] * up[iijj] / up[iipjjp] * exp (en_internal * oneoverRT); 
+                                                            //GlogZ[index_terminal_AU_penalty] += p[iipjjp] * up[iijj] / up[iipjjp] * exp (en_internal * oneoverRT);
                                                             GlogZ[index_internal_AU_closure] += p[iipjjp] * up[iijj] / up[iipjjp] * EXP (en_internal * oneoverRT);
                                                         }
-                                                        // AG and UU mismatch can't happen here, because k is A and l is A                                               
+                                                        // AG and UU mismatch can't happen here, because k is A and l is A
                                                     }
                                                 }
                                             }
-                                        }                                
-                                    }                            
-                                
+                                        }
+                                    }
+
                                     // the general case
                                     // left tstacki, the right one to be added
-                                    if (sequence[ii] == i && sequence[jj] == j && 
+                                    if (sequence[ii] == i && sequence[jj] == j &&
                                         sequence[ii+1] == k && sequence[jj-1] == l)
                                     {
                                         // jj < ii
@@ -3218,9 +3218,9 @@ void s_partition_function::compute_logZ_gradient ()
                                         {
                                             int minq = MAX (jj-ii+iip-MAXLOOP-2, 0);    // ip+1+TURN);
                                             for (jjp = minq; jjp < jj; jjp++)
-                                            {        
+                                            {
                                                 if (sequence[iip]+sequence[jjp] == 3 ||
-                                                    sequence[iip]+sequence[jjp] == 5)        
+                                                    sequence[iip]+sequence[jjp] == 5)
                                                 {
                                                     // same as before
                                                     int branch1 = iip-ii-1;
@@ -3237,50 +3237,50 @@ void s_partition_function::compute_logZ_gradient ()
                                                         continue;
                                                     if (branch1 == 0 || branch2 == 0)    // bulge
                                                         continue;
-                                                        
+
                                                     //jjp < iip
-                                                    iipjjp = index[jjp] + iip - jjp;  
+                                                    iipjjp = index[jjp] + iip - jjp;
                                                     if ((branch1 == 1 || branch2 == 1) && misc.gail_rule)
                                                         continue;
                                                     en_internal = s_internal_loop::get_energy (jjp, iip, jj, ii, sequence);
                                                     PFTYPE grad = p[iipjjp] * up[iijj] / up[iipjjp] * EXP (en_internal * oneoverRT);
-                                                    
+
                                                     // now check if any of the 3 internal params is involved
                                                     if (((i == A || i == G) && j == U) ||
                                                         ((j == A || j == G) && i == U))
                                                     {
-                                                        //GlogZ[index_terminal_AU_penalty] += p[iipjjp] * up[iijj] / up[iipjjp] * exp (en_internal * oneoverRT); 
-                                                        GlogZ[index_internal_AU_closure] += grad; 
+                                                        //GlogZ[index_terminal_AU_penalty] += p[iipjjp] * up[iijj] / up[iipjjp] * exp (en_internal * oneoverRT);
+                                                        GlogZ[index_internal_AU_closure] += grad;
                                                     }
                                                     if ((k == A && l == G) ||
                                                         (l == A && k == G))
                                                     {
-                                                        GlogZ[index_internal_AG_mismatch] += grad; 
+                                                        GlogZ[index_internal_AG_mismatch] += grad;
                                                     }
                                                     if (k == U && l == U)
                                                     {
-                                                        GlogZ[index_internal_UU_mismatch] += grad; 
-                                                    }                                                 
+                                                        GlogZ[index_internal_UU_mismatch] += grad;
+                                                    }
                                                 }
                                             }
-                                        }                                    
+                                        }
                                     }
                                 }
                             }
-                            //index_param++;   // there are only 3 tstacki parameters                              
-                        }    // end if (tstacki[i][j][k][l] < INF)                                            
+                            //index_param++;   // there are only 3 tstacki parameters
+                        }    // end if (tstacki[i][j][k][l] < INF)
                     }
-                    
-        index_param += 3;           
-        index_should_be = structure_type_index("int11[0][3][3][3][0][3]");     
+
+        index_param += 3;
+        index_should_be = structure_type_index("int11[0][3][3][3][0][3]");
         if (index_param != index_should_be)
         {
-            printf ("Index param after tstacki = %d, should be %d\n", index_param, index_should_be);
+            fprintf (stderr, "Index param after tstacki = %d, should be %d\n", index_param, index_should_be);
             exit(1);
-        }                
-                                        
-        // internal loops 1x1                        
-        if (!simple_internal_energy)          
+        }
+
+        // internal loops 1x1
+        if (!simple_internal_energy)
         {
             for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
@@ -3288,14 +3288,14 @@ void s_partition_function::compute_logZ_gradient ()
                         for (l=0; l < NUCL; l++)
                             for (m=0; m < NUCL; m++)
                                 for (n=0; n < NUCL; n++)
-                                {                            
+                                {
                                     if (int11[i][j][k][l][m][n] < INF)
                                     {
                                         // exclude duplicates
                                         // int11[i][j][k][l][m][n] is the same as int11[n][m][l][k][j][i]
                                         if (i*100000 + j*10000 + k*1000 + l*100 + m*10 + n <= n*100000 + m*10000 + l*1000+ k*100 + j*10 + i)
-                                        {             
-                                        
+                                        {
+
                                             // look from the left
                                             for (ii = 0; ii < seqlen-TURN-5; ii++)
                                             {
@@ -3304,29 +3304,29 @@ void s_partition_function::compute_logZ_gradient ()
                                                     for (jj = ii + TURN+5; jj < seqlen; jj++)
                                                     {
                                                         if (sequence[jj] == j && sequence[jj-1] == l && sequence[jj-2] == n)
-                                                        {                      
-                                                            iijj = index[ii] + jj -ii;    
-                                                            iipjjp = index[ii+2] + jj-2 - (ii+2); 
+                                                        {
+                                                            iijj = index[ii] + jj -ii;
+                                                            iipjjp = index[ii+2] + jj-2 - (ii+2);
                                                             en_internal = s_internal_loop::get_energy (ii, jj, ii+2, jj-2, sequence);
                                                             PFTYPE grad = p[iijj] * up[iipjjp] / up[iijj] * EXP (en_internal * oneoverRT);
-                                
+
                                                             int iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc;
-                                                            iinuc = sequence[ii]; 
+                                                            iinuc = sequence[ii];
                                                             jjnuc = sequence[jj];
                                                             kknuc = sequence[ii+1];
                                                             llnuc = sequence[jj-1];
                                                             mmnuc = sequence[ii+2];
                                                             nnnuc = sequence[jj-2];
-                                            
-                                                            if ( ((iinuc==C && jjnuc==G) || (iinuc==G && jjnuc==C)) && ((mmnuc==C && nnnuc==G) || (mmnuc==G && nnnuc==C))) 
+
+                                                            if ( ((iinuc==C && jjnuc==G) || (iinuc==G && jjnuc==C)) && ((mmnuc==C && nnnuc==G) || (mmnuc==G && nnnuc==C)))
                                                             {
                                                                 if (!can_pair(kknuc,llnuc))
                                                                     sprintf (type, "int11[%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc);
                                                                 else
                                                                     sprintf (type, "misc.internal11_basic_mismatch");
-                                                                tindex = structure_type_index (type);                                                            
+                                                                tindex = structure_type_index (type);
                                                                 GlogZ[tindex] += grad;
-                                                            }        
+                                                            }
                                                             else if (watson_crick(iinuc,jjnuc) && watson_crick(mmnuc,nnnuc) && kknuc==U && llnuc==U)
                                                             {
                                                                 sprintf (type, "int11[%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc);
@@ -3341,12 +3341,12 @@ void s_partition_function::compute_logZ_gradient ()
                                                                     sprintf (type, "misc.internal11_basic_mismatch");
                                                                 tindex = structure_type_index (type);
                                                                 GlogZ[tindex] += grad;
-                                                                                            
+
                                                                 if (has_AU_penalty(iinuc,jjnuc))
                                                                 {
                                                                     sprintf (type, "misc.internal_AU_closure");
                                                                     tindex = structure_type_index (type);
-                                                                    GlogZ[tindex] += grad;         
+                                                                    GlogZ[tindex] += grad;
                                                                 }
                                                                 if (has_AU_penalty(mmnuc,nnnuc))
                                                                 {
@@ -3354,12 +3354,12 @@ void s_partition_function::compute_logZ_gradient ()
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += grad;
                                                                 }
-                                                            }                                                                                                       
-                                                        }    
+                                                            }
+                                                        }
                                                     }
-                                                }                   
+                                                }
                                             }
-                            
+
                                             // look from the right, if it's not symmetric
                                             if (!(i==n && k==l && m==j))
                                             {
@@ -3372,28 +3372,28 @@ void s_partition_function::compute_logZ_gradient ()
                                                             if (sequence[jj] == j && sequence[jj-1] == l && sequence[jj-2] == n)
                                                             {
                                                                 //jj < ii
-                                                                iijj = index[jj] + ii -jj;    
-                                                                iipjjp = index[jj-2] + ii+2 - (jj-2); 
+                                                                iijj = index[jj] + ii -jj;
+                                                                iipjjp = index[jj-2] + ii+2 - (jj-2);
                                                                 en_internal = s_internal_loop::get_energy (jj-2, ii+2, jj, ii, sequence);
                                                                 PFTYPE grad = p[iipjjp] * up[iijj] / up[iipjjp] * EXP (en_internal * oneoverRT);
-                                                                
+
                                                                 int iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc;
-                                                                iinuc = sequence[ii]; 
+                                                                iinuc = sequence[ii];
                                                                 jjnuc = sequence[jj];
                                                                 kknuc = sequence[ii+1];
                                                                 llnuc = sequence[jj-1];
                                                                 mmnuc = sequence[ii+2];
                                                                 nnnuc = sequence[jj-2];
-                                                
-                                                                if ( ((iinuc==C && jjnuc==G) || (iinuc==G && jjnuc==C)) && ((mmnuc==C && nnnuc==G) || (mmnuc==G && nnnuc==C))) 
+
+                                                                if ( ((iinuc==C && jjnuc==G) || (iinuc==G && jjnuc==C)) && ((mmnuc==C && nnnuc==G) || (mmnuc==G && nnnuc==C)))
                                                                 {
                                                                     if (!can_pair(kknuc,llnuc))
                                                                         sprintf (type, "int11[%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc);
                                                                     else
                                                                         sprintf (type, "misc.internal11_basic_mismatch");
-                                                                    tindex = structure_type_index (type);                                                            
+                                                                    tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += grad;
-                                                                }        
+                                                                }
                                                                 else if (watson_crick(iinuc,jjnuc) && watson_crick(mmnuc,nnnuc) && kknuc==U && llnuc==U)
                                                                 {
                                                                     sprintf (type, "int11[%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc);
@@ -3408,12 +3408,12 @@ void s_partition_function::compute_logZ_gradient ()
                                                                         sprintf (type, "misc.internal11_basic_mismatch");
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += grad;
-                                                                                                
+
                                                                     if (has_AU_penalty(iinuc,jjnuc))
                                                                     {
                                                                         sprintf (type, "misc.internal_AU_closure");
                                                                         tindex = structure_type_index (type);
-                                                                        GlogZ[tindex] += grad;  
+                                                                        GlogZ[tindex] += grad;
                                                                     }
                                                                     if (has_AU_penalty(mmnuc,nnnuc))
                                                                     {
@@ -3421,24 +3421,24 @@ void s_partition_function::compute_logZ_gradient ()
                                                                         tindex = structure_type_index (type);
                                                                         GlogZ[tindex] += grad;
                                                                     }
-                                                                }                                                                                                       
-                                                                    
-                                                            }    
+                                                                }
+
+                                                            }
                                                         }
-                                                    }                   
+                                                    }
                                                 }
-                                            }                         
-                                        }                                            
+                                            }
+                                        }
                                     } // end if (int11[i][j][k][l][m][n] < INF)
                                 }    // end int11
             index_param += 33;
             index_should_be = structure_type_index("int21[1][2][0][0][1][2][0]");
             if (index_param != index_should_be)
             {
-                printf ("Index param after int11 = %d, should be %d\n", index_param, index_should_be);
+                fprintf (stderr, "Index param after int11 = %d, should be %d\n", index_param, index_should_be);
                 exit(1);
-            }                 
-            
+            }
+
             // int12 energies
             for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
@@ -3460,11 +3460,11 @@ void s_partition_function::compute_logZ_gradient ()
                                                     {
                                                         if (sequence[jj] == j && sequence[jj-1] == l && sequence[jj-2] == o && sequence[jj-3] == n)
                                                         {
-                                                            iijj = index[ii] + jj -ii;    
-                                                            iipjjp = index[ii+2] + jj-3 - (ii+2); 
+                                                            iijj = index[ii] + jj -ii;
+                                                            iipjjp = index[ii+2] + jj-3 - (ii+2);
                                                             en_internal = s_internal_loop::get_energy (ii, jj, ii+2, jj-3, sequence);
                                                             PFTYPE grad = p[iijj] * up[iipjjp] / up[iijj] * EXP (en_internal * oneoverRT);
-                                                            
+
                                                             int iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc;
                                                             iinuc = sequence[ii];
                                                             jjnuc = sequence[jj];
@@ -3472,8 +3472,8 @@ void s_partition_function::compute_logZ_gradient ()
                                                             llnuc = sequence[jj-1];
                                                             mmnuc = sequence[ii+2];
                                                             nnnuc = sequence[jj-3];
-                                                            oonuc = sequence[jj-2];            
-                                                
+                                                            oonuc = sequence[jj-2];
+
                                                             if ((iinuc==C && jjnuc==G && mmnuc==C && nnnuc==G) ||  // these are already filled above, except what can pair inside
                                                                 (iinuc==G && jjnuc==C && mmnuc==G && nnnuc==C))
                                                             {
@@ -3497,29 +3497,29 @@ void s_partition_function::compute_logZ_gradient ()
                                                                     sprintf (type, "int21[%d][%d][%d][%d][%d][%d][%d]", C, G, kknuc, llnuc, C, G, oonuc);
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += 0.5 * grad;
-                                                                    
+
                                                                     sprintf (type, "int21[%d][%d][%d][%d][%d][%d][%d]", G, C, kknuc, llnuc, G, C, oonuc);
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += 0.5 * grad;
-                                                                }    
+                                                                }
                                                                 if (has_AU_penalty(iinuc,jjnuc))
                                                                 {
                                                                     sprintf (type, "misc.internal21_AU_closure");
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += grad;
-                                                                }    
-                                                                if (has_AU_penalty(mmnuc,nnnuc))    
+                                                                }
+                                                                if (has_AU_penalty(mmnuc,nnnuc))
                                                                 {
                                                                     sprintf (type, "misc.internal21_AU_closure");
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += grad;
-                                                                }    
-                                                            }                                                                                                                                                    
-                                                        }    
+                                                                }
+                                                            }
+                                                        }
                                                     }
-                                                }                   
+                                                }
                                             }
-                            
+
                                             // int21 cannot be symmetric
                                             for (ii = seqlen-3; ii >= TURN+4; ii--)
                                             {
@@ -3530,11 +3530,11 @@ void s_partition_function::compute_logZ_gradient ()
                                                         if (sequence[jj] == j && sequence[jj-1] == l && sequence[jj-2] == o && sequence[jj-3] == n)
                                                         {
                                                             //jj < ii
-                                                            iijj = index[jj] + ii -jj;    
-                                                            iipjjp = index[jj-3] + ii+2 - (jj-3); 
+                                                            iijj = index[jj] + ii -jj;
+                                                            iipjjp = index[jj-3] + ii+2 - (jj-3);
                                                             en_internal = s_internal_loop::get_energy (jj-3, ii+2, jj, ii, sequence);
                                                             PFTYPE grad = p[iipjjp] * up[iijj] / up[iipjjp] * EXP (en_internal * oneoverRT);
-                                                            
+
                                                             int iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc;
                                                             iinuc = sequence[ii];
                                                             jjnuc = sequence[jj];
@@ -3542,8 +3542,8 @@ void s_partition_function::compute_logZ_gradient ()
                                                             llnuc = sequence[jj-1];
                                                             mmnuc = sequence[ii+2];
                                                             nnnuc = sequence[jj-3];
-                                                            oonuc = sequence[jj-2];            
-                                                
+                                                            oonuc = sequence[jj-2];
+
                                                             if ((iinuc==C && jjnuc==G && mmnuc==C && nnnuc==G) ||  // these are already filled above, except what can pair inside
                                                                 (iinuc==G && jjnuc==C && mmnuc==G && nnnuc==C))
                                                             {
@@ -3567,7 +3567,7 @@ void s_partition_function::compute_logZ_gradient ()
                                                                     sprintf (type, "int21[%d][%d][%d][%d][%d][%d][%d]", C, G, kknuc, llnuc, C, G, oonuc);
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += 0.5 * grad;
-                                                                    
+
                                                                     sprintf (type, "int21[%d][%d][%d][%d][%d][%d][%d]", G, C, kknuc, llnuc, G, C, oonuc);
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += 0.5 * grad;
@@ -3577,30 +3577,30 @@ void s_partition_function::compute_logZ_gradient ()
                                                                     sprintf (type, "misc.internal21_AU_closure");
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += grad;
-                                                                }    
-                                                                if (has_AU_penalty(mmnuc,nnnuc))    
+                                                                }
+                                                                if (has_AU_penalty(mmnuc,nnnuc))
                                                                 {
                                                                     sprintf (type, "misc.internal21_AU_closure");
                                                                     tindex = structure_type_index (type);
                                                                     GlogZ[tindex] += grad;
-                                                                }    
-                                                            }                
-                                                        }    
+                                                                }
+                                                            }
+                                                        }
                                                     }
-                                                }                   
+                                                }
                                             }
-                                        //index_param++;                            
-                                        }                                            
+                                        //index_param++;
+                                        }
                                     } // end int21
-                                    
-            index_param += 54;                                
-            index_should_be = structure_type_index("int22[0][3][0][0][3][0][0][0]");                                
+
+            index_param += 54;
+            index_should_be = structure_type_index("int22[0][3][0][0][3][0][0][0]");
             if (index_param != index_should_be)
             {
-                printf ("Index param after int21 = %d, should be %d\n", index_param, index_should_be);
+                fprintf (stderr, "Index param after int21 = %d, should be %d\n", index_param, index_should_be);
                 exit(1);
-            }                                     
-            // energies int22                                
+            }
+            // energies int22
             for (i=0; i < NUCL; i++)
                 for (j=0; j < NUCL; j++)
                     for (k=0; k < NUCL; k++)
@@ -3625,11 +3625,11 @@ void s_partition_function::compute_logZ_gradient ()
                                                             {
                                                                 if (sequence[jj]==j && sequence[jj-1]==l && sequence[jj-2]==r && sequence[jj-3]==n)
                                                                 {
-                                                                    iijj = index[ii] + jj -ii;    
-                                                                    iipjjp = index[ii+3] + jj-3 - (ii+3); 
+                                                                    iijj = index[ii] + jj -ii;
+                                                                    iipjjp = index[ii+3] + jj-3 - (ii+3);
                                                                     en_internal = s_internal_loop::get_energy (ii, jj, ii+3, jj-3, sequence);
                                                                     PFTYPE grad = p[iijj] * up[iipjjp] / up[iijj] * EXP (en_internal * oneoverRT);
-                                                                    
+
                                                                     int iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc, ppnuc;
                                                                     iinuc = sequence[ii];
                                                                     jjnuc = sequence[jj];
@@ -3637,35 +3637,35 @@ void s_partition_function::compute_logZ_gradient ()
                                                                     llnuc = sequence[jj-1];
                                                                     mmnuc = sequence[ii+3];
                                                                     nnnuc = sequence[jj-3];
-                                                                    oonuc = sequence[ii+2];            
+                                                                    oonuc = sequence[ii+2];
                                                                     ppnuc = sequence[jj-2];
-                                                                    
+
                                                                     if (nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc & watson_crick(iinuc,jjnuc) && !watson_crick(kknuc,llnuc))
                                                                     {
                                                                         sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc, ppnuc);
                                                                         tindex = structure_type_index (type);
                                                                         GlogZ[tindex] += grad;
                                                                     }
-                                                                
-                                                                    int iinuc2, jjnuc2, mmnuc2, nnnuc2;                
+
+                                                                    int iinuc2, jjnuc2, mmnuc2, nnnuc2;
                                                                     if (iinuc==G && jjnuc==U)   iinuc2 = A;     else iinuc2 = iinuc;
                                                                     if (iinuc==U && jjnuc==G)   jjnuc2 = A;     else jjnuc2 = jjnuc;
                                                                     if (mmnuc==G && nnnuc==U)   mmnuc2 = A;     else mmnuc2 = mmnuc;
                                                                     if (mmnuc==U && nnnuc==G)   nnnuc2 = A;     else nnnuc2 = nnnuc;
-                                                                    
+
                                                                     if (watson_crick(kknuc,llnuc) || watson_crick(oonuc,ppnuc))
                                                                     {
                                                                         sprintf (type, "misc.internal22_match");
                                                                         tindex = structure_type_index (type);
                                                                         GlogZ[tindex] += grad;
                                                                     }
-                                                                    else if ( ((iinuc==G && jjnuc==U) || (iinuc==U && jjnuc==G) || (mmnuc==G && nnnuc==U) || (mmnuc==U && nnnuc==G)) &&  
+                                                                    else if ( ((iinuc==G && jjnuc==U) || (iinuc==U && jjnuc==G) || (mmnuc==G && nnnuc==U) || (mmnuc==U && nnnuc==G)) &&
                                                                             (nnnuc2==iinuc2 && mmnuc2==jjnuc2 && ppnuc==kknuc && oonuc==llnuc))  // the UG closing pairs are the same as UA
                                                                     {
                                                                         sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc2, jjnuc2, kknuc, llnuc, mmnuc2, nnnuc2, oonuc, ppnuc);
                                                                         tindex = structure_type_index (type);
                                                                         GlogZ[tindex] += grad;
-                                                                    }                
+                                                                    }
                                                                     else if (!(nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc))   // was already filled above
                                                                     {
                                                                         sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc2, jjnuc2, kknuc, llnuc, jjnuc2, iinuc2, llnuc, kknuc);
@@ -3674,34 +3674,34 @@ void s_partition_function::compute_logZ_gradient ()
                                                                         sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", nnnuc2, mmnuc2, ppnuc, oonuc, mmnuc2, nnnuc2, oonuc, ppnuc);
                                                                         tindex = structure_type_index (type);
                                                                         GlogZ[tindex] += 0.5 * grad;
-                                                                        
-                                                                        int result = check_stability_and_size (kknuc, llnuc, oonuc, ppnuc);                    
+
+                                                                        int result = check_stability_and_size (kknuc, llnuc, oonuc, ppnuc);
                                                                         switch (result)
                                                                         {
-                                                                            case 1: 
+                                                                            case 1:
                                                                                 sprintf (type, "misc.internal22_delta_same_size");
                                                                                 break;
-                                                                            case 2: 
+                                                                            case 2:
                                                                                 sprintf (type, "misc.internal22_delta_different_size");
                                                                                 break;
-                                                                            case 3: 
+                                                                            case 3:
                                                                                 sprintf (type, "misc.internal22_delta_1stable_1unstable");
                                                                                 break;
-                                                                            case 4: 
+                                                                            case 4:
                                                                                 sprintf (type, "misc.internal22_delta_AC");
                                                                                 break;
-                                                                            default: 
-                                                                                printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, kknuc, llnuc, oonuc, ppnuc);
+                                                                            default:
+                                                                                fprintf (stderr, "ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, kknuc, llnuc, oonuc, ppnuc);
                                                                                 exit(1);
                                                                         }
                                                                         tindex = structure_type_index (type);
                                                                         GlogZ[tindex] += grad;
-                                                                    }                                                                
-                                                                }    
+                                                                    }
+                                                                }
                                                             }
-                                                        }                   
+                                                        }
                                                     }
-                                    
+
                                                     // look from the right, if it's not symmetric
                                                     if (!(i==n && k==r && o==l && m==j))
                                                     {
@@ -3714,11 +3714,11 @@ void s_partition_function::compute_logZ_gradient ()
                                                                     if (sequence[jj]==j && sequence[jj-1]==l && sequence[jj-2]==r && sequence[jj-3]==n)
                                                                     {
                                                                         //jj < ii
-                                                                        iijj = index[jj] + ii -jj;    
-                                                                        iipjjp = index[jj-3] + ii+3 - (jj-3); 
+                                                                        iijj = index[jj] + ii -jj;
+                                                                        iipjjp = index[jj-3] + ii+3 - (jj-3);
                                                                         en_internal = s_internal_loop::get_energy (jj-3, ii+3, jj, ii, sequence);
                                                                         PFTYPE grad = p[iipjjp] * up[iijj] / up[iipjjp] * EXP (en_internal * oneoverRT);
-                                                                        
+
                                                                         int iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc, ppnuc;
                                                                         iinuc = sequence[ii];
                                                                         jjnuc = sequence[jj];
@@ -3726,35 +3726,35 @@ void s_partition_function::compute_logZ_gradient ()
                                                                         llnuc = sequence[jj-1];
                                                                         mmnuc = sequence[ii+3];
                                                                         nnnuc = sequence[jj-3];
-                                                                        oonuc = sequence[ii+2];            
+                                                                        oonuc = sequence[ii+2];
                                                                         ppnuc = sequence[jj-2];
-                                                                        
+
                                                                         if (nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc & watson_crick(iinuc,jjnuc) && !watson_crick(kknuc,llnuc))
                                                                         {
                                                                             sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc, jjnuc, kknuc, llnuc, mmnuc, nnnuc, oonuc, ppnuc);
                                                                             tindex = structure_type_index (type);
                                                                             GlogZ[tindex] += grad;
                                                                         }
-                                                                    
-                                                                        int iinuc2, jjnuc2, mmnuc2, nnnuc2;                
+
+                                                                        int iinuc2, jjnuc2, mmnuc2, nnnuc2;
                                                                         if (iinuc==G && jjnuc==U)   iinuc2 = A;     else iinuc2 = iinuc;
                                                                         if (iinuc==U && jjnuc==G)   jjnuc2 = A;     else jjnuc2 = jjnuc;
                                                                         if (mmnuc==G && nnnuc==U)   mmnuc2 = A;     else mmnuc2 = mmnuc;
                                                                         if (mmnuc==U && nnnuc==G)   nnnuc2 = A;     else nnnuc2 = nnnuc;
-                                                                        
+
                                                                         if (watson_crick(kknuc,llnuc) || watson_crick(oonuc,ppnuc))
                                                                         {
                                                                             sprintf (type, "misc.internal22_match");
                                                                             tindex = structure_type_index (type);
                                                                             GlogZ[tindex] += grad;
                                                                         }
-                                                                        else if ( ((iinuc==G && jjnuc==U) || (iinuc==U && jjnuc==G) || (mmnuc==G && nnnuc==U) || (mmnuc==U && nnnuc==G)) &&  
+                                                                        else if ( ((iinuc==G && jjnuc==U) || (iinuc==U && jjnuc==G) || (mmnuc==G && nnnuc==U) || (mmnuc==U && nnnuc==G)) &&
                                                                                 (nnnuc2==iinuc2 && mmnuc2==jjnuc2 && ppnuc==kknuc && oonuc==llnuc))  // the UG closing pairs are the same as UA
                                                                         {
                                                                             sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc2, jjnuc2, kknuc, llnuc, mmnuc2, nnnuc2, oonuc, ppnuc);
                                                                             tindex = structure_type_index (type);
                                                                             GlogZ[tindex] += grad;
-                                                                        }                
+                                                                        }
                                                                         else if (!(nnnuc==iinuc && mmnuc==jjnuc && ppnuc==kknuc && oonuc==llnuc))   // was already filled above
                                                                         {
                                                                             sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", iinuc2, jjnuc2, kknuc, llnuc, jjnuc2, iinuc2, llnuc, kknuc);
@@ -3763,64 +3763,64 @@ void s_partition_function::compute_logZ_gradient ()
                                                                             sprintf (type, "int22[%d][%d][%d][%d][%d][%d][%d][%d]", nnnuc2, mmnuc2, ppnuc, oonuc, mmnuc2, nnnuc2, oonuc, ppnuc);
                                                                             tindex = structure_type_index (type);
                                                                             GlogZ[tindex] += 0.5 * grad;
-                                                                            
-                                                                            int result = check_stability_and_size (kknuc, llnuc, oonuc, ppnuc);                    
+
+                                                                            int result = check_stability_and_size (kknuc, llnuc, oonuc, ppnuc);
                                                                             switch (result)
                                                                             {
-                                                                                case 1: 
+                                                                                case 1:
                                                                                     sprintf (type, "misc.internal22_delta_same_size");
                                                                                     break;
-                                                                                case 2: 
+                                                                                case 2:
                                                                                     sprintf (type, "misc.internal22_delta_different_size");
                                                                                     break;
-                                                                                case 3: 
+                                                                                case 3:
                                                                                     sprintf (type, "misc.internal22_delta_1stable_1unstable");
                                                                                     break;
-                                                                                case 4: 
+                                                                                case 4:
                                                                                     sprintf (type, "misc.internal22_delta_AC");
                                                                                     break;
-                                                                                default: 
-                                                                                    printf ("ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, kknuc, llnuc, oonuc, ppnuc);
+                                                                                default:
+                                                                                    fprintf (stderr, "ERROR: result %d for k=%d, l=%d, o=%d, p=%d, ABORT!\n", result, kknuc, llnuc, oonuc, ppnuc);
                                                                                     exit(1);
                                                                             }
                                                                             tindex = structure_type_index (type);
                                                                             GlogZ[tindex] += grad;
                                                                         }
-                                                                    }    
+                                                                    }
                                                                 }
-                                                            }                   
+                                                            }
                                                         }
-                                                    }    
-                                                //index_param++;                            
-                                                }                                            
+                                                    }
+                                                //index_param++;
+                                                }
                                             } // end if (int11[i][j][k][l][m][n] < INF)
                                         }    // end int11
-                                            
-            index_param += 53;                                    
-            index_should_be = structure_type_index("dangle_top[0][3][0]");                                                
+
+            index_param += 53;
+            index_should_be = structure_type_index("dangle_top[0][3][0]");
             if (index_param != index_should_be)
             {
-                printf ("Index param after int22 = %d, should be %d\n", index_param, index_should_be);
+                fprintf (stderr, "Index param after int22 = %d, should be %d\n", index_param, index_should_be);
                 exit(1);
-            }              
-                                        
-        }    // end int11, int12, int22,     // end if (!simple_internal_energy)     
+            }
+
+        }    // end int11, int12, int22,     // end if (!simple_internal_energy)
     }   // end if !ignore_internal
-    
-    
+
+
 
     if (compute_gradient_dangles)    // we don't need to compute dangling ends
     {
-    
-    // dangling 3', or dangle_top    
+
+    // dangling 3', or dangle_top
     for (i=0; i < NUCL; i++)
         for (j=0; j < NUCL; j++)
             for (k=0; k < NUCL; k++)
             {
                 if (dangle_top[i][j][k] < INF)
                 {
-                    // no duplicates here                    
-                    // traverse the whole sequence and look for this building block                    
+                    // no duplicates here
+                    // traverse the whole sequence and look for this building block
 
                     // it never gets here but anyway
                     IFD
@@ -3829,34 +3829,34 @@ void s_partition_function::compute_logZ_gradient ()
                         index_param++;
                         continue;
                     }
-                    
-                    // first add the dangling energies that participate to the external loop                     
+
+                    // first add the dangling energies that participate to the external loop
                     for (ii = 0; ii < seqlen; ii++)
                     {
                         for (jj = ii+TURN+1; jj < seqlen-1; jj++)
                         {
                             if (sequence[jj] == i && sequence[ii] == j && sequence[jj+1] == k)
-                            {            
+                            {
                                 PFTYPE term1 = 0.0;
                                 PFTYPE term2 = 0.0;
-                                                            
+
                                 iijj = index[ii]+jj-ii;
-                                
-                                if (ii > TURN)        
-                                    term1 += u_ip_jp[ii-1] + u_iu_jp[ii-1] + exp_dangle5(jj,ii,ii-1)*(u_ip_ju[ii-1] + u_iu_ju[ii-1]);                                  
+
+                                if (ii > TURN)
+                                    term1 += u_ip_jp[ii-1] + u_iu_jp[ii-1] + exp_dangle5(jj,ii,ii-1)*(u_ip_ju[ii-1] + u_iu_ju[ii-1]);
                                 else if (ii > 0)      term1 += exp_dangle5(jj,ii,ii-1);
-                                else                  term1 = 1;  
-    
+                                else                  term1 = 1;
+
                                 if (jj < seqlen-3)
                                 {
                                     int jjp2n = index[jj+2]+seqlen-1-(jj+2);
-                                    term2 += 
+                                    term2 +=
                                             exp_dangle3(jj,ii,jj+1) * (u_ip_jp[jjp2n] + u_ip_ju[jjp2n] + u_iu_jp[jjp2n] + u_iu_ju[jjp2n]);
                                 }
                                 else if (jj < seqlen-1) term2 += exp_dangle3(jj,ii,jj+1);
                                 // it will never get here
                                 //else                  term2 = 1;
-                                
+
                                 GlogZ[index_param] += term1*up[iijj]*term2* exp_AUpenalty (ii,jj);
                             }
                         }
@@ -3864,38 +3864,38 @@ void s_partition_function::compute_logZ_gradient ()
                     // moved the denominator outside, it's the same everywhere
                     GlogZ[index_param] /= (u_ip_jp[seqlen-1] + u_ip_ju[seqlen-1] + u_iu_jp[seqlen-1] + u_iu_ju[seqlen-1]) ;
 
-                    
+
                     // contribution from multi-loops
                     // the first free bases
-                    // taken from compute_upm  
-                                      
+                    // taken from compute_upm
+
                     PFTYPE temp = 0;
                     for (jj=TURN+1; jj < seqlen; jj++)
                     {
                         for (ii=jj-TURN-1; ii>=0; ii--)
-                        {                     
-                            iijj = index[ii] + jj -ii;  
+                        {
+                            iijj = index[ii] + jj -ii;
                             if (sequence[ii] == i && sequence[jj] == j && sequence[ii+1] == k)
-                            {                 
+                            {
                                 temp = 0;
                                 if (upm[iijj] == 0)
-                                    continue;                                                              
+                                    continue;
                                 for (l=ii+3; l < jj-TURN-2; l++)    // case (.(...)--(--)-)
                                 {
                                     int iip2l = index[ii+2]+l-ii-2;
                                     int lp2jjm1 = index[l+2]+jj-1-l-2;
                                     int lp1jjm1 = index[l+1]+jj-1-l-1;
                                     int lp2jjm2 = index[l+2]+jj-2-l-2;
-                                    int lp1jjm2 = index[l+1]+jj-2-l-1;        
+                                    int lp1jjm2 = index[l+1]+jj-2-l-1;
                                     int lp2jjm3 = index[l+2]+jj-3-l-2;
-                                    int lp1jjm3 = index[l+1]+jj-3-l-1;                
+                                    int lp1jjm3 = index[l+1]+jj-3-l-1;
                                     temp += up[iip2l] *
                                             exp_AUpenalty (ii+2, l) *
-                                            ( u1_ip_jp[lp1jjm1]      // [.(...)(.-..)] or [.(...)(.-..).]                    
+                                            ( u1_ip_jp[lp1jjm1]      // [.(...)(.-..)] or [.(...)(.-..).]
                                                 + exp_dangle3 (l, ii+2, l+1) * EXPC[1] *
-                                                    ( u1_ip_jp[lp2jjm1] + u1_iu_jp[lp2jjm1] +     // [.(...).-(...)] or [.(...).-(...).] 
+                                                    ( u1_ip_jp[lp2jjm1] + u1_iu_jp[lp2jjm1] +     // [.(...).-(...)] or [.(...).-(...).]
                                                        exp_dangle5(ii,jj,jj-1) * (u1_ip_ju[lp2jjm1] + u1_iu_ju[lp2jjm1])) +    // [.(...).-(...)-..]
-                                                + exp_dangle5(ii,jj,jj-1) * u1_ip_ju[lp1jjm1]);    // [.(...)(...)-..]                                             
+                                                + exp_dangle5(ii,jj,jj-1) * u1_ip_ju[lp1jjm1]);    // [.(...)(...)-..]
                                 }
                                 for (h=ii+3; h < jj-TURN-2; h++)    // case (....(...)--(--)-)
                                 {
@@ -3904,52 +3904,52 @@ void s_partition_function::compute_logZ_gradient ()
                                     int hjjm2 = index[h] + jj-2 -h;
                                     int hjjm3 = index[h] + jj-3 -h;
                                     temp += EXPC[h-ii-2] *
-                                        ( s2_jp[hjjm1]    // --(...)) or --(...).) 
+                                        ( s2_jp[hjjm1]    // --(...)) or --(...).)
                                           + s2_ju[hjjm1]* exp_dangle5(ii,jj,jj-1));    // --(...)..)
                                     //s2[hj];
-                                }    
+                                }
                                 //printf ("i=%d, j=%d, upm=%g\n", i, j, upm[ij]);
 
                                 GlogZ[index_param] += temp * EXPA * EXPB2 * EXPC[1] *exp_AUpenalty (ii,jj) * exp_dangle3 (ii, jj, ii+1) * p[iijj] / up[iijj];
                             }
                         }
                     }
-                    
+
 
                     // the multi-loop 3' dangling end which can appear to the right of branches
                     // taken from compute_p
                     temp = 0;
-                    for (h=0; h < seqlen; h++)   
+                    for (h=0; h < seqlen; h++)
                     {
                         for (l=seqlen-2; l > h+TURN; l--)    // it's seqlen-2 because l+1 must be valid
                         {
                             //printf ("h=%d, l=%d, seqlen=%d\n", h, l, seqlen);
-                            if (can_pair (sequence[h], sequence[l]) && 
-                                sequence[l] == i && sequence[h] == j && sequence[l+1] == k)    
+                            if (can_pair (sequence[h], sequence[l]) &&
+                                sequence[l] == i && sequence[h] == j && sequence[l+1] == k)
                             {
                                 PFTYPE temp = 0;
                                 int hl = index[h] + l - h;
-                                
+
                                 for (ii=0; ii < h; ii++)
                                 {
-                                    int iil = index[ii] + l - ii;                                    
+                                    int iil = index[ii] + l - ii;
                                     // the case when h-l is the first branch of the multi-loop
                                     if (ii < h-1)  // we must add d3 (which is added in pmd3); also add d5 here, if i < h-2
                                     {
                                         // removed one line, no dangling end of interest
                                         temp += EXPC[h-ii] * pmd3_needmidd3[iil]  *   // EXPC[1] * // added it to the left
-                                                    (ii<h-2?exp_dangle5(l,h,h-1):1);    
-                                            // (.-[...].-(---)-)    i.-h...l.-(---)-j                 
+                                                    (ii<h-2?exp_dangle5(l,h,h-1):1);
+                                            // (.-[...].-(---)-)    i.-h...l.-(---)-j
                                     }
                                     else    // case ((... , no dangling end
                                     {
                                         // removed one line, no dangling end of interest
                                         temp += pmnod3_needmidd3[iil] * EXPC[h-ii]; // * EXPC[1];
-                                            // ([...].-(---)-)    ih...l.-(---)-j                 
+                                            // ([...].-(---)-)    ih...l.-(---)-j
                                     }
-                                    
+
                                     if (ii < h - TURN -2)    // only now we can have a branch to the left
-                                    {        
+                                    {
                                         int iip1hm1 = index[ii+1] + h-1 - (ii+1);
                                         int iip1hm2 = index[ii+1] + h-2 - (ii+1);
                                         int iip1hm3 = index[ii+1] + h-3 - (ii+1);
@@ -3961,12 +3961,12 @@ void s_partition_function::compute_logZ_gradient ()
                                         int iip3hm3 = index[ii+3] + h-3 - (ii+3);
                                         int iilp1 = index[ii] + l+1 - ii;
                                         // removed term1, no dangling end of interest
-                                        
+
                                         temp +=
-                                        
+
                                         // first, when h-l is the last branch to the right
-                                                                                            
-                                        // case ((..-)-[...].-)  
+
+                                        // case ((..-)-[...].-)
                                         pm1nod3_needendd3[iil] *    // EXPC added in pm1nod3
                                             (u1_ip_jp[iip1hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[iip1hm1])
                                                     // c is added in pm1nod3_needendd3
@@ -3975,17 +3975,17 @@ void s_partition_function::compute_logZ_gradient ()
                                         + pm1d3_needendd3[iil] * //  don't need EXPC[1]
                                             (u1_ip_jp[iip2hm1] + u1_iu_jp[iip2hm1] +
                                                 exp_dangle5(l,h,h-1)*(u1_ip_ju[iip2hm1] + u1_iu_ju[iip2hm1]))
-                                                    // (.(...).-[...].-)        i.(...)h...l.-j                                                    
-                                        // case (..-(..-)-[...].-)            
+                                                    // (.(...).-[...].-)        i.(...)h...l.-j
+                                        // case (..-(..-)-[...].-)
                                                     // (..-(...)[...].-)      i..-(...)h...l.-j
-                                                    
+
                                         // we have branches to the left and to the right of h-l
                                         // if this is changed in compute_p, it should be changed here too
-                                        //+ pmnod3_noneedmidd3[iil]  * u1[iip1hm1]     
-                                                    // ((...)[...]-(---)...)    i(...)h...l-(---)...j 
-                                        //+ pmnod3_needmidd3[iil] * exp_dangle3(l,h,l+1) * u1[iip1hm1]);        
-                                                    // ((...).-[...]-(---)...)    i(...).-h...l-(---)...j 
-                                                    
+                                        //+ pmnod3_noneedmidd3[iil]  * u1[iip1hm1]
+                                                    // ((...)[...]-(---)...)    i(...)h...l-(---)...j
+                                        //+ pmnod3_needmidd3[iil] * exp_dangle3(l,h,l+1) * u1[iip1hm1]);
+                                                    // ((...).-[...]-(---)...)    i(...).-h...l-(---)...j
+
                                         + pmnod3_needmidd3[iil] * EXPC[1]*    //+ pmnod3_noneedmidd3[il]) *
                                             (u1_ip_jp[iip1hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[iip1hm1])
                                                     // c is added in pm1nod3_needendd3
@@ -3995,25 +3995,25 @@ void s_partition_function::compute_logZ_gradient ()
                                                 (u1_ip_jp[iip2hm1] + u1_iu_jp[iip2hm1] +
                                                     exp_dangle5(l,h,h-1)*(u1_ip_ju[iip2hm1]+u1_iu_ju[iip2hm1]));
                                                     // (.(...).-[...].-)        i.(...)h...l.-j
-                                                    
+
                                         // case (..-(..-)-[...].-(--)-) or (..-(..-)-[...](--)-)
                                     }
                                 }
                                 GlogZ[index_param] += up[hl] * EXPA * EXPB2 * exp_AUpenalty (h,l) *
-                                        exp_dangle3(l,h,l+1) * temp;                                
+                                        exp_dangle3(l,h,l+1) * temp;
                             }
                         }
                     }
-                    
+
                     index_param++;
                 }
             }
-    index_should_be = structure_type_index("dangle_bot[0][3][0]");            
+    index_should_be = structure_type_index("dangle_bot[0][3][0]");
     if (index_param != index_should_be)
     {
-        printf ("Index param after dangle_top = %d, should be %d\n", index_param, index_should_be);
+        fprintf (stderr, "Index param after dangle_top = %d, should be %d\n", index_param, index_should_be);
         exit(1);
-    }      
+    }
 
     // dangling 5', or dangle_bot
     for (i=0; i < NUCL; i++)
@@ -4032,131 +4032,131 @@ void s_partition_function::compute_logZ_gradient ()
                     // no duplicates here
                     // first add the dangling energies that participate to the external loop
                     // traverse the whole sequence and look for this building block
-                    
-                    
+
+
                     for (ii = 1; ii < seqlen; ii++)
                     {
                         for (jj = ii+TURN+1; jj < seqlen; jj++)
                         {
                             if (sequence[jj] == i && sequence[ii] == j && sequence[ii-1] == k)
-                            {                            
+                            {
                                 PFTYPE term1 = 0.0;
                                 PFTYPE term2 = 0.0;
-                                iijj = index[ii]+jj-ii;                                
-                                if (ii > TURN)        
+                                iijj = index[ii]+jj-ii;
+                                if (ii > TURN)
                                         // case i-1 paired
                                     term1 += exp_dangle5(jj,ii,ii-1)*(u_ip_ju[ii-1] + u_iu_ju[ii-1]);
                                 else if (ii > 0)      term1 += exp_dangle5(jj,ii,ii-1);
                                 // this case doesn't occur anyway
-                                //else                  term1 = 1;  
+                                //else                  term1 = 1;
                                 if (jj < seqlen-3)
                                 {
                                     int jjp1n = index[jj+1]+seqlen-1-(jj+1);
                                     int jjp2n = index[jj+2]+seqlen-1-(jj+2);
-                                    term2 += (u_ip_jp[jjp1n] + u_ip_ju[jjp1n] + 
+                                    term2 += (u_ip_jp[jjp1n] + u_ip_ju[jjp1n] +
                                         exp_dangle3(jj,ii,jj+1)*(u_ip_jp[jjp2n] + u_ip_ju[jjp2n] + u_iu_jp[jjp2n] + u_iu_ju[jjp2n]));
-                                }    
+                                }
                                 else if (jj < seqlen-1) term2 += exp_dangle3(jj,ii,jj+1);
                                 else                  term2 = 1;
-                                
+
                                 GlogZ[index_param] += term1 * up[iijj] * term2 * exp_AUpenalty (ii,jj);
                                 //printf ("GlogZ[%d]=%g\n", index_param, GlogZ[index_param]);
                             }
                         }
                     }
-                    GlogZ[index_param] /= (u_ip_jp[seqlen-1] + u_ip_ju[seqlen-1] + u_iu_jp[seqlen-1] + u_iu_ju[seqlen-1]);                   
-                    
-                    
+                    GlogZ[index_param] /= (u_ip_jp[seqlen-1] + u_ip_ju[seqlen-1] + u_iu_jp[seqlen-1] + u_iu_ju[seqlen-1]);
+
+
                     // contribution from multi-loops
                     // the last dangling 5'
-                    // taken from compute_upm                    
+                    // taken from compute_upm
                     PFTYPE temp = 0;
-                    
+
                     for (jj=TURN+1; jj < seqlen; jj++)
                     {
                         for (ii=jj-TURN-1; ii>=0; ii--)
-                        {                     
-                            iijj = index[ii] + jj -ii;  
+                        {
+                            iijj = index[ii] + jj -ii;
                             if (upm[iijj] == 0)
                                 continue;
                             if (sequence[ii] == i && sequence[jj] == j && sequence[jj-1] == k)
-                            {       
+                            {
                                 temp = 0;
                                 // there must be at least one more branch (i.e. 5 nucleotides) from l+1 to j-1, plus at least 2 free bases: l+1+TURN <= j-3
                                 // removed the cases where there isn't a 5' dangling end on the last free base
                                 for (l=ii+2; l < jj-TURN-4; l++)    // case ((...)--(--)-..)
                                 {
                                     int iip1l = index[ii+1]+l-ii-1;
-                                    int lp1jjm1 = index[l+1]+jj-1-l-1;        
+                                    int lp1jjm1 = index[l+1]+jj-1-l-1;
                                     int lp2jjm1 = index[l+2]+jj-1-l-2;
                                     temp += up[iip1l] * exp_AUpenalty (ii+1,l) *
-                                            (  //u1_ip_jp[lp1jjm1] +     // no dangling end of interest [(...)(.-..)] or [(...)(.-..).]                    
+                                            (  //u1_ip_jp[lp1jjm1] +     // no dangling end of interest [(...)(.-..)] or [(...)(.-..).]
                                              exp_dangle3 (l, ii+1, l+1) * EXPC[1] *
-                                                    ( //u1_ip_jp[lp2jjm1] + u1_iu_jp[lp2jjm1] +     // [(...).-(...)] or [(...).-(...).] 
+                                                    ( //u1_ip_jp[lp2jjm1] + u1_iu_jp[lp2jjm1] +     // [(...).-(...)] or [(...).-(...).]
                                                         (u1_ip_ju[lp2jjm1] + u1_iu_ju[lp2jjm1])) +    // [(...).-(...)-..]
                                             + u1_ip_ju[lp1jjm1]);    // [(...)(...)-..]
                                             // TODO shouldn't there be an EXPC[1] here in the last line?
-                                }   
-                                                             
+                                }
+
                                 PFTYPE upm_temp = 0;
                                 for (l=ii+3; l < jj-TURN-4; l++)    // case (.(...)--(--)-..)
                                 {
                                     int iip2l = index[ii+2]+l-ii-2;
-                                    int lp1jjm1 = index[l+1]+jj-1-l-1;        
+                                    int lp1jjm1 = index[l+1]+jj-1-l-1;
                                     int lp2jjm1 = index[l+2]+jj-1-l-2;
                                     upm_temp += up[iip2l] * exp_AUpenalty (ii+2, l) *
-                                            (  //u1_ip_jp[lp1jjm1] +     // no dangling end of interest [.(...)(.-..)] or [.(...)(.-..).]                    
+                                            (  //u1_ip_jp[lp1jjm1] +     // no dangling end of interest [.(...)(.-..)] or [.(...)(.-..).]
                                               exp_dangle3 (l, ii+2, l+1) * EXPC[1] *
-                                                    ( //u1_ip_jp[lp2jjm1] + u1_iu_jp[lp2jjm1] +     // no dangling end [.(...).-(...)] or [.(...).-(...).] 
+                                                    ( //u1_ip_jp[lp2jjm1] + u1_iu_jp[lp2jjm1] +     // no dangling end [.(...).-(...)] or [.(...).-(...).]
                                                         (u1_ip_ju[lp2jjm1] + u1_iu_ju[lp2jjm1]))   // [.(...).-(...)-..]
                                               + u1_ip_ju[lp1jjm1]);    // [.(...)(...)-..]
                                 }
-                                                                
+
                                 for (h=ii+3; h < jj-TURN-4; h++)    // case (....(...)--(--)-..)
                                 {
                                     int hjjm1 = index[h] + jj-1 -h;
                                     upm_temp +=  EXPC[h-ii-2] * s2_ju[hjjm1];
                                          //s2_jp[hjjm1] +   // no dangling end --(...)) or --(...).)
                                          // --(...)..)
-                                }    
-                                temp += exp_dangle3 (ii, jj, ii+1) * EXPC[1] * upm_temp;                                
+                                }
+                                temp += exp_dangle3 (ii, jj, ii+1) * EXPC[1] * upm_temp;
                                 //printf ("i=%d, j=%d, upm=%g\n", i, j, upm[ij]);
-                            
+
                                 GlogZ[index_param] += temp * EXPA * EXPB2 * exp_dangle5(ii,jj,jj-1) *
                                     exp_AUpenalty (ii,jj) * p[iijj] / up[iijj];
                             }
                         }
-                    }                                                                   
+                    }
 
-                    
+
                     // the multi-loop 5' dangling end which can appear to the left of branches
                     // taken from compute_p
                     temp = 0;
-                    
+
                     for (h=1; h < seqlen; h++)   // starts from 1 because h-1 must be valid
                     {
                         for (l=seqlen-1; l > h+TURN; l--)
                         {
-                            if (can_pair (sequence[h], sequence[l]) && 
-                                sequence[l] == i && sequence[h] == j && sequence[h-1] == k)    
-                            {                    
-                                // from now on, taken from compute_p      
+                            if (can_pair (sequence[h], sequence[l]) &&
+                                sequence[l] == i && sequence[h] == j && sequence[h-1] == k)
+                            {
+                                // from now on, taken from compute_p
                                 int hl = index[h] + l - h;
-                                
+
                                 for (ii=0; ii < h; ii++)
                                 {
                                     int iil = index[ii] + l - ii;
                                     // the case when h-l is the first branch of the multi-loop
                                     if (ii < h-2)  // we must add d3 (which is added in pmd3); also add d5 here, if i < h-2
                                     {
-                                        temp += EXPC[h-ii-1] * 
+                                        temp += EXPC[h-ii-1] *
                                             (pmd3_noneedmidd3[iil] + pmd3_needmidd3[iil]  * exp_dangle3(l,h,l+1) * EXPC[1]);
-                                            // (.-[...](---)-)    i.-h...l(---)-j 
+                                            // (.-[...](---)-)    i.-h...l(---)-j
                                             // (.-[...].-(---)-)    i.-h...l.-(---)-j
                                     }
-                                    
+
                                     if (ii < h - TURN -2)    // only now we can have a branch to the left
-                                    {        
+                                    {
                                         int iip1hm1 = index[ii+1] + h-1 - (ii+1);
                                         int iip1hm2 = index[ii+1] + h-2 - (ii+1);
                                         int iip1hm3 = index[ii+1] + h-3 - (ii+1);
@@ -4168,29 +4168,29 @@ void s_partition_function::compute_logZ_gradient ()
                                         int iip3hm3 = index[ii+3] + h-3 - (ii+3);
                                         int iilp1 = index[ii] + l+1 - ii;
                                         PFTYPE term1 = 0.0;
-                                        
+
                                         if (up[iilp1] != 0)
                                         {
                                             //printf ("EXPC=%g\n", exp ((misc.multi_free_base_penalty) * oneoverRT) );
                                             term1 = p[iilp1] / up[iilp1] *  exp_AUpenalty (ii,l+1) *
-                                            
+
                                                         (  // first, the case ((..-)-[...])
                                                              u1_ip_ju[iip1hm1]    // ((..-).-[...])
-                                                                
+
                                                             // next, the case (.-(...)-[...])      i..-(...)h...lj
                                                         + exp_dangle3(ii,l+1,ii+1) * EXPC[1] *
                                                             (u1_ip_ju[iip2hm1]+u1_iu_ju[iip2hm1])
-                                                                // (..-(..-).-[...])     
+                                                                // (..-(..-).-[...])
                                                         );
                                         }
-                                        
-                                        temp += 
-                                        
+
+                                        temp +=
+
                                         // first, when h-l is the last branch to the right
-                                        ( term1 + 
-                                        
-                                        
-                                        // case ((..-)-[...].-)  
+                                        ( term1 +
+
+
+                                        // case ((..-)-[...].-)
                                         pm1nod3_needendd3[iil] * exp_dangle3(l,h,l+1) *   // EXPC added in pm1nod3
                                             u1_ip_ju[iip1hm1]
                                                     // c is added in pm1nod3_needendd3
@@ -4198,14 +4198,14 @@ void s_partition_function::compute_logZ_gradient ()
                                         // case (.(..-)-[...].-)
                                         + pm1d3_needendd3[iil] * exp_dangle3(l,h,l+1) *     // don't need EXPC[1]
                                             (u1_ip_ju[iip2hm1]+u1_iu_ju[iip2hm1])
-                                                    // (.(...).-[...].-)        i.(...)h...l.-j                                                    
-                                        // case (..-(..-)-[...].-)            
+                                                    // (.(...).-[...].-)        i.(...)h...l.-j
+                                        // case (..-(..-)-[...].-)
                                                     // (..-(...)..-[...].-)      i..-(...)h...l.-j
-                                                    
+
                                         // we have branches to the left and to the right of h-l
                                         //+ pmnod3_needmidd3[iil] * exp_dangle3(l,h,l+1) * u1[iip1hm1]);
-                                                    // ((...).-[...]-(---)...)    i(...).-h...l-(---)...j 
-                                                                                                        
+                                                    // ((...).-[...]-(---)...)    i(...).-h...l-(---)...j
+
                                         + (pmnod3_needmidd3[iil] * exp_dangle3(l,h,l+1) * EXPC[1]+ pmnod3_noneedmidd3[iil]) *
                                             u1_ip_ju[iip1hm1]
                                                     // c is added in pm1nod3_needendd3
@@ -4213,54 +4213,54 @@ void s_partition_function::compute_logZ_gradient ()
                                         // case (.(..-)-[...].-(--)-) or (.(..-)-[...](--)-)
                                         + EXPC[1]*(pmd3_needmidd3[iil] * exp_dangle3(l,h,l+1) * EXPC[1] + pmd3_noneedmidd3[iil]) *
                                             (u1_ip_ju[iip2hm1]+u1_iu_ju[iip2hm1]));
-                                                    // (.(...).-[...].-)        i.(...)h...l.-j                                                    
+                                                    // (.(...).-[...].-)        i.(...)h...l.-j
                                         // case (..-(..-)-[...].-(--)-) or (..-(..-)-[...](--)-)
                                                     // (..-(...)..-[...].-)      i..-(...)h...l.-j
-                                                    
-                                    }        
+
+                                    }
                                 }
                                 GlogZ[index_param] += up[hl] * EXPA * EXPB2 * exp_dangle5(l,h,h-1) * exp_AUpenalty (h,l) * temp;
                             }
                         }
-                    }             
-                           
+                    }
+
                     index_param++;
                 }
             }
-    index_should_be = structure_type_index("internal_penalty_by_size[4]");            
+    index_should_be = structure_type_index("internal_penalty_by_size[4]");
     if (index_param != index_should_be)
     {
-        printf ("Index param after dangle_bot = %d, should be %d\n", index_param, index_should_be);
+        fprintf (stderr, "Index param after dangle_bot = %d, should be %d\n", index_param, index_should_be);
         exit(1);
     }
-          
+
 
 
     }       // end if (compute_gradient_dangles)
-    
+
     // compute derivatives for AU_penalties
     // the contribution from hairpin loop of size 3 was computed above
     // now consider the constributions from the exterior loop
 
     PFTYPE term1 = 0.0;
     PFTYPE term2 = 0.0;
-        
-    
+
+
     for (ii = 0; ii < seqlen; ii++)
     {
         for (jj = ii+TURN+1; jj < seqlen; jj++)
         {
             if (can_pair (sequence[ii], sequence[jj]) && has_AU_penalty (sequence[ii], sequence[jj]))
-            {   
+            {
                 iijj = index[ii]+jj-ii;
                 AUpen = AU_penalty (sequence[ii], sequence[jj]);
-    
-                
-                // first, exterior loop - same as in compute_p            
-                
+
+
+                // first, exterior loop - same as in compute_p
+
                 term1 = 0.0;
                 term2 = 0.0;
-                    
+
                 IFD
                 {
                     if (ii > 0)     term1 = u[ii-1];
@@ -4268,13 +4268,13 @@ void s_partition_function::compute_logZ_gradient ()
                 }
                 else
                 {
-                    if (ii > TURN)        
+                    if (ii > TURN)
                             // case i-1 paired
                         term1 += (u_ip_jp[ii-1] + u_iu_jp[ii-1] + exp_dangle5(jj,ii,ii-1)*(u_ip_ju[ii-1] + u_iu_ju[ii-1]));
                     else if (ii > 0)      term1 += exp_dangle5(jj,ii,ii-1);
-                    else                  term1 = 1;  
+                    else                  term1 = 1;
                 }
-                                
+
                 IFD
                 {
                     if (jj < seqlen-1)    term2 = u[index[jj+1]+seqlen-1-(jj+1)];
@@ -4284,8 +4284,8 @@ void s_partition_function::compute_logZ_gradient ()
                 {
                     int jjp1n = index[jj+1] + seqlen-1 - jj-1;
                     int jjp2n = index[jj+2] + seqlen-1 - jj-2;
-                    if (jj < seqlen-3)    
-                        term2 += u_ip_jp[jjp1n] + u_ip_ju[jjp1n] + 
+                    if (jj < seqlen-3)
+                        term2 += u_ip_jp[jjp1n] + u_ip_ju[jjp1n] +
                                 exp_dangle3(jj,ii,jj+1)*(u_ip_jp[jjp2n] + u_ip_ju[jjp2n] + u_iu_jp[jjp2n] + u_iu_ju[jjp2n]);
                     else if (jj < seqlen-1) term2 += exp_dangle3(jj,ii,jj+1);
                     else                  term2 = 1;
@@ -4293,7 +4293,7 @@ void s_partition_function::compute_logZ_gradient ()
 
                 IFD
                 {
-                    GlogZ[AUpen_index] += term1 *up[iijj] * term2 * exp_AUpenalty(ii,jj) / u[seqlen-1];                        
+                    GlogZ[AUpen_index] += term1 *up[iijj] * term2 * exp_AUpenalty(ii,jj) / u[seqlen-1];
                 }
                 else
                 {
@@ -4301,9 +4301,9 @@ void s_partition_function::compute_logZ_gradient ()
                         (u_ip_jp[seqlen-1] + u_ip_ju[seqlen-1] + u_iu_jp[seqlen-1] + u_iu_ju[seqlen-1]);
                 }
                 // if it closes a multi loop, or closes a helix of a multi-loop - it's considered at helix below
-            }                                        
+            }
         }
-    }               
+    }
 
     if (!ignore_multi)
     {
@@ -4314,12 +4314,12 @@ void s_partition_function::compute_logZ_gradient ()
             {
                 iijj = index[ii]+jj-ii;
                 if (upm[iijj] > 0)
-                {   
+                {
                     GlogZ[sizeindex] += upm[iijj] * p[iijj] / up[iijj];
                 }
             }
         }
-        
+
         sizeindex = structure_type_index ("misc.multi_helix_penalty");
         // took the multi-loop contribution of p, and upm, like above
         // taken from compute_upm and compute_p
@@ -4331,41 +4331,41 @@ void s_partition_function::compute_logZ_gradient ()
                 if (!can_pair (sequence[h], sequence[l]))
                     continue;
                 int hl = index[h]+l-h;
-                // the exterior multi-loop pair      
-                temp = upm[hl] * p[hl] / up[hl];      
+                // the exterior multi-loop pair
+                temp = upm[hl] * p[hl] / up[hl];
                 GlogZ[sizeindex] += temp;
                 if (has_AU_penalty (sequence[h],sequence[l]))    GlogZ[AUpen_index] += temp;
-    
+
                 temp = 0;
                 for (i=0; i < h; i++)
                 {
-                    int il = index[i] + l - i;  
+                    int il = index[i] + l - i;
                     IFD
                     {
                         temp += EXPC[h-i-1] * pm[il];
                     }
                     else
-                    {                          
+                    {
                         if (i < h-1)  // we must add d3 (which is added in pmd3); also add d5 here, if i < h-2
                         {
                             temp += EXPC[h-i-1] * (i<h-2?exp_dangle5(l,h,h-1):1) *
                                 (pmd3_noneedmidd3[il] + pmd3_needmidd3[il]  * exp_dangle3(l,h,l+1) * EXPC[1]);
-                                // (.-[...](---)-)    i.-h...l(---)-j                                 
-                                // (.-[...].-(---)-)    i.-h...l.-(---)-j  
+                                // (.-[...](---)-)    i.-h...l(---)-j
+                                // (.-[...].-(---)-)    i.-h...l.-(---)-j
                         }
                         else    // case ((... , no dangling end
                         {
                             temp +=  pmnod3_noneedmidd3[il];
                                 // ([...](---)-)    ih...l(---)-j
-                                
+
                             temp +=  pmnod3_needmidd3[il] * exp_dangle3(l,h,l+1) * EXPC[1];
-                                // ([...].-(---)-)    ih...l.-(---)-j                 
+                                // ([...].-(---)-)    ih...l.-(---)-j
                         }
-                    }                    
+                    }
                     if (i < h - TURN -2)    // only now we can have a branch to the left
-                    {        
-                        int ip1hm1 = index[i+1] + h-1 - (i+1);                
-                        
+                    {
+                        int ip1hm1 = index[i+1] + h-1 - (i+1);
+
                         IFD
                         {
                             temp += u1[ip1hm1] * (pm1[il] + pm[il]);
@@ -4388,22 +4388,22 @@ void s_partition_function::compute_logZ_gradient ()
                                 term1 = p[ilp1] / up[ilp1] *  exp_AUpenalty (i,l+1) *
                                             (  // first, the case ((..-)-[...])
                                             ( u1_ip_jp[ip1hm1]    // ((..-)[...]) or ((..-).[...])
-                                                + exp_dangle5(l,h,h-1)*u1_ip_ju[ip1hm1] )   // ((..-).-[...])  
-                                                    
+                                                + exp_dangle5(l,h,h-1)*u1_ip_ju[ip1hm1] )   // ((..-).-[...])
+
                                                 // next, the case (.-(...)-[...])      i..-(...)h...lj
                                             + exp_dangle3(i,l+1,i+1) * EXPC[1] *
-                                                ( u1_ip_jp[ip2hm1] + u1_iu_jp[ip2hm1] 
-                                                        + exp_dangle5(l,h,h-1)*(u1_ip_ju[ip2hm1]+u1_iu_ju[ip2hm1]) ) 
-                                                    // (..-(..-).-[...])     
-                                            ); 
+                                                ( u1_ip_jp[ip2hm1] + u1_iu_jp[ip2hm1]
+                                                        + exp_dangle5(l,h,h-1)*(u1_ip_ju[ip2hm1]+u1_iu_ju[ip2hm1]) )
+                                                    // (..-(..-).-[...])
+                                            );
                             }
-                            
-                            temp += 
-                            
+
+                            temp +=
+
                             // first, when h-l is the last branch to the right
-                            ( term1 + 
-                            
-                            // case ((..-)-[...].-)  
+                            ( term1 +
+
+                            // case ((..-)-[...].-)
                             pm1nod3_needendd3[il] * exp_dangle3(l,h,l+1) * // we don't need EXPC[1] here, because it's in pm1nod3_needendd3
                                 (u1_ip_jp[ip1hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[ip1hm1])
                                         // c is added in pm1nod3_needendd3
@@ -4412,18 +4412,18 @@ void s_partition_function::compute_logZ_gradient ()
                             + pm1d3_needendd3[il] * exp_dangle3(l,h,l+1) * // we don't need EXPC[1] here, because it's in pm1d3_needendd3
                                 (u1_ip_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[ip2hm1])
                                         // (.(...).-[...].-)        i.(...)h...l.-j
-                                        
-                            // case (..-(..-)-[...].-)            
+
+                            // case (..-(..-)-[...].-)
                             + pm1d3_needendd3[il]  * exp_dangle3(l,h,l+1) * // don't need EXPC[1]
                                 (u1_iu_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_iu_ju[ip2hm1])
                                         // (..-(...)..-[...].-)      i..-(...)h...l.-j
-                                        
+
                             // we have branches to the left and to the right of h-l
-                            //+ pmnod3_noneedmidd3[il]  * u1[ip1hm1] +    
-                                        // ((...)[...]-(---)...)    i(...)h...l-(---)...j 
-                            //pmnod3_needmidd3[il] * exp_dangle3(l,h,l+1) * u1[ip1hm1]);        
-                                        // ((...).-[...]-(---)...)    i(...).-h...l-(---)...j 
-                            
+                            //+ pmnod3_noneedmidd3[il]  * u1[ip1hm1] +
+                                        // ((...)[...]-(---)...)    i(...)h...l-(---)...j
+                            //pmnod3_needmidd3[il] * exp_dangle3(l,h,l+1) * u1[ip1hm1]);
+                                        // ((...).-[...]-(---)...)    i(...).-h...l-(---)...j
+
                             + (pmnod3_needmidd3[il] * exp_dangle3(l,h,l+1) * EXPC[1]+ pmnod3_noneedmidd3[il]) *
                                 (u1_ip_jp[ip1hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[ip1hm1])
                                         // c is added in pm1nod3_needendd3
@@ -4431,39 +4431,39 @@ void s_partition_function::compute_logZ_gradient ()
                             // case (.(..-)-[...].-(--)-) or (.(..-)-[...](--)-)
                             + EXPC[1]*(pmd3_needmidd3[il] * exp_dangle3(l,h,l+1) * EXPC[1] + pmd3_noneedmidd3[il]) *
                                     (u1_ip_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_ip_ju[ip2hm1])
-                                        
+
                             // case (..-(..-)-[...].-(--)-) or (..-(..-)-[...](--)-)
                             + EXPC[1]*(pmd3_needmidd3[il]  * exp_dangle3(l,h,l+1) * EXPC[1] + pmd3_noneedmidd3[il])*
-                                (u1_iu_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_iu_ju[ip2hm1]) ); 
-                                        
-                        }                
-                    }        
+                                (u1_iu_jp[ip2hm1] + exp_dangle5(l,h,h-1)*u1_iu_ju[ip2hm1]) );
+
+                        }
+                    }
                 }
                 temp *= up[hl] * EXPA * EXPB2 * exp_AUpenalty (h,l);
                 GlogZ[sizeindex] += temp;
                 if (has_AU_penalty (sequence[h],sequence[l]))    GlogZ[AUpen_index] += temp;
             }
         }
-                    
+
         sizeindex = structure_type_index ("misc.multi_free_base_penalty");
-        // traverse the sequence from left to right         
+        // traverse the sequence from left to right
         int ij, hl;
         int ip1l, ip2l, lp2jm1, lp1jm1, lp2jm2, lp1jm2, lp2jm3, lp1jm3, hj;
         PFTYPE upm_temp;
-    
+
         // the first free bases
-        for (h=0; h < seqlen; h++)   
+        for (h=0; h < seqlen; h++)
         {
             for (l=seqlen-1; l > h+TURN; l--)
-            {    
+            {
                 if (!can_pair(sequence[h], sequence[l]))
                     continue;
-                hl = index[h]+l-h;        
-                    
+                hl = index[h]+l-h;
+
                 PFTYPE temp = 0;
                 for (i=0; i < h-1; i++)
                 {
-                    int il = index[i] + l - i;                
+                    int il = index[i] + l - i;
                     IFD
                     {
                         temp += (h-i-1)* EXPC[h-i-1] * pm[il];
@@ -4480,11 +4480,11 @@ void s_partition_function::compute_logZ_gradient ()
                 GlogZ[sizeindex]  += up[hl] * exp_AUpenalty (h,l) * EXPA * EXPB2 * temp;
             }
         }
-        
+
         //printf ("GlogZ[%d] = %g\n", sizeindex, GlogZ[sizeindex]);
-        
+
         // second, there is at least a branch to the left of k, and a branch to the right
-        // Now, k is the free base inside a multi-loop, closed be i,j     
+        // Now, k is the free base inside a multi-loop, closed be i,j
         for (i=0; i < seqlen-2*TURN-5; i++)
         {
             for (j=i+2*TURN+5; j < seqlen; j++)
@@ -4497,60 +4497,60 @@ void s_partition_function::compute_logZ_gradient ()
                     {
                         int ip1km1 = index[i+1] + k-1 - (i+1);
                         int kp1jm1 = index[k+1] + j-1 - (k+1);
-                        
+
                         IFD
                         {
                             temp += EXPC[1] * u1[ip1km1] * u1[kp1jm1];
                         }
                         else
                         {
-                            int ip1k = index[i+1] + k - (i+1);                    
+                            int ip1k = index[i+1] + k - (i+1);
                             int ip1km2 = index[i+1] + k-2 - (i+1);
                             int ip2k = index[i+2] + k - (i+2);
                             int ip2km1 = index[i+2] + k-1 - (i+2);
                             int ip2km2 = index[i+2] + k-2 - (i+2);
                             int kjm1 = index[k] + j-1 - (k);
                             int kjm2 = index[k] + j-2 - (k);
-                            int kjm3 = index[k] + j-3 - (k);                    
+                            int kjm3 = index[k] + j-3 - (k);
                             int kp1jm2 = index[k+1] + j-2 - (k+1);
                             int kp1jm3 = index[k+1] + j-3 - (k+1);
                             // first situation (---)-.k---
-                                            
+
                             temp +=
-                                
+
                                 // the branch(es) to the left of k
-                                
+
                                 ( exp_dangle3 (i, j, i+1) * EXPC[1]* (u1_ip_ju[ip2k] + u1_iu_ju[ip2k])    // (.-(---)-.k(
                                 + u1_ip_ju[ip1k] ) *   // ((---).k(
                                 // the branch(es) to the right of k
                                 ( u1_iu_jp[kjm1] / EXPC[1] + u1_iu_ju[kjm1]/EXPC[1] *exp_dangle5(i,j,j-1));
-                                            
+
                             // second situation (---)k---
                             temp +=
                                 // the branch(es) to the left of k
                                 (exp_dangle3 (i, j, i+1) * EXPC[1]*(u1_ip_ju_jm1p[ip2k] + u1_iu_ju_jm1p[ip2k]) + u1_ip_ju_jm1p[ip1k]) *    // only j should be paired, not j-1
                                 // the branch(es) to the right of k
-                                (u1_ip_jp[kp1jm1] + u1_iu_jp[kp1jm1] + (u1_ip_ju[kp1jm1] + u1_iu_ju[kp1jm1])*exp_dangle5(i,j,j-1));                                                        
+                                (u1_ip_jp[kp1jm1] + u1_iu_jp[kp1jm1] + (u1_ip_ju[kp1jm1] + u1_iu_ju[kp1jm1])*exp_dangle5(i,j,j-1));
                         }
                     }
                     GlogZ[sizeindex] += p[ij] / up[ij] * EXPA * EXPB1 * exp_AUpenalty(i,j) * temp;
                 }
             }
         }
-    
-    
-    
+
+
+
         // last, no branch to the right of k
-        // similar to the first free bases 
-        for (h=0; h < seqlen; h++)   
+        // similar to the first free bases
+        for (h=0; h < seqlen; h++)
         {
             int hj;
             for (l=seqlen-3; l > h+TURN; l--)
-            {    
+            {
                 if (!can_pair(sequence[h], sequence[l]))
                     continue;
-                hl = index[h]+l-h;        
-                    
+                hl = index[h]+l-h;
+
                 PFTYPE temp = 0;
                 IFD
                 {
@@ -4566,12 +4566,12 @@ void s_partition_function::compute_logZ_gradient ()
                 {
                     j = l+2;
                     hj = index[h] + j - h;
-    
+
                     temp += (j-l-1)* EXPC[j-l-1] *
                         (pm2nod5_noneedmidd5[hj] + pm2nod5_needmidd5[hj] * exp_dangle5(l,h,h-1));
                         // (-(---)[...].) or (-(---).[...].)
                         // (-(---)-..[...].)
-    
+
                     for (j=l+3; j < seqlen; j++)
                     {
                         // needs the last 5' dangling end
@@ -4582,11 +4582,11 @@ void s_partition_function::compute_logZ_gradient ()
                                     // (-(---)-..[...].-.)
                     }
                     GlogZ[sizeindex] += up[hl] * exp_dangle3(l,h,l+1) * exp_AUpenalty (h,l) * EXPA * EXPB2 * temp;
-                }            
+                }
             }
-        }    
+        }
     }   // end if !ignore_multi
-    
+
     /*
     // make sure all gradients are <=1            // actually it can be > 1, but not by tooo much
     for (i=0; i < num_params; i++)
@@ -4600,7 +4600,7 @@ void s_partition_function::compute_logZ_gradient ()
     */
 }
 
-                
+
 int s_partition_function::correct_gradient ()
 // return 1 if it is correct, 0 otherwise
 {
@@ -4608,18 +4608,18 @@ int s_partition_function::correct_gradient ()
     int i, j, k, l, m, n, o, p;
     index_param = 0;
     int correct = 1;
- 
-    PFTYPE diff; 
+
+    PFTYPE diff;
     for (i=0; i < num_params; i++)
     {
         diff = GlogZexhaustive[i] - GlogZ[i];
-        if (diff < 0)     diff *= -1.0;        
+        if (diff < 0)     diff *= -1.0;
         if ((GlogZexhaustive[i] != 0 || GlogZ[i] != 0 ) && diff > PREC)
         {
             printf ("%d %s\texhaust=%g\tsmart=%g\tdiff=%g\n", i, string_params[i], GlogZexhaustive[i], GlogZ[i], diff);
             correct = 0;
         }
-        else if (GlogZexhaustive[i] != 0) 
+        else if (GlogZexhaustive[i] != 0)
             printf ("%d %s\texhaust=%g\tsmart=%g\t+++++++++\n", i, string_params[i], GlogZexhaustive[i], GlogZ[i]);
     }
     return correct;
@@ -4684,7 +4684,7 @@ void s_partition_function::compute_upm (int i, int j)
     int l, h;
     int ip1l, ip2l, lp2jm1, lp1jm1, lp2jm2, lp1jm2, lp2jm3, lp1jm3, hj;
     double upm_temp;
-    
+
     if (!can_pair(sequence[i], sequence[j]))
         return;
     upm[ij] = 0;
@@ -4701,9 +4701,9 @@ void s_partition_function::compute_upm (int i, int j)
             upm[ij] += up[ip1l] * exp_AUpenalty (i+1,l) * u1[lp1jm1];
         else
             upm[ij] += up[ip1l] * exp_AUpenalty (i+1,l) *
-                    (  u1_ip_jp[lp1jm1]      // [(...)(.-..)] or [(...)(.-..).]                    
+                    (  u1_ip_jp[lp1jm1]      // [(...)(.-..)] or [(...)(.-..).]
                        + exp_dangle3 (l, i+1, l+1) * EXPC[1] *
-                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [(...).-(...)] or [(...).-(...).] 
+                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [(...).-(...)] or [(...).-(...).]
                                 exp_dangle5(i,j,j-1) * (u1_ip_ju[lp2jm1] + u1_iu_ju[lp2jm1])) +    // [(...).-(...)-..]
                        + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);    // [(...)(...)-..]
     }
@@ -4713,19 +4713,19 @@ void s_partition_function::compute_upm (int i, int j)
         lp2jm1 = index[l+2]+j-1-l-2;
         lp1jm1 = index[l+1]+j-1-l-1;
         lp2jm2 = index[l+2]+j-2-l-2;
-        lp1jm2 = index[l+1]+j-2-l-1;        
+        lp1jm2 = index[l+1]+j-2-l-1;
         lp2jm3 = index[l+2]+j-3-l-2;
-        lp1jm3 = index[l+1]+j-3-l-1;      
+        lp1jm3 = index[l+1]+j-3-l-1;
         IFD
             upm[ij] += up[ip2l] * EXPC[1] * exp_AUpenalty (i+2, l) * u1[lp1jm1];
         else
             upm[ij] += up[ip2l] * EXPC[1] *
-                    exp_dangle3 (i, j, i+1) * exp_AUpenalty (i+2, l) * 
-                    (  u1_ip_jp[lp1jm1]      // [.(...)(.-..)] or [.(...)(.-..).]                    
+                    exp_dangle3 (i, j, i+1) * exp_AUpenalty (i+2, l) *
+                    (  u1_ip_jp[lp1jm1]      // [.(...)(.-..)] or [.(...)(.-..).]
                        + exp_dangle3 (l, i+2, l+1) * EXPC[1] *
-                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [.(...).-(...)] or [.(...).-(...).] 
+                            ( u1_ip_jp[lp2jm1] + u1_iu_jp[lp2jm1] +     // [.(...).-(...)] or [.(...).-(...).]
                                 exp_dangle5(i,j,j-1) * (u1_ip_ju[lp2jm1] + u1_iu_ju[lp2jm1])) +    // [.(...).-(...)-..]
-                       + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);    // [.(...)(...)-..] 
+                       + exp_dangle5(i,j,j-1) * u1_ip_ju[lp1jm1]);    // [.(...)(...)-..]
     }
     upm_temp = 0;
     for (h=i+3; h < j-TURN-2; h++)    // case (....(...)--(--)-)
@@ -4738,14 +4738,14 @@ void s_partition_function::compute_upm (int i, int j)
             upm_temp += EXPC[h-i-1] * s2[hjm1];
         else
             upm_temp += EXPC[h-i-1] *
-                ( s2_jp[hjm1]    // --(...)) or --(...).) 
+                ( s2_jp[hjm1]    // --(...)) or --(...).)
                   + s2_ju[hjm1]* exp_dangle5(i,j,j-1));    // --(...)..)
-    }   
+    }
     IFD
         upm[ij] += upm_temp;
     else
     {
-        upm[ij] += exp_dangle3 (i, j, i+1) * upm_temp;        
+        upm[ij] += exp_dangle3 (i, j, i+1) * upm_temp;
     }
     upm[ij] *= upm_common;
     //printf ("i=%d, j=%d, upm=%g\n", i, j, upm[ij]);
