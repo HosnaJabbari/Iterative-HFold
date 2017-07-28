@@ -199,7 +199,7 @@ int main (int argc, char **argv) {
 	}
 
 	if(!validateSequence(sequence)){
-		printf("-s is invalid\n");
+		fprintf(stderr,"-s sequence is invalid. sequence: %s\n",sequence);
 		printUsage();
 		exit(1);
 	}
@@ -249,25 +249,37 @@ int main (int argc, char **argv) {
         method4_calculation(sequence, structure, method4_structure, method4_energy, result);
 
 
-        if (*method1_energy < final_energy && *method1_energy != 0) {
+        //Zero energy could be a valid result and it is not ingnored in the original perl code.
+        //So, we take it into account.
+        //if (*method1_energy < final_energy && *method1_energy != 0) {
+        if (*method1_energy < final_energy) {
                 final_energy = *method1_energy;
                 strcpy(final_structure, method1_structure);
                 method_chosen = 1;
         }
 
-        if (*method2_energy < final_energy && *method2_energy != 0) {
+        //Zero energy could be a valid result and it is not ingnored in the original perl code.
+        //So, we take it into account.
+        //if (*method2_energy < final_energy && *method2_energy != 0) {
+        if (*method2_energy < final_energy) {
                 final_energy = *method2_energy; 
                 strcpy(final_structure, method2_structure);             
                 method_chosen = 2;
         }
 
-        if (*method3_energy < final_energy && *method3_energy != 0) {
+        //Zero energy could be a valid result and it is not ingnored in the original perl code.
+        //So, we take it into account.
+        //if (*method3_energy < final_energy && *method3_energy != 0) {
+        if (*method3_energy < final_energy) {
                 final_energy = *method3_energy; 
                 strcpy(final_structure, method3_structure);             
                 method_chosen = 3;
         }
 
-        if (*method4_energy < final_energy && *method4_energy != 0) {
+        //Zero energy could be a valid result and it is not ingnored in the original perl code.
+        //So, we take it into account.
+        //if (*method4_energy < final_energy && *method4_energy != 0) {
+        if (*method4_energy < final_energy) {
                 final_energy = *method4_energy; 
                 strcpy(final_structure, method4_structure);             
                 method_chosen = 4;
