@@ -9,7 +9,7 @@ class VM_final;
 class V_final{
 	public: 
 	// constructor
-	V_final();
+	V_final(int nb_nucleotides);
 	~V_final();
 	void setloops(s_energy_matrix *v, VM_final *vm);
 	int get_energy(int i, int j);

@@ -59,7 +59,7 @@ void W_final::space_allocation(){
 	//vm->set_energy_matrix(s_min_folding::V);
 
 	// Hosna June 20th, 2007
-	v = new V_final();
+	v = new V_final(nb_nucleotides);
 	if (v == NULL) giveup ("Cannot allocate memory", "W_final");
 	//s_min_folding::V, s_min_folding::H, s_min_folding::S, s_min_folding::VBI, vm);
 	v->setloops(this->V,vm);
