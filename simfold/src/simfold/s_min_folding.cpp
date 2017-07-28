@@ -57,7 +57,7 @@ void s_min_folding::allocate_space()
 {
     int i;
     nb_nucleotides = strlen(sequence);
-    
+
     f = new minimum_fold [nb_nucleotides];
     if (f == NULL) giveup ("Cannot allocate memory", "energy");
     W = new PARAMTYPE [nb_nucleotides];
@@ -125,7 +125,7 @@ double s_min_folding::s_simfold_restricted ()
 {
     double energy;
     energy = fold_sequence_restricted ();
-    return energy;    
+    return energy;
 }
 
 
@@ -150,30 +150,30 @@ double s_min_folding::fold_sequence ()
     {
         compute_W (j);
     }
-    energy = W[nb_nucleotides-1]/100.0;        
-    
+    energy = W[nb_nucleotides-1]/100.0;
+
     if (debug)
     {
         for (j=1; j < nb_nucleotides; j++)
         {
             printf ("W(%d) = %d\n", j, W[j]);
         }
-    }    
-    
-    
+    }
+
+
     // backtrack
     // first add (0,n-1) on the stack
     stack_interval = new seq_interval;
     stack_interval->i = 0;
     stack_interval->j = nb_nucleotides - 1;
-    stack_interval->energy = W[nb_nucleotides-1]; 
+    stack_interval->energy = W[nb_nucleotides-1];
     stack_interval->type = FREE;
     stack_interval->next = NULL;
 
     seq_interval *cur_interval = stack_interval;
 
     while ( cur_interval != NULL)
-    {         
+    {
         stack_interval = stack_interval->next;
         backtrack (cur_interval);
         delete cur_interval;    // this should make up for the new in the insert_node
@@ -182,7 +182,7 @@ double s_min_folding::fold_sequence ()
     if (debug)
     {
         print_result ();
-    }    
+    }
     //delete stack_interval;
     return energy;
 }
@@ -195,23 +195,23 @@ double s_min_folding::fold_sequence_restricted ()
     int i, j;
 
     str_features *fres;
-    if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");   
-    // detect the structure features  
+    if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
+    // detect the structure features
     detect_structure_features (restricted, fres);
-    
+
     /*
     for (i=0; i < nb_nucleotides; i++)
         if (fres[i].pair != -1)
             printf ("%d pairs %d, type %c\n", i, fres[i].pair, fres[i].type);
     */
-    
+
     for (j=0; j < nb_nucleotides; j++)
     {
         for (i=0; i<j; i++)
-        {            
+        {
             // V(i,j) = infinity if i restricted or j restricted and pair of i is not j
-            if ((fres[i].pair > -1 && fres[i].pair !=j) || (fres[j].pair > -1 && fres[j].pair != i)) 
-                continue;              
+            if ((fres[i].pair > -1 && fres[i].pair !=j) || (fres[j].pair > -1 && fres[j].pair != i))
+                continue;
             if (fres[i].pair == -1 || fres[j].pair == -1)   // i or j MUST be unpaired
                 continue;
             V->compute_energy_restricted (i, j, fres);
@@ -223,30 +223,30 @@ double s_min_folding::fold_sequence_restricted ()
     {
         compute_W_restricted (j, fres);
     }
-    energy = W[nb_nucleotides-1]/100.0;        
-    
+    energy = W[nb_nucleotides-1]/100.0;
+
     if (debug)
     {
         for (j=1; j < nb_nucleotides; j++)
         {
             printf ("W(%d) = %d\n", j, W[j]);
         }
-    }    
-    
-    
+    }
+
+
     // backtrack
     // first add (0,n-1) on the stack
     stack_interval = new seq_interval;
     stack_interval->i = 0;
     stack_interval->j = nb_nucleotides - 1;
-    stack_interval->energy = W[nb_nucleotides-1]; 
+    stack_interval->energy = W[nb_nucleotides-1];
     stack_interval->type = FREE;
     stack_interval->next = NULL;
 
     seq_interval *cur_interval = stack_interval;
 
     while ( cur_interval != NULL)
-    {         
+    {
         stack_interval = stack_interval->next;
         backtrack_restricted (cur_interval, fres);
         delete cur_interval;    // this should make up for the new in the insert_node
@@ -255,7 +255,7 @@ double s_min_folding::fold_sequence_restricted ()
     if (debug)
     {
         print_result ();
-    }    
+    }
     delete [] fres;
     //delete stack_interval;
     return energy;
@@ -265,7 +265,7 @@ double s_min_folding::fold_sequence_restricted ()
 
 void s_min_folding::insert_node (int i, int j, char type)
   // insert at the beginning
-{      
+{
     seq_interval *tmp;
     tmp = new seq_interval;
     tmp->i = i;
@@ -279,7 +279,7 @@ void s_min_folding::insert_node (int i, int j, char type)
 
 void s_min_folding::backtrack (seq_interval *cur_interval)
 // PRE:  All matrixes V, VM, WM and W have been filled
-// POST: Discover the MFE path   
+// POST: Discover the MFE path
 {
     char type;
 
@@ -291,9 +291,9 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
         f[j].pair = i;
         structure[i] = '(';
         structure[j] = ')';
-      
+
         type = V->get_type (i,j);
-        if (debug) 
+        if (debug)
             printf ("\t(%d,%d) LOOP - type %c\n", i,j,type);
         if (type == STACK)
         {
@@ -303,25 +303,25 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                 insert_node (i+1, j-1, LOOP);
             else
             {
-                printf ("NOT GOOD STACK, i=%d, j=%d\n", i, j);
+                fprintf (stderr, "NOT GOOD STACK, i=%d, j=%d\n", i, j);
                 exit (0);
-            }                    
+            }
         }
         else if (type == HAIRP)
         {
             f[i].type = HAIRP;
             f[j].type = HAIRP;
         }
-        else if (type == INTER) 
+        else if (type == INTER)
         {
             f[i].type = INTER;
             f[j].type = INTER;
             // detect the other closing pair
             int ip, jp, best_ip, best_jp, minq;
             PARAMTYPE tmp, min = INF;
-            for (ip = i+1; ip <= MIN(j-2,i+MAXLOOP+1); ip++) 
+            for (ip = i+1; ip <= MIN(j-2,i+MAXLOOP+1); ip++)
             {
-                minq = MAX (j-i+ip-MAXLOOP-2, ip+1);    
+                minq = MAX (j-i+ip-MAXLOOP-2, ip+1);
                 for (jp = minq; jp < j; jp++)
                 {
                     tmp = VBI->get_energy_str (i,j,ip,jp);
@@ -337,9 +337,9 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                 insert_node (best_ip, best_jp, LOOP);
             else
             {
-                printf ("NOT GOOD INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
+                fprintf (stderr, "NOT GOOD INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
                 exit (0);
-            }                    
+            }
         }
         else if (type == MULTI)
         {
@@ -356,39 +356,39 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                     best_k = k;
                     best_row = 1;
                 }
-                tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-1) + 
-                        dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] + 
+                tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-1) +
+                        dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
                         misc.multi_free_base_penalty;
                 // add the loss
                 if (pred_pairings != NULL)
                 {
                     pred_pairings[i+1] = -1;
                     tmp = tmp - loss (i+1,i+1);
-                }                        
+                }
                 if (tmp < min)
                 {
                     min = tmp;
                     best_k = k;
                     best_row = 2;
                 }
-                tmp = VM->get_energy_WM (i+1,k) + VM->get_energy_WM (k+1, j-2) + 
-                        dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] + 
+                tmp = VM->get_energy_WM (i+1,k) + VM->get_energy_WM (k+1, j-2) +
+                        dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
                         misc.multi_free_base_penalty;
                 // add the loss
                 if (pred_pairings != NULL)
                 {
                     pred_pairings[j-1] = -1;
                     tmp = tmp - loss (j-1,j-1);
-                }                                      
+                }
                 if (tmp < min)
                 {
                     min = tmp;
                     best_k = k;
                     best_row = 3;
                 }
-                tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-2) + 
-                        dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] + 
-                        dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] + 
+                tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-2) +
+                        dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
+                        dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
                         2*misc.multi_free_base_penalty;
                 // add the loss
                 if (pred_pairings != NULL)
@@ -396,7 +396,7 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                     pred_pairings[i+1] = -1;
                     pred_pairings[j-1] = -1;
                     tmp = tmp - loss (i+1,i+1) - loss (j-1,j-1);
-                }                                                    
+                }
                 if (tmp < min)
                 {
                     min = tmp;
@@ -406,7 +406,7 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
             }
             switch (best_row)
               {
-              case 1:                
+              case 1:
                   insert_node (i+1, best_k, M_WM);
                   insert_node (best_k+1, j-1, M_WM); break;
               case 2: insert_node (i+2, best_k, M_WM);
@@ -421,30 +421,30 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
     else if(cur_interval->type == FREE)
     {
         int j = cur_interval->j;
-    
-        if (j <= TURN) return; 
-        
+
+        if (j <= TURN) return;
+
         PARAMTYPE min = INF, tmp, acc, energy_ij;
         int best_row, i, best_i;
-    
+
         if (debug)
             printf ("\t(0,%d) FREE\n", j);
-        tmp = W[j-1];      
+        tmp = W[j-1];
         // add the loss
         if (pred_pairings != NULL)
         {
             pred_pairings[j] = -1;
             tmp = tmp - loss (j,j);
-        }                            
-      
+        }
+
         if (tmp < min)
         {
-            min = tmp;          
+            min = tmp;
             best_row = 0;
         }
         for (i=0; i<=j-TURN-1; i++)
         {
-            acc = (i-1>0) ? W[i-1] : 0;          
+            acc = (i-1>0) ? W[i-1] : 0;
             energy_ij = V->get_energy(i,j);
             if (energy_ij < INF)
             {
@@ -455,8 +455,8 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                     best_i = i;
                     best_row = 1;
                 }
-            }        
-            energy_ij = V->get_energy(i+1,j);            
+            }
+            energy_ij = V->get_energy(i+1,j);
             if (energy_ij < INF)
             {
                 tmp = energy_ij + AU_penalty (int_sequence[i+1],int_sequence[j]) + acc;
@@ -468,14 +468,14 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                 {
                     pred_pairings[i] = -1;
                     tmp = tmp - loss (i,i);
-                }                                
+                }
                 if (tmp < min)
                 {
                     min = tmp;
                     best_i = i;
                     best_row = 2;
                 }
-            }          
+            }
             energy_ij = V->get_energy(i,j-1);
             if (energy_ij < INF)
             {
@@ -488,14 +488,14 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                 {
                     pred_pairings[j] = -1;
                     tmp = tmp - loss (j,j);
-                }                                
+                }
                 if (tmp < min)
                 {
                     min = tmp;
                     best_i = i;
                     best_row = 3;
                 }
-            }                  
+            }
             energy_ij = V->get_energy(i+1,j-1);
             if (energy_ij < INF)
             {
@@ -512,7 +512,7 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
                     pred_pairings[i] = -1;
                     pred_pairings[j] = -1;
                     tmp = tmp - loss (i,i) - loss (j,j);
-                }            
+                }
                 if (tmp < min)
                 {
                     min = tmp;
@@ -524,21 +524,21 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
         switch (best_row)
             {
             case 0: insert_node (0, j-1, FREE); break;
-            case 1: insert_node (best_i, j, LOOP); 
-            if (best_i-1 > TURN) 
-                insert_node (0, best_i-1, FREE); 
+            case 1: insert_node (best_i, j, LOOP);
+            if (best_i-1 > TURN)
+                insert_node (0, best_i-1, FREE);
             break;
-            case 2: insert_node (best_i+1, j, LOOP); 
-            if (best_i-1 > TURN) 
-                insert_node (0, best_i-1, FREE); 
+            case 2: insert_node (best_i+1, j, LOOP);
+            if (best_i-1 > TURN)
+                insert_node (0, best_i-1, FREE);
             break;
-            case 3: insert_node (best_i, j-1, LOOP); 
-            if (best_i-1 > TURN) 
-                insert_node (0, best_i-1, FREE); 
+            case 3: insert_node (best_i, j-1, LOOP);
+            if (best_i-1 > TURN)
+                insert_node (0, best_i-1, FREE);
             break;
-            case 4: insert_node (best_i+1, j-1, LOOP); 
-            if (best_i-1 > TURN) 
-                insert_node (0, best_i-1, FREE); 
+            case 4: insert_node (best_i+1, j-1, LOOP);
+            if (best_i-1 > TURN)
+                insert_node (0, best_i-1, FREE);
             break;
             }
     }
@@ -548,10 +548,10 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
         int j = cur_interval->j;
         PARAMTYPE tmp, min = INF;
         int best_k, best_row;
-    
+
         if (debug)
             printf ("\t (%d,%d) M_WM\n", i,j);
-    
+
         tmp = V->get_energy(i,j) +
             AU_penalty (int_sequence[i], int_sequence[j]) +
             misc.multi_helix_penalty;
@@ -560,7 +560,7 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
             min = tmp;
             best_row = 1;
         }
-    
+
         tmp = V->get_energy(i+1,j) +
                 AU_penalty (int_sequence[i+1], int_sequence[j]) +
                 dangle_bot [int_sequence[j]]
@@ -573,13 +573,13 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
         {
             pred_pairings[i] = -1;
             tmp = tmp - loss (i,i);
-        }                    
+        }
         if (tmp < min)
         {
             min = tmp;
             best_row = 2;
         }
-            
+
         tmp = V->get_energy(i,j-1) +
                     AU_penalty (int_sequence[i], int_sequence[j-1]) +
                     dangle_top [int_sequence[j-1]]
@@ -592,13 +592,13 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
         {
             pred_pairings[j] = -1;
             tmp = tmp - loss (j,j);
-        }                                
+        }
         if (tmp < min)
         {
             min = tmp;
             best_row = 3;
         }
-    
+
         tmp = V->get_energy(i+1,j-1) +
                     AU_penalty (int_sequence[i+1], int_sequence[j-1]) +
                     dangle_bot [int_sequence[j-1]]
@@ -615,40 +615,40 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
             pred_pairings[i] = -1;
             pred_pairings[j] = -1;
             tmp = tmp - loss (i,i) - loss (j,j);
-        }                                
+        }
         if (tmp < min)
         {
             min = tmp;
             best_row = 4;
         }
-            
+
         tmp = VM->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
         // add the loss
         if (pred_pairings != NULL)
         {
             pred_pairings[i] = -1;
             tmp = tmp - loss (i,i);
-        }                    
+        }
         if (tmp < min)
         {
             min = tmp;
             best_row = 5;
         }
-            
+
         tmp = VM->get_energy_WM (i,j-1) + misc.multi_free_base_penalty;
         // add the loss
         if (pred_pairings != NULL)
         {
             pred_pairings[j] = -1;
             tmp = tmp - loss (j,j);
-        }            
-        
+        }
+
         if (tmp < min)
         {
             min = tmp;
             best_row = 6;
         }
-    
+
         for (int k=i; k < j; k++)
         {
             tmp = VM->get_energy_WM (i, k) + VM->get_energy_WM (k+1, j);
@@ -665,28 +665,28 @@ void s_min_folding::backtrack (seq_interval *cur_interval)
             case 2: insert_node (i+1, j, LOOP); break;
             case 3: insert_node (i, j-1, LOOP); break;
             case 4: insert_node (i+1, j-1, LOOP); break;
-            case 5: 
+            case 5:
                 if (j-i-1 > TURN)
                     insert_node (i+1, j, M_WM);
                 break;
             case 6:
                 if (j-1-i > TURN)
                     insert_node (i, j-1, M_WM);
-                break;            
-            case 7: 
-                if (best_k-i > TURN) 
+                break;
+            case 7:
+                if (best_k-i > TURN)
                     insert_node (i, best_k, M_WM);
                 if (j-best_k-1 > TURN)
-                    insert_node (best_k+1, j, M_WM); 
+                    insert_node (best_k+1, j, M_WM);
                 break;
-        }        
+        }
     }
 }
 
 
 void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_features *fres)
 // PRE:  All matrixes V, VM, WM and W have been filled
-// POST: Discover the MFE path   
+// POST: Discover the MFE path
 {
     char type;
 
@@ -694,44 +694,44 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
     {
         int i = cur_interval->i;
         int j = cur_interval->j;
-        if (i >= j) 
+        if (i >= j)
             return;
         f[i].pair = j;
         f[j].pair = i;
         structure[i] = '(';
         structure[j] = ')';
-      
+
         type = V->get_type (i,j);
-        if (debug) 
+        if (debug)
             printf ("\t(%d,%d) LOOP - type %c\n", i,j,type);
         if (type == STACK)
         {
             f[i].type = STACK;
             f[j].type = STACK;
-            if (i+1 < j-1)            
+            if (i+1 < j-1)
                 insert_node (i+1, j-1, LOOP);
             else
             {
-                printf ("NOT GOOD RESTR STACK, i=%d, j=%d\n", i, j);
+                fprintf (stderr, "NOT GOOD RESTR STACK, i=%d, j=%d\n", i, j);
                 exit (0);
-            }    
-            
+            }
+
         }
         else if (type == HAIRP)
         {
             f[i].type = HAIRP;
             f[j].type = HAIRP;
         }
-        else if (type == INTER) 
+        else if (type == INTER)
         {
             f[i].type = INTER;
             f[j].type = INTER;
             // detect the other closing pair
             int ip, jp, best_ip, best_jp, minq;
             PARAMTYPE tmp, min = INF;
-            for (ip = i+1; ip <= MIN(j-2,i+MAXLOOP+1); ip++) 
+            for (ip = i+1; ip <= MIN(j-2,i+MAXLOOP+1); ip++)
             {
-                minq = MAX (j-i+ip-MAXLOOP-2, ip+1);    
+                minq = MAX (j-i+ip-MAXLOOP-2, ip+1);
                 for (jp = minq; jp < j; jp++)
                 {
                     if (exists_restricted (i,ip,fres) || exists_restricted (jp,j,fres))
@@ -749,9 +749,9 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                 insert_node (best_ip, best_jp, LOOP);
             else
             {
-                printf ("NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
+                fprintf (stderr, "NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
                 exit (0);
-            }                    
+            }
         }
         else if (type == MULTI)
         {
@@ -769,9 +769,9 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                     best_row = 1;
                   }
                 if (fres[i+1].pair <= -1)
-                {  
-                    tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-1) + 
-                    dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] + 
+                {
+                    tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-1) +
+                    dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
                     misc.multi_free_base_penalty;
                     if (tmp < min)
                     {
@@ -781,9 +781,9 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                     }
                 }
                 if (fres[j-1].pair <= -1)
-                {    
-                    tmp = VM->get_energy_WM (i+1,k) + VM->get_energy_WM (k+1, j-2) + 
-                    dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] + 
+                {
+                    tmp = VM->get_energy_WM (i+1,k) + VM->get_energy_WM (k+1, j-2) +
+                    dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
                     misc.multi_free_base_penalty;
                     if (tmp < min)
                     {
@@ -793,10 +793,10 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                     }
                 }
                 if (fres[i+1].pair <= -1 && fres[j-1].pair <= -1)
-                {    
-                    tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-2) + 
-                    dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] + 
-                    dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] + 
+                {
+                    tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-2) +
+                    dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
+                    dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
                     2*misc.multi_free_base_penalty;
                     if (tmp < min)
                     {
@@ -804,7 +804,7 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                         best_k = k;
                         best_row = 4;
                     }
-                }    
+                }
               }
             switch (best_row)
               {
@@ -824,25 +824,25 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
         int j = cur_interval->j;
 
         if (j==0) return;
-        //if (j <= TURN) return; 
-        
+        //if (j <= TURN) return;
+
         PARAMTYPE min = INF, tmp, acc, energy_ij;
         int best_row, i, best_i;
-    
+
         if (debug)
             printf ("\t(0,%d) FREE\n", j);
-            
+
         // this case is for j unpaired, so I have to check that.
-        if (fres[j].pair <= -1)  
+        if (fres[j].pair <= -1)
         {
         //printf ("j=%d\n", j);
             tmp = W[j-1];
             if (tmp < min)
             {
-                min = tmp;          
+                min = tmp;
                 best_row = 0;
             }
-        }      
+        }
         for (i=0; i<=j-1; i++)    // no TURN
         {
 
@@ -867,15 +867,15 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                 best_row = 1;
                 }
             }
-                        
+
             if (fres[i].pair <= -1)
-            {  
-                energy_ij = V->get_energy(i+1,j);            
+            {
+                energy_ij = V->get_energy(i+1,j);
                 if (energy_ij < INF)
                 {
                     tmp = energy_ij + AU_penalty (int_sequence[i+1],int_sequence[j]) + acc;
                     tmp += dangle_bot [int_sequence[j]]
-                        [int_sequence[i+1]]                    
+                        [int_sequence[i+1]]
                         [int_sequence[i]];
     //                 if (fres[i+1].pair == j)
     //                 {
@@ -883,17 +883,17 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
     //                     best_i = i;
     //                     best_row = 2;
     //                     continue;
-    //                 }                    
+    //                 }
                     if (tmp < min)
                     {
                         min = tmp;
                         best_i = i;
                         best_row = 2;
                     }
-                }          
+                }
             }
             if (fres[j].pair <= -1)
-            {      
+            {
                 energy_ij = V->get_energy(i,j-1);
                 if (energy_ij < INF)
                 {
@@ -905,19 +905,19 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
     //                 {
     //                     min = tmp;
     //                     best_i = i;
-    //                     best_row = 3; 
+    //                     best_row = 3;
     //                     continue;
-    //                 }                    
+    //                 }
                     if (tmp < min)
                     {
                         min = tmp;
                         best_i = i;
                         best_row = 3;
                     }
-                }                  
+                }
             }
             if (fres[i].pair <= -1 && fres[j].pair <= -1)
-            {      
+            {
                 energy_ij = V->get_energy(i+1,j-1);
                 if (energy_ij < INF)
                 {
@@ -934,7 +934,7 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
     //                     best_i = i;
     //                     best_row = 4;
     //                     continue;
-    //                 }                    
+    //                 }
                     if (tmp < min)
                     {
                         min = tmp;
@@ -942,26 +942,26 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                         best_row = 4;
                     }
                 }
-            }      
+            }
         }
         switch (best_row)
         {
             case 0: insert_node (0, j-1, FREE); break;
-            case 1: insert_node (best_i, j, LOOP); 
+            case 1: insert_node (best_i, j, LOOP);
                 if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
-                    insert_node (0, best_i-1, FREE); 
+                    insert_node (0, best_i-1, FREE);
                 break;
-            case 2: insert_node (best_i+1, j, LOOP); 
-                if (best_i-1 > 0) 
-                    insert_node (0, best_i-1, FREE); 
+            case 2: insert_node (best_i+1, j, LOOP);
+                if (best_i-1 > 0)
+                    insert_node (0, best_i-1, FREE);
                 break;
-            case 3: insert_node (best_i, j-1, LOOP); 
-                if (best_i-1 > 0) 
-                    insert_node (0, best_i-1, FREE); 
+            case 3: insert_node (best_i, j-1, LOOP);
+                if (best_i-1 > 0)
+                    insert_node (0, best_i-1, FREE);
                 break;
-            case 4: insert_node (best_i+1, j-1, LOOP); 
-                if (best_i-1 > 0) 
-                    insert_node (0, best_i-1, FREE); 
+            case 4: insert_node (best_i+1, j-1, LOOP);
+                if (best_i-1 > 0)
+                    insert_node (0, best_i-1, FREE);
                 break;
         }
     }
@@ -997,9 +997,9 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
               min = tmp;
               best_row = 2;
           }
-      }      
+      }
       if (fres[j].pair <= -1)
-      {    
+      {
           tmp = V->get_energy(i,j-1) +
                 AU_penalty (int_sequence[i], int_sequence[j-1]) +
                 dangle_top [int_sequence[j-1]]
@@ -1012,7 +1012,7 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
               min = tmp;
               best_row = 3;
           }
-      }  
+      }
       if (fres[i].pair <= -1 && fres[j].pair <= -1)
       {
           tmp = V->get_energy(i+1,j-1) +
@@ -1030,7 +1030,7 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
               min = tmp;
               best_row = 4;
           }
-      }   
+      }
       if (fres[i].pair <= -1)
       {
           tmp = VM->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
@@ -1039,16 +1039,16 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
               min = tmp;
               best_row = 5;
           }
-      }      
+      }
       if (fres[j].pair <= -1)
-      {          
+      {
           tmp = VM->get_energy_WM (i,j-1) + misc.multi_free_base_penalty;
           if (tmp < min)
           {
               min = tmp;
               best_row = 6;
           }
-      }      
+      }
 
       for (int k=i; k < j; k++)
         {
@@ -1066,21 +1066,21 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
           case 2: insert_node (i+1, j, LOOP); break;
           case 3: insert_node (i, j-1, LOOP); break;
           case 4: insert_node (i+1, j-1, LOOP); break;
-          case 5: 
+          case 5:
             if (j-i-1 > 0)
               insert_node (i+1, j, M_WM);
             break;
           case 6:
             if (j-1-i > 0)
               insert_node (i, j-1, M_WM);
-            break;            
-          case 7: 
-            if (best_k-i > 0) 
+            break;
+          case 7:
+            if (best_k-i > 0)
               insert_node (i, best_k, M_WM);
             if (j-best_k-1 > 0)
-              insert_node (best_k+1, j, M_WM); 
+              insert_node (best_k+1, j, M_WM);
             break;
-          }        
+          }
     }
 }
 
@@ -1096,20 +1096,20 @@ PARAMTYPE s_min_folding::compute_W_br2 (int j)
     int i;
 
     for (i=0; i<=j-TURN-1; i++)
-    {  
+    {
         acc = (i-1>0) ? W[i-1]: 0;
-        
+
         energy_ij = V->get_energy(i,j);
         if (energy_ij < INF)
         {
             tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
             if (tmp < min)
             {
-                min = tmp;          
+                min = tmp;
             }
         }
-        
-        energy_ij = V->get_energy(i+1,j);            
+
+        energy_ij = V->get_energy(i+1,j);
         if (energy_ij < INF)
         {
             tmp = energy_ij + AU_penalty (int_sequence[i+1],int_sequence[j]) + acc;
@@ -1121,14 +1121,14 @@ PARAMTYPE s_min_folding::compute_W_br2 (int j)
             {
                 pred_pairings[i] = -1;
                 tmp = tmp - loss (i,i);
-            }            
-                              
+            }
+
             if (tmp < min)
             {
                 min = tmp;
             }
         }
-        
+
         energy_ij = V->get_energy(i,j-1);
         if (energy_ij < INF)
         {
@@ -1141,15 +1141,15 @@ PARAMTYPE s_min_folding::compute_W_br2 (int j)
             {
                 pred_pairings[j] = -1;
                 tmp = tmp - loss (j,j);
-            }            
-                              
+            }
+
             if (tmp < min)
             {
                 min = tmp;
             }
         }
 
-        
+
         energy_ij = V->get_energy(i+1,j-1);
         if (energy_ij < INF)
         {
@@ -1166,15 +1166,15 @@ PARAMTYPE s_min_folding::compute_W_br2 (int j)
                 pred_pairings[i] = -1;
                 pred_pairings[j] = -1;
                 tmp = tmp - loss (i,i) - loss (j,j);
-            }            
-                              
+            }
+
             if (tmp < min)
             {
                 min = tmp;
             }
         }
     }
-    return min;    
+    return min;
 }
 
 
@@ -1191,8 +1191,8 @@ void s_min_folding::compute_W (int j)
     {
         pred_pairings[j] = -1;
         m1 = m1 - loss (j,j);
-    }            
-    
+    }
+
     m2 = compute_W_br2(j);
     if (m1 < m2)     // does this make sense?    || (m1 >= MAXENERGY && m2 >= MAXENERGY))
     {
@@ -1200,7 +1200,7 @@ void s_min_folding::compute_W (int j)
     }
     else
     {
-        W[j] = m2;        
+        W[j] = m2;
     }
 }
 
@@ -1208,7 +1208,7 @@ void s_min_folding::compute_W (int j)
 PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, int &must_choose_this_branch)
 // Compute the second branch of W formula.
 //       This branch has to consider the AU_penalties and the dangling energies.
-// May 16, 2007: this function had some bugs. 
+// May 16, 2007: this function had some bugs.
 {
     PARAMTYPE min = INF, tmp, energy_ij = INF, acc;
     int i;
@@ -1218,18 +1218,18 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
     // I have to check if j is restricted
     // added Jan 28, 2006
 
- 
+
     // j does not HAVE to pair (or not with a base downstream)
     must_choose_this_branch = 0;
     for (i=0; i<=j-1; i++)    // TURN shouldn't be there
-    {  
+    {
         // don't allow pairing with restricted i's
         // added Jan 28, 2006
 
         // We don't need to make sure i and j don't have to pair with something else,
         //  because that would be INF - done in fold_sequence_restricted
         acc = (i-1>0) ? W[i-1]: 0;
-            
+
         energy_ij = V->get_energy(i,j);
         if (energy_ij < INF)
         {
@@ -1253,33 +1253,33 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
         // I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
         if (fres[i].pair <= -1 && i+1 < j)
         {
-            energy_ij = V->get_energy(i+1,j);            
+            energy_ij = V->get_energy(i+1,j);
             if (energy_ij < INF)
             {
                 tmp = energy_ij + AU_penalty (int_sequence[i+1],int_sequence[j]) + acc;
                 tmp += dangle_bot [int_sequence[j]]
                                 [int_sequence[i+1]]
                                 [int_sequence[i]];
-                // May 16, 2007: I don't think I need this                                
+                // May 16, 2007: I don't think I need this
 //                 if (fres[i+1].pair == j)
 //                 {
 //                     must_choose_this_branch = 1;
 //                     printf ("i=%d, j=%d, en=%d, chose i+1 j\n", i, j, tmp);
 //                     return tmp;
-//                 }                                
+//                 }
                 if (tmp < min)
                 {
                     min = tmp;
                     chosen = 22;  best_i = i;
                     if (fres[i+1].pair == j)  must_choose_this_branch = 1;
-                    else                      must_choose_this_branch = 0;                    
+                    else                      must_choose_this_branch = 0;
                 }
             }
         }
-         
+
         // I have to condition on  fres[j].pair <= -1 to make sure that j can be unpaired
         if (fres[j].pair <= -1 && i < j-1)
-        {   
+        {
             energy_ij = V->get_energy(i,j-1);
             if (energy_ij < INF)
             {
@@ -1293,16 +1293,16 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                     must_choose_this_branch = 1;
 //                     printf ("i=%d, j=%d, en=%d, chose i j-1\n", i, j, tmp);
 //                     return tmp;
-//                 }                                                                
+//                 }
                 if (tmp < min)
                 {
                     min = tmp;
                     chosen = 23;  best_i = i;
                     if (fres[i].pair == j-1)  must_choose_this_branch = 1;
-                    else                      must_choose_this_branch = 0;                    
+                    else                      must_choose_this_branch = 0;
                 }
             }
-        }    
+        }
 
         if (fres[i].pair <= -1 && fres[j].pair <= -1 && i+1 < j-1)
         {
@@ -1322,19 +1322,19 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                     must_choose_this_branch = 1;
 //                     printf ("i=%d, j=%d, en=%d, chose i+1 j-1\n", i, j, tmp);
 //                     return tmp;
-//                 }                                                                
+//                 }
                 if (tmp < min)
                 {
                     min = tmp;
                     chosen = 24;  best_i = i;
                     if (fres[i+1].pair == j-1)  must_choose_this_branch = 1;
-                    else                        must_choose_this_branch = 0;                                        
+                    else                        must_choose_this_branch = 0;
                 }
             }
-        }    
+        }
     }
     //printf ("Chosen=%d, best_i=%d\n", chosen, best_i);
-    return min;    
+    return min;
 }
 
 
@@ -1360,11 +1360,11 @@ void s_min_folding::compute_W_restricted (int j, str_features *fres)
             //printf ("j=%d, chose branch 1, W[%d]=%d\n", j, j, W[j]);
         }
         else
-        {        
+        {
             W[j] = m2;
             //printf ("j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
         }
-    }        
+    }
 }
 
 
@@ -1377,7 +1377,7 @@ void s_min_folding::print_result ()
 //  char type[5][10] = {"hairpin","stacked","internal", "multi", "bulge"};
     PARAMTYPE energy = INF, sum;
 
-    printf ("Minimum energy: %d\n", W[nb_nucleotides-1]);    
+    printf ("Minimum energy: %d\n", W[nb_nucleotides-1]);
     sum = 0;
 
     for (i=0; i< nb_nucleotides; i++)
@@ -1391,7 +1391,7 @@ void s_min_folding::print_result ()
             /*
             else if (f[i].type == INTER)
             {
-                V_node = V->get_node(i, f[i].pair);    
+                V_node = V->get_node(i, f[i].pair);
                 energy = V_node->energy - V->get_energy (((internal_details *)V_node->details)->prime.i,
                                                          ((internal_details *)V_node->details)->prime.j);
             }
@@ -1399,7 +1399,7 @@ void s_min_folding::print_result ()
             else if (f[i].type == MULTI)
             {
                 multi_details *m_node;
-                V_node = V->get_node(i, f[i].pair);    
+                V_node = V->get_node(i, f[i].pair);
                 m_node = (multi_details*)V_node->details;
                 energy = V_node->energy;
                 for (k=0; k< m_node->num_branches; k++)

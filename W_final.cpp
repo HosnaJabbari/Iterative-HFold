@@ -93,58 +93,58 @@ double W_final::hfold_pkonly(){
     if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
     // detect the structure features
     detect_structure_features (restricted, fres);
-	
+
 
 
     // Hosna: June 28, 2007
     // set the features for checking
     v->set_features(fres);
-	
+
     // Hosna: July 2nd, 2007
     // set the VM matrix for VM_final
     vm->set_VM_matrix(VM);
 
-	
-	// TODO: 
+
+	// TODO:
 	// I think I shoud fill simfold tables here, before filling the HFold tables
 	// Hosna, March 8, 2012
-	
+
 	// 1) fill all th ematrices simfold needs (i.e. pk free ones)
 	// This is done similar to s_min_folding::fold_sequence_restricted()
 	for (j=0; j < nb_nucleotides; j++)
     {
         for (i=0; i<j; i++)
-        {            
+        {
             // V(i,j) = infinity if i restricted or j restricted and pair of i is not j
-            if ((fres[i].pair > -1 && fres[i].pair !=j) || (fres[j].pair > -1 && fres[j].pair != i)) 
-                continue;              
+            if ((fres[i].pair > -1 && fres[i].pair !=j) || (fres[j].pair > -1 && fres[j].pair != i))
+                continue;
             if (fres[i].pair == -1 || fres[j].pair == -1)   // i or j MUST be unpaired
                 continue;
             V->compute_energy_restricted_pkonly (i, j, fres); // in s_energy_matrix in simfold package
-			
-			
+
+
         }
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM_restricted_pkonly (j, fres); // added April 18, 2012
-		
+
     }
-	
+
 
 	for (j=0; j < nb_nucleotides; j++)
     {
 		// Hosna, March 19, 2012
         for (i =j; i >= 0; i--)//for (i=0; i<=j; i++)
-        {            
+        {
 			WMB->compute_energies(i,j);
-			
+
         	vm->WM_compute_energy(i,j);
         }
-		
+
 	}
-	
-	
+
+
 	// end of addition at March 8, 2012, Hosna
-	
+
 	for (j= 1; j < nb_nucleotides; j++)
     {
     	this->compute_W_restricted_pkonly(j,fres);
@@ -172,7 +172,7 @@ double W_final::hfold_pkonly(){
         delete cur_interval;    // this should make up for the new in the insert_node
         cur_interval = stack_interval;
     }
-	
+
 
     if (debug)
     {
@@ -187,7 +187,7 @@ double W_final::hfold_pkonly(){
 double W_final::hfold_interacting() {
     double energy;
     int i, j;
-    
+
     h_str_features *h_fres;
     if ((h_fres = new h_str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "h_str_features");
     // detect the structure features
@@ -199,11 +199,11 @@ double W_final::hfold_interacting() {
     if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
     // detect the structure features
     detect_structure_features (restricted, fres);
-    
+
     // Hosna: June 28, 2007
     // set the features for checking
     v->set_features(fres);
-    
+
     // Hosna: July 2nd, 2007
     // set the VM matrix for VM_final
     vm->set_VM_matrix(VM);
@@ -211,7 +211,7 @@ double W_final::hfold_interacting() {
     // TODO:
     // I think I shoud fill simfold tables here, before filling the HFold tables
     // Hosna, March 8, 2012
-    
+
     // 1) fill all th ematrices simfold needs (i.e. pk free ones)
     // This is done similar to s_min_folding::fold_sequence_restricted()
     for (j=0; j < nb_nucleotides; j++)
@@ -229,7 +229,7 @@ double W_final::hfold_interacting() {
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM_restricted_pmo (j, fres);
     }
-    
+
     for (j=0; j < nb_nucleotides; j++)
     {
         for (i =j; i >= 0; i--)//for (i=0; i<=j; i++)
@@ -239,7 +239,7 @@ double W_final::hfold_interacting() {
         }
     }
     // end of addition at March 8, 2012, Hosna
-    
+
     for (j= 1; j < nb_nucleotides; j++) {
 		if (j == 615) {
 			int temp = 0;
@@ -265,7 +265,7 @@ double W_final::hfold_interacting() {
         delete cur_interval;    // this should make up for the new in the insert_node
         cur_interval = stack_interval;
     }
-  
+
     energy = this->W[nb_nucleotides-1];
 	for (i = 0; i < linker_pos; i++) {
 		if (f[i].pair > linker_pos+linker_length-1) {
@@ -277,13 +277,13 @@ double W_final::hfold_interacting() {
 
     delete [] h_fres;
     delete [] fres;
-    return energy; 
+    return energy;
 }
 
 double W_final::hfold_interacting_pkonly() {
     double energy;
     int i, j;
-    
+
     h_str_features *h_fres;
     if ((h_fres = new h_str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "h_str_features");
     // detect the structure features
@@ -295,11 +295,11 @@ double W_final::hfold_interacting_pkonly() {
     if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
     // detect the structure features
     detect_structure_features (restricted, fres);
-    
+
     // Hosna: June 28, 2007
     // set the features for checking
     v->set_features(fres);
-    
+
     // Hosna: July 2nd, 2007
     // set the VM matrix for VM_final
     vm->set_VM_matrix(VM);
@@ -307,13 +307,13 @@ double W_final::hfold_interacting_pkonly() {
     // TODO:
     // I think I shoud fill simfold tables here, before filling the HFold tables
     // Hosna, March 8, 2012
-    
+
     // 1) fill all th ematrices simfold needs (i.e. pk free ones)
     // This is done similar to s_min_folding::fold_sequence_restricted()
     for (j=0; j < nb_nucleotides; j++)
     {
         for (i=0; i<j; i++)
-        {      
+        {
             // V(i,j) = infinity if i restricted or j restricted and pair of i is not j
             if ((fres[i].pair > -1 && fres[i].pair !=j) || (fres[j].pair > -1 && fres[j].pair != i))
             	continue;
@@ -325,7 +325,7 @@ double W_final::hfold_interacting_pkonly() {
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM_restricted_pkonly_pmo (j, fres);
     }
-    
+
     for (j=0; j < nb_nucleotides; j++)
     {
         for (i =j; i >= 0; i--)//for (i=0; i<=j; i++)
@@ -335,12 +335,12 @@ double W_final::hfold_interacting_pkonly() {
         }
     }
     // end of addition at March 8, 2012, Hosna
-    
+
     for (j= 1; j < nb_nucleotides; j++) {
         this->compute_W_restricted_pkonly_pmo(j,fres);
 		//printf("W[%d]=%d", j, W[j]);
     }
-    
+
     // backtrack
     // first add (0,n-1) on the stack
     stack_interval = new seq_interval;
@@ -366,107 +366,107 @@ double W_final::hfold_interacting_pkonly() {
 		}
 	}
 	energy /= 100.0;
-   
+
     if (debug) {
         print_result ();
     }
 
     delete [] h_fres;
     delete [] fres;
-    return energy; 
+    return energy;
 }
 
 double W_final::hfold(){
-	
+
 	double energy;
     int i, j;
-	
+
 	h_str_features *h_fres;
     if ((h_fres = new h_str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "h_str_features");
     // detect the structure features
     detect_h_structure_features (restricted, h_fres);
     WMB->set_features(h_fres);
     WMB->initialize();
-	
+
     str_features *fres;
     if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
     // detect the structure features
     detect_structure_features (restricted, fres);
-	
-	
-	
+
+
+
     // Hosna: June 28, 2007
     // set the features for checking
     v->set_features(fres);
-	
+
     // Hosna: July 2nd, 2007
     // set the VM matrix for VM_final
     vm->set_VM_matrix(VM);
-	
-	
-	// TODO: 
+
+
+	// TODO:
 	// I think I shoud fill simfold tables here, before filling the HFold tables
 	// Hosna, March 8, 2012
-	
+
 	// 1) fill all th ematrices simfold needs (i.e. pk free ones)
 	// This is done similar to s_min_folding::fold_sequence_restricted()
 	for (j=0; j < nb_nucleotides; j++)
     {
         for (i=0; i<j; i++)
-        {            
+        {
             // V(i,j) = infinity if i restricted or j restricted and pair of i is not j
-            if ((fres[i].pair > -1 && fres[i].pair !=j) || (fres[j].pair > -1 && fres[j].pair != i)) 
-                continue;              
+            if ((fres[i].pair > -1 && fres[i].pair !=j) || (fres[j].pair > -1 && fres[j].pair != i))
+                continue;
             if (fres[i].pair == -1 || fres[j].pair == -1)   // i or j MUST be unpaired
                 continue;
             V->compute_energy_restricted (i, j, fres);
-			
+
         }
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM_restricted (j, fres);
-		
+
 		// test V values
 		/*
 		 for (i=0; i<j; i++)
 		 {
 		 if (fres[i].pair ==j && fres[j].pair ==i){
 		 printf("---->> V(%d,%d) = %d \n",i,j, V->get_energy(i,j));
-		 
+
 		 }
 		 }
 		 */
     }
-	
-	
-	
+
+
+
 	for (j=0; j < nb_nucleotides; j++)
     {
         for (i =j; i >= 0; i--)//for (i=0; i<=j; i++)
-        {            
+        {
 			WMB->compute_energies(i,j);
-			
+
 			vm->WM_compute_energy(i,j);
 			//        	if (debug){
 			//        		printf("WM_final(%d,%d) = %d \n",i,j,vm->get_energy_WM(i,j));
 			//        	}
         }
-		
+
 	}
-	
-	
+
+
 	// end of addition at March 8, 2012, Hosna
-	
+
 	for (j= 1; j < nb_nucleotides; j++)
     {
     	this->compute_W_restricted(j,fres);
     }
     energy = this->W[nb_nucleotides-1]/100.0;
 	//    printf("energy = %f \n", energy);
-	
-	
-	
-	
-	
+
+
+
+
+
     // backtrack
     // first add (0,n-1) on the stack
     stack_interval = new seq_interval;
@@ -475,9 +475,9 @@ double W_final::hfold(){
     stack_interval->energy = W[nb_nucleotides-1];
     stack_interval->type = FREE;
     stack_interval->next = NULL;
-	
+
     seq_interval *cur_interval = stack_interval;
-	
+
     while ( cur_interval != NULL)
     {
         stack_interval = stack_interval->next;
@@ -485,8 +485,8 @@ double W_final::hfold(){
         delete cur_interval;    // this should make up for the new in the insert_node
         cur_interval = stack_interval;
     }
-	
-	
+
+
     if (debug)
     {
         print_result ();
@@ -494,7 +494,7 @@ double W_final::hfold(){
     delete [] h_fres;
     delete [] fres;
     return energy;
-	
+
 }
 
 
@@ -518,7 +518,7 @@ void W_final::compute_W_restricted (int j, str_features *fres)
     	W[j] = INF;
     	return;
     }
-	
+
     if (must_choose_this_branch)
     {
         W[j] = MIN(m2,m3);
@@ -566,7 +566,7 @@ void W_final::compute_W_restricted_pkonly (int j, str_features *fres)
     	W[j] = INF;
     	return;
     }
-	
+
     if (must_choose_this_branch)
     {
         W[j] = MIN(m2,m3);
@@ -575,7 +575,7 @@ void W_final::compute_W_restricted_pkonly (int j, str_features *fres)
     {
         W[j] = MIN(m1,MIN(m2,m3));
     }
-	
+
 }
 
 void W_final::compute_W_restricted_pkonly_pmo (int j, str_features *fres)
@@ -591,7 +591,7 @@ void W_final::compute_W_restricted_pkonly_pmo (int j, str_features *fres)
     	W[j] = INF;
     	return;
     }
-	
+
     if (must_choose_this_branch)
     {
         W[j] = MIN(m2,m3);
@@ -604,7 +604,7 @@ void W_final::compute_W_restricted_pkonly_pmo (int j, str_features *fres)
 	if (j== 605) {
 		int t = 0;
 	}
-	
+
 }
 
 int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choose_this_branch)
@@ -625,7 +625,7 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
         acc = (i-1>0) ? W[i-1]: 0;
 
         energy_ij = v->get_energy(i,j);
-		
+
         if (energy_ij < INF)
         {
             tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
@@ -654,7 +654,7 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j && fres[j].pair==i+1){
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				}
 				tmp += dan;
                 if (tmp < min)
@@ -684,7 +684,7 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i].pair == j-1 && fres[j-1].pair==i){
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				 }
                 tmp += dan;
                 if (tmp < min)
@@ -708,7 +708,7 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
 				PARAMTYPE dan_bot = dangle_bot [int_sequence[j-1]]
 												[int_sequence[i+1]]
 												[int_sequence[i]];
-				
+
 				PARAMTYPE dan_top = dangle_top [int_sequence [j-1]]
 									[int_sequence [i+1]]
 									[int_sequence [j]];
@@ -716,7 +716,7 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j-1 && fres[j-1].pair==i+1){
-					dan_bot = MIN(0,dan_bot); 
+					dan_bot = MIN(0,dan_bot);
 					dan_top = MIN(0,dan_top);
 				}
 				tmp += dan_bot;
@@ -759,7 +759,7 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
         acc = (i-1>0) ? W[i-1]: 0;
 
         energy_ij = v->get_energy(i,j);
-		
+
 		if (energy_ij != INF && j == 23) {//if (energy_ij != INF && j == 165) {
 			acc = (i-1>0) ? W[i-1]: 0;
 		}
@@ -770,7 +770,7 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
             if (tmp < min)
             {
                 min = tmp;
-                chosen = 21;        
+                chosen = 21;
 				best_i = i;
                 if (fres[i].pair == j){
 					must_choose_this_branch = 1;
@@ -790,7 +790,7 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
 
                 PARAMTYPE dan = (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j]]
 																		[int_sequence[i+1]]
-																		[int_sequence[i]] + 
+																		[int_sequence[i]] +
 												rna_percentage*dangle_bot[int_sequence[j]]
 																		[int_sequence[i+1]]
 																		[int_sequence[i]]);
@@ -799,18 +799,18 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j && fres[j].pair==i+1){
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				}
 				tmp += dan;
                 if (tmp < min) {
                     min = tmp;
-                    chosen = 22;  
+                    chosen = 22;
 					best_i = i;
                     if (fres[i+1].pair == j){
 						must_choose_this_branch = 1;
 					} else {
 						must_choose_this_branch = 0;
-					}  
+					}
 	            }
             }
         }
@@ -825,7 +825,7 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
 
 				PARAMTYPE dan = (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 																		[int_sequence[i]]
-																		[int_sequence[j]] + 
+																		[int_sequence[j]] +
 												rna_percentage*dangle_top[int_sequence[j-1]]
 																		[int_sequence[i]]
 																		[int_sequence[j]]);
@@ -833,12 +833,12 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i].pair == j-1 && fres[j-1].pair==i) {
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				}
                 tmp += dan;
                 if (tmp < min) {
                     min = tmp;
-                    chosen = 23;  
+                    chosen = 23;
 					best_i = i;
                     if (fres[i].pair == j-1){
 						must_choose_this_branch = 1;
@@ -858,14 +858,14 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
 
 				PARAMTYPE dan_bot = (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j-1]]
 																			[int_sequence[i+1]]
-																			[int_sequence[i]] + 
+																			[int_sequence[i]] +
 													rna_percentage*dangle_bot[int_sequence[j-1]]
 																			[int_sequence[i+1]]
 																			[int_sequence[i]]);
 
 				PARAMTYPE dan_top = (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 																			[int_sequence[i+1]]
-																			[int_sequence[j]] + 
+																			[int_sequence[j]] +
 													rna_percentage*dangle_top[int_sequence[j-1]]
 																			[int_sequence[i+1]]
 																			[int_sequence[j]]);
@@ -874,18 +874,18 @@ int W_final::compute_W_br2_restricted_pmo (int j, str_features *fres, int &must_
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j-1 && fres[j-1].pair==i+1){
-					dan_bot = MIN(0,dan_bot); 
+					dan_bot = MIN(0,dan_bot);
 					dan_top = MIN(0,dan_top);
 				}
 				tmp += dan_bot;
                 tmp += dan_top;
                 if (tmp < min) {
                     min = tmp;
-                    chosen = 24;  
+                    chosen = 24;
 					best_i = i;
                     if (fres[i+1].pair == j-1){
 						must_choose_this_branch = 1;
-					} else {                       
+					} else {
 						must_choose_this_branch = 0;
 					}
                 }
@@ -903,19 +903,19 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
     int i;
     int chosen = 0;
     int best_i = 0;
-	
+
 	must_choose_this_branch = 0;
     for (i=0; i<=j-1; i++)    // TURN shouldn't be there
     {
         // don't allow pairing with restricted i's
         // added Jan 28, 2006
-		
+
         // We don't need to make sure i and j don't have to pair with something else,
         //  because that would be INF - done in fold_sequence_restricted
         acc = (i-1>0) ? W[i-1]: 0;
-		
+
         energy_ij = (fres[j].pair == i && fres[i].pair ==j)? v->get_energy(i,j) : INF; //v->get_energy(i,j);
-		
+
         if (energy_ij < INF)
         {
             tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
@@ -929,7 +929,7 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
                 else                    must_choose_this_branch = 0;
             }
         }
-		
+
         // I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
 		// in the pk_only version we don't add any pseudoknot free base pairs
         if (fres[i].pair <= -1 && i+1 < j && fres[i+1].pair ==j && fres[j].pair==i+1)
@@ -945,7 +945,7 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j && fres[j].pair==i+1){
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				}
 				tmp += dan;
                 if (tmp < min)
@@ -959,7 +959,7 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
                 }
             }
         }
-		
+
         // I have to condition on  fres[j].pair <= -1 to make sure that j can be unpaired
 		// in the pkonly version we don't add any pseudoknot free base pairs
         if (fres[j].pair <= -1 && i < j-1 && fres[i].pair ==j-1 && fres[j-1].pair ==i)
@@ -976,7 +976,7 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i].pair == j-1 && fres[j-1].pair==i){
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				}
                 tmp += dan;
                 if (tmp < min)
@@ -990,7 +990,7 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
                 }
             }
         }
-		
+
 		// in the pkonly version we don't add any pseudoknot free base pairs
         if (fres[i].pair <= -1 && fres[j].pair <= -1 && i+1 < j-1 && fres[i+1].pair==j-1 && fres[j-1].pair==i+1)
         {
@@ -1001,7 +1001,7 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
 				PARAMTYPE dan_bot = dangle_bot [int_sequence[j-1]]
 				[int_sequence[i+1]]
 				[int_sequence[i]];
-				
+
 				PARAMTYPE dan_top = dangle_top [int_sequence [j-1]]
 				[int_sequence [i+1]]
 				[int_sequence [j]];
@@ -1009,7 +1009,7 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j-1 && fres[j-1].pair==i+1){
-					dan_bot = MIN(0,dan_bot); 
+					dan_bot = MIN(0,dan_bot);
 					dan_top = MIN(0,dan_top);
 				}
 				tmp += dan_bot;
@@ -1047,13 +1047,13 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 
         // don't allow pairing with restricted i's
         // added Jan 28, 2006
-		
+
         // We don't need to make sure i and j don't have to pair with something else,
         //  because that would be INF - done in fold_sequence_restricted
         acc = (i-1>0) ? W[i-1]: 0;
-		
+
         energy_ij = (fres[j].pair == i && fres[i].pair ==j)? v->get_energy(i,j) : INF; //v->get_energy(i,j);
-		
+
         if (energy_ij < INF) {
             tmp = energy_ij + acc + (PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i],int_sequence[j]) + rna_percentage*AU_penalty(int_sequence[i],int_sequence[j]));
 
@@ -1068,7 +1068,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 					must_choose_this_branch = 0;
             }
         }
-		
+
         // I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
 		// in the pk_only version we don't add any pseudoknot free base pairs
         if (fres[i].pair <= -1 && i+1 < j && fres[i+1].pair ==j && fres[j].pair==i+1) {
@@ -1079,7 +1079,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 
                 PARAMTYPE dan = (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j]]
 																		[int_sequence[i+1]]
-																		[int_sequence[i]] + 
+																		[int_sequence[i]] +
 												rna_percentage*dangle_bot[int_sequence[j]]
 																		[int_sequence[i+1]]
 																		[int_sequence[i]]);
@@ -1088,7 +1088,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j && fres[j].pair==i+1) {
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				}
 
 				tmp += dan;
@@ -1104,7 +1104,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
                 }
             }
         }
-		
+
         // I have to condition on  fres[j].pair <= -1 to make sure that j can be unpaired
 		// in the pkonly version we don't add any pseudoknot free base pairs
         if (fres[j].pair <= -1 && i < j-1 && fres[i].pair ==j-1 && fres[j-1].pair ==i) {
@@ -1114,7 +1114,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 
 				PARAMTYPE dan = (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence [j-1]]
 																		[int_sequence [i]]
-																		[int_sequence [j]] + 
+																		[int_sequence [j]] +
 												rna_percentage*dangle_top[int_sequence [j-1]]
 																		[int_sequence [i]]
 																		[int_sequence [j]]);
@@ -1123,7 +1123,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i].pair == j-1 && fres[j-1].pair==i) {
-					dan = MIN(0,dan); 
+					dan = MIN(0,dan);
 				}
 
                 tmp += dan;
@@ -1139,7 +1139,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
                 }
             }
         }
-		
+
 		// in the pkonly version we don't add any pseudoknot free base pairs
         if (fres[i].pair <= -1 && fres[j].pair <= -1 && i+1 < j-1 && fres[i+1].pair==j-1 && fres[j-1].pair==i+1) {
             energy_ij = v->get_energy(i+1,j-1);
@@ -1148,14 +1148,14 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 
 				PARAMTYPE dan_bot = (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j-1]]
 																			[int_sequence[i+1]]
-																			[int_sequence[i]] + 
+																			[int_sequence[i]] +
 													rna_percentage*dangle_bot[int_sequence[j-1]]
 																			[int_sequence[i+1]]
 																			[int_sequence[i]]);
-				
+
 				PARAMTYPE dan_top = (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence [j-1]]
 																			[int_sequence [i+1]]
-																			[int_sequence [j]] + 
+																			[int_sequence [j]] +
 													rna_percentage*dangle_top[int_sequence [j-1]]
 																			[int_sequence [i+1]]
 																			[int_sequence [j]]);
@@ -1164,7 +1164,7 @@ int W_final::compute_W_br2_restricted_pkonly_pmo (int j, str_features *fres, int
 				// dangle is INF if the bases are non-canonical and \leq 0 otherwise
 				// to accommodate non-canonical base pairing in input structure I add the MIN
 				if (fres[i+1].pair == j-1 && fres[j-1].pair==i+1) {
-					dan_bot = MIN(0,dan_bot); 
+					dan_bot = MIN(0,dan_bot);
 					dan_top = MIN(0,dan_top);
 				}
 
@@ -1303,8 +1303,8 @@ int W_final::compute_W_br3_restricted(int j, str_features *fres){
 
 void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fres){
     char type;
-	
-	
+
+
 
 	//Hosna, March 8, 2012
 	// changing nested if to switch for optimality
@@ -1315,7 +1315,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 			int j = cur_interval->j;
 			if (i >= j)
 				return;
-			f[i].pair = j; 
+			f[i].pair = j;
 			f[j].pair = i;
 
 			// Hosna Jun. 28 2007
@@ -1345,7 +1345,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 						//insert_node (i+1, j-1, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR STACK, i=%d, j=%d\n", i, j);
+						fprintf (stderr, "NOT GOOD RESTR STACK, i=%d, j=%d\n", i, j);
 						exit (0);
 					}
 
@@ -1397,7 +1397,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 						insert_node (best_ip, best_jp, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
+						fprintf (stderr, "NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
 						exit (0);
 					}
 				}
@@ -1418,7 +1418,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 							best_k = k;
 							best_row = 1;
 						  }
-						  // TODO: 
+						  // TODO:
 						  // Hosna, May 1st, 2012
 						  // do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
 						if (fres[i+1].pair <= -1)
@@ -1505,7 +1505,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 			}
 		}
 			break;
-		case FREE:    
+		case FREE:
 		{
 			int j = cur_interval->j;
 
@@ -1533,7 +1533,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 				//  it's INF, done in fold_sequence_restricted
 				acc = (i-1>0) ? W[i-1] : 0;
 				energy_ij = v->get_energy(i,j);
-				
+
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
@@ -1623,11 +1623,11 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 				acc = (i-1>0) ? W[i-1]: 0;
 
 				energy_ij = WMB->get_energy(i,j);
-				
+
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + PS_penalty + acc;
-					
+
 					if (tmp < min)
 					{
 						min = tmp;
@@ -1689,25 +1689,25 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 				case 0:
 					//printf("W(%d) case 0: inserting Free (0,%d)\n",j,j-1);
 					insert_node (0, j-1, FREE); break;
-				case 1: 
+				case 1:
 					//printf("W(%d) case 1: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, LOOP);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 2: 
+				case 2:
 					//printf("W(%d) case 2: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, LOOP);
 					if (best_i >= 0)// Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 3: 
+				case 3:
 					//printf("W(%d) case 3: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, LOOP);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 4: 
+				case 4:
 					//printf("W(%d) case 4: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, LOOP);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -1715,25 +1715,25 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 					break;
 				// Hosna: June 28, 2007
 				// the last branch of W, which is WMB_i,j
-				case 5: 
+				case 5:
 					//printf("W(%d) case 5: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, P_WMB);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 6: 
+				case 6:
 					//printf("W(%d) case 6: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 7: 
+				case 7:
 					//printf("W(%d) case 7: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, P_WMB);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 8: 
+				case 8:
 					//printf("W(%d) case 8: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -1967,7 +1967,7 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 			int j = cur_interval->j;
 			if (i >= j)
 				return;
-			f[i].pair = j; 
+			f[i].pair = j;
 			f[j].pair = i;
 
 			get_pmo_usage_percentages(i, j, &pmo_percentage, &rna_percentage);
@@ -2001,7 +2001,7 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 						//insert_node (i+1, j-1, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR STACK, i=%d, j=%d\n", i, j);
+						fprintf (stderr, "NOT GOOD RESTR STACK, i=%d, j=%d\n", i, j);
 						exit (0);
 					}
 
@@ -2054,7 +2054,7 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 						insert_node (best_ip, best_jp, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
+						fprintf (stderr, "NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
 						exit (0);
 					}
 				}
@@ -2075,19 +2075,19 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 							best_k = k;
 							best_row = 1;
 						  }
-						  // TODO: 
+						  // TODO:
 						  // Hosna, May 1st, 2012
 						  // do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
 						if (fres[i+1].pair <= -1)
 						{
-							tmp = vm->get_energy_WM (i+2,k) + 
-								vm->get_energy_WM (k+1, j-1) + 
+							tmp = vm->get_energy_WM (i+2,k) +
+								vm->get_energy_WM (k+1, j-1) +
 								(PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[i+1]] + 
+																		[int_sequence[i+1]] +
 												rna_percentage*dangle_top[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[i+1]]) + 
+																		[int_sequence[i+1]]) +
 								(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_free_base_penalty + rna_percentage*misc.multi_free_base_penalty);
 
 							if (tmp < min)
@@ -2100,13 +2100,13 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 						if (fres[j-1].pair <= -1)
 						{
 							tmp = vm->get_energy_WM (i+1,k) +
-								vm->get_energy_WM (k+1, j-2) + 
+								vm->get_energy_WM (k+1, j-2) +
 								(PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[j-1]] + 
+																		[int_sequence[j-1]] +
 												rna_percentage*dangle_bot[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[j-1]]) + 
+																		[int_sequence[j-1]]) +
 								(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_free_base_penalty + rna_percentage*misc.multi_free_base_penalty);
 
 							if (tmp < min)
@@ -2118,20 +2118,20 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 						}
 						if (fres[i+1].pair <= -1 && fres[j-1].pair <= -1)
 						{
-							tmp = vm->get_energy_WM (i+2,k) + 
-								vm->get_energy_WM (k+1, j-2) + 
+							tmp = vm->get_energy_WM (i+2,k) +
+								vm->get_energy_WM (k+1, j-2) +
 								(PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[i+1]] + 
+																		[int_sequence[i+1]] +
 												rna_percentage*dangle_top[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[i+1]]) + 
+																		[int_sequence[i+1]]) +
 								(PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[j-1]] + 
+																		[int_sequence[j-1]] +
 												rna_percentage*dangle_bot[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[j-1]]) + 
+																		[int_sequence[j-1]]) +
 								(PARAMTYPE) round(pmo_percentage*2*misc_pmo.multi_free_base_penalty + rna_percentage*2*misc.multi_free_base_penalty);
 
 							if (tmp < min)
@@ -2188,7 +2188,7 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 			}
 		}
 			break;
-		case FREE:    
+		case FREE:
 		{
 			int j = cur_interval->j;
 
@@ -2214,12 +2214,12 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 				get_pmo_usage_percentages(i, j, &pmo_percentage, &rna_percentage);
 				if (int_sequence[i] == 4 || int_sequence[j] == 4 || int_sequence[i+1] == 4 || int_sequence[j+1] == 4 || int_sequence[i-1] == 4 || int_sequence[j-1] == 4)
 					continue;
-				
+
 				// Don't need to make sure i and j don't have to pair with something else
 				//  it's INF, done in fold_sequence_restricted
 				acc = (i-1>0) ? W[i-1] : 0;
 				energy_ij = v->get_energy(i,j);
-				
+
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + acc + (PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i],int_sequence[j]) + rna_percentage*AU_penalty(int_sequence[i],int_sequence[j]));
@@ -2240,7 +2240,7 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j]]
 																		[int_sequence[i+1]]
-																		[int_sequence[i]] + 
+																		[int_sequence[i]] +
 												rna_percentage*dangle_bot[int_sequence[j]]
 																		[int_sequence[i+1]]
 																		[int_sequence[i]]);
@@ -2262,7 +2262,7 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 																		[int_sequence[i]]
-																		[int_sequence[j]] + 
+																		[int_sequence[j]] +
 												rna_percentage*dangle_top[int_sequence[j-1]]
 																		[int_sequence[i]]
 																		[int_sequence[j]]);
@@ -2284,14 +2284,14 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j-1]]
 																		[int_sequence[i+1]]
-																		[int_sequence[i]] + 
+																		[int_sequence[i]] +
 												rna_percentage*dangle_bot[int_sequence[j-1]]
 																		[int_sequence[i+1]]
 																		[int_sequence[i]]);
 
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 																		[int_sequence[i+1]]
-																		[int_sequence[j]] + 
+																		[int_sequence[j]] +
 												rna_percentage*dangle_top[int_sequence[j-1]]
 																		[int_sequence[i+1]]
 																		[int_sequence[j]]);
@@ -2328,11 +2328,11 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 				acc = (i-1>0) ? W[i-1]: 0;
 
 				energy_ij = WMB->get_energy(i,j);
-				
+
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + PS_penalty + acc;
-					
+
 					if (tmp < min)
 					{
 						min = tmp;
@@ -2394,26 +2394,26 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 				case 0:
 					//printf("W(%d) case 0: inserting Free (0,%d)\n",j,j-1);
 					insert_node (0, j-1, FREE); break;
-				case 1: 
+				case 1:
 				//kevin : always loop here when 0,28 which is when [
 					//printf("W(%d) case 1: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, LOOP);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 2: 
+				case 2:
 					//printf("W(%d) case 2: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, LOOP);
 					if (best_i >= 0)// Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 3: 
+				case 3:
 					//printf("W(%d) case 3: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, LOOP);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 4: 
+				case 4:
 					//printf("W(%d) case 4: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, LOOP);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -2421,25 +2421,25 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 					break;
 				// Hosna: June 28, 2007
 				// the last branch of W, which is WMB_i,j
-				case 5: 
+				case 5:
 					//printf("W(%d) case 5: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, P_WMB);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 6: 
+				case 6:
 					//printf("W(%d) case 6: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 7: 
+				case 7:
 					//printf("W(%d) case 7: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, P_WMB);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 8: 
+				case 8:
 					//printf("W(%d) case 8: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -2463,8 +2463,8 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 			if (int_sequence[i] == 4 || int_sequence[j] == 4 || int_sequence[i+1] == 4 || int_sequence[j+1] == 4 || int_sequence[i-1] == 4 || int_sequence[j-1] == 4)
 				return;
 
-			tmp = v->get_energy(i,j) + 
-				(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i], int_sequence[j]) + rna_percentage*AU_penalty(int_sequence[i], int_sequence[j])) + 
+			tmp = v->get_energy(i,j) +
+				(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i], int_sequence[j]) + rna_percentage*AU_penalty(int_sequence[i], int_sequence[j])) +
 				(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_helix_penalty + rna_percentage*misc.multi_helix_penalty);
 
 			if (tmp < min)
@@ -2474,15 +2474,15 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 			}
 			if (fres[i].pair <= -1)
 			{
-				tmp = v->get_energy(i+1,j) + 
-					(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i+1], int_sequence[j]) + rna_percentage*AU_penalty(int_sequence[i+1], int_sequence[j])) + 
+				tmp = v->get_energy(i+1,j) +
+					(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i+1], int_sequence[j]) + rna_percentage*AU_penalty(int_sequence[i+1], int_sequence[j])) +
 					(PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j]]
 															[int_sequence[i+1]]
-															[int_sequence[i]] + 
+															[int_sequence[i]] +
 									rna_percentage*dangle_bot[int_sequence[j]]
 															[int_sequence[i+1]]
-															[int_sequence[i]]) + 
-					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_helix_penalty + rna_percentage*misc.multi_helix_penalty) + 
+															[int_sequence[i]]) +
+					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_helix_penalty + rna_percentage*misc.multi_helix_penalty) +
 					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_free_base_penalty + rna_percentage*misc.multi_free_base_penalty);
 
 				if (tmp < min)
@@ -2493,15 +2493,15 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 			}
 			if (fres[j].pair <= -1)
 			{
-				tmp = v->get_energy(i,j-1) + 
-					(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i], int_sequence[j-1]) + rna_percentage*AU_penalty(int_sequence[i], int_sequence[j-1])) + 
+				tmp = v->get_energy(i,j-1) +
+					(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i], int_sequence[j-1]) + rna_percentage*AU_penalty(int_sequence[i], int_sequence[j-1])) +
 					(PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 															[int_sequence[i]]
-															[int_sequence[j]] + 
+															[int_sequence[j]] +
 									rna_percentage*dangle_top[int_sequence[j-1]]
 															[int_sequence[i]]
 															[int_sequence[j]]) +
-					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_helix_penalty + rna_percentage*misc.multi_helix_penalty) + 
+					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_helix_penalty + rna_percentage*misc.multi_helix_penalty) +
 					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_free_base_penalty + rna_percentage*misc.multi_free_base_penalty);
 
 				if (tmp < min)
@@ -2512,21 +2512,21 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 			}
 			if (fres[i].pair <= -1 && fres[j].pair <= -1)
 			{
-				tmp = v->get_energy(i+1,j-1) + 
-					(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i+1], int_sequence[j-1]) + rna_percentage*AU_penalty(int_sequence[i+1], int_sequence[j-1])) + 
+				tmp = v->get_energy(i+1,j-1) +
+					(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i+1], int_sequence[j-1]) + rna_percentage*AU_penalty(int_sequence[i+1], int_sequence[j-1])) +
 					(PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j-1]]
 															[int_sequence[i+1]]
-															[int_sequence[i]] + 
+															[int_sequence[i]] +
 									rna_percentage*dangle_bot[int_sequence[j-1]]
 															[int_sequence[i+1]]
-															[int_sequence[i]]) + 
+															[int_sequence[i]]) +
 					(PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 															[int_sequence[i+1]]
-															[int_sequence[j]] + 
+															[int_sequence[j]] +
 									rna_percentage*dangle_top[int_sequence[j-1]]
 															[int_sequence[i+1]]
-															[int_sequence[j]]) + 
-					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_helix_penalty + rna_percentage*misc.multi_helix_penalty) + 
+															[int_sequence[j]]) +
+					(PARAMTYPE) round(pmo_percentage*misc_pmo.multi_helix_penalty + rna_percentage*misc.multi_helix_penalty) +
 					(PARAMTYPE) round(pmo_percentage*2*misc_pmo.multi_free_base_penalty + rna_percentage*2*misc.multi_free_base_penalty);
 
 				if (tmp < min)
@@ -2681,14 +2681,14 @@ void W_final::backtrack_restricted_pmo (seq_interval *cur_interval, str_features
 void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_features *fres){
     char type;
 	//Hosna, March 8, 2012
-	// changing nested if to switch for optimality 
+	// changing nested if to switch for optimality
 
 	switch (cur_interval->type){
-			// TODO: 
+			// TODO:
 			// April 3, 2012
 			// for the pk only case, I don't think I need to change any part of the LOOP case
 			// April 18, 2012
-			// I think the closing base pairs of the loops are set previously, but the pkonly condition needs to be checked 
+			// I think the closing base pairs of the loops are set previously, but the pkonly condition needs to be checked
 			// for the inner base pairs.
 		case LOOP:
 		{
@@ -2696,9 +2696,9 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 			int j = cur_interval->j;
 			if (i >= j)
 				return;
-			f[i].pair = j; 
+			f[i].pair = j;
 			f[j].pair = i;
-			
+
 			// Hosna Jun. 28 2007
 			// if the pairing is part of original structure, put '(' and ')' in the structure
 			// otherwise make it '[' and ']'
@@ -2706,12 +2706,12 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 				structure[i] = '(';
 				structure[j] = ')';
 			}else{
-				printf("Base pairing between %d and %d is pseudoknot free and should not happen here!! \n",i,j);
+				fprintf(stderr, "Base pairing between %d and %d is pseudoknot free and should not happen here!! \n",i,j);
 				exit(0);
 				//structure[i] = '[';
 				//structure[j] = ']';
 			}
-			
+
 			type = v->get_type (i,j);
 			if (debug)
 				printf ("\t(%d,%d) LOOP - type %c\n", i,j,type);
@@ -2728,10 +2728,10 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 					//insert_node (i+1, j-1, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR STACK (i+1 and j-1 are not paired!), i=%d, j=%d\n", i, j);
+						fprintf (stderr, "NOT GOOD RESTR STACK (i+1 and j-1 are not paired!), i=%d, j=%d\n", i, j);
 						exit (0);
 					}
-					
+
 				}
 					break;
 				case HAIRP:
@@ -2752,7 +2752,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 					// Hosna, August 31, 2012
 					// The following restriction misses the long restricted loops, so I am chaning it
 					//for (ip = i+1; ip <= MIN(j-2,i+MAXLOOP+1) ; ip++)  // the -TURN shouldn't be there
-					for (ip = i+1; ip <= j-2 ; ip++)  // the -TURN shouldn't be there						
+					for (ip = i+1; ip <= j-2 ; ip++)  // the -TURN shouldn't be there
 					{
 						// Hosna, August 28, 2012
 						// TODO: cannot understand why we have th efollowing calculations, as it makes the following case be missed!
@@ -2762,7 +2762,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 						// in this example int(5,59,11,27) is falsely missed and is equal to INF
 						// So I am changing it to the be jp=ip+1; jp<j; jp++ instead
 						//minq = MAX (j-i+ip-MAXLOOP-2, ip+1);    // without TURN
-						minq = ip+1;						
+						minq = ip+1;
 						for (jp = minq; jp < j; jp++)
 						{
 							if (exists_restricted (i,ip,fres) || exists_restricted (jp,j,fres))
@@ -2785,7 +2785,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 						insert_node (best_ip, best_jp, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
+						fprintf (stderr, "NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
 						exit (0);
 					}
 				}
@@ -2843,7 +2843,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 								best_row = 4;
 							}
 						}
-						
+
 						// Hosna: June 28, 2007
 						// the last branch of VM, which is WMB_(i+1),(j-1)
 						// Hosna: July 5th, 2007
@@ -2854,7 +2854,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 							min = tmp;
 							best_row = 5;
 						}
-						
+
 					}
 					switch (best_row)
 					{
@@ -2890,17 +2890,17 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 			}
 		}
 			break;
-		case FREE:    
+		case FREE:
 		{
 			int j = cur_interval->j;
-			
+
 			if (j==0) return;
-			
+
 			int min = INF, tmp, best_row, i, best_i, acc, energy_ij;
-			
+
 			if (debug)
 				printf ("\t(0,%d) FREE\n", j);
-			
+
 			// this case is for j unpaired, so I have to check that.
 			if (fres[j].pair <= -1)
 			{
@@ -2913,7 +2913,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 			}
 			for (i=0; i<=j-1; i++)    // no TURN
 			{
-				
+
 				// Don't need to make sure i and j don't have to pair with something else
 				//  it's INF, done in fold_sequence_restricted
 				acc = (i-1>0) ? W[i-1] : 0;
@@ -2932,7 +2932,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 						best_row = 1;
 					}
 				}
-				
+
 				if (fres[i].pair <= -1)
 				{
 					energy_ij = (fres[j].pair == i+1 && fres[i+1].pair== j) ? v->get_energy(i+1,j) : INF;
@@ -2988,7 +2988,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 					}
 				}
 			}
-			
+
 			// Hosna: June 28, 2007
 			// the last branch of W, which is WMB_i,j
 			//        energy_ij = WMB->get_energy(0,j);
@@ -3007,15 +3007,15 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 				// Hosna: July 9, 2007
 				// We only chop W to W + WMB when the bases before WMB are free
 				if (i == 0 || (WMB->is_weakly_closed(0,i-1) && WMB->is_weakly_closed(i,j))){
-					
+
 					acc = (i-1>0) ? W[i-1]: 0;
-					
+
 					energy_ij = WMB->get_energy(i,j);
-					
+
 					if (energy_ij < INF)
 					{
 						tmp = energy_ij + PS_penalty + acc;
-						
+
 						if (tmp < min)
 						{
 							min = tmp;
@@ -3023,7 +3023,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 							best_i = i;
 						}
 					}
-					
+
 					// I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
 					if (fres[i].pair <= -1 && i+1 < j)
 					{
@@ -3039,7 +3039,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 							}
 						}
 					}
-					
+
 					// I have to condition on  fres[j].pair <= -1 to make sure that j can be unpaired
 					if (fres[j].pair <= -1 && i < j-1)
 					{
@@ -3055,7 +3055,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 							}
 						}
 					}
-					
+
 					if (fres[i].pair <= -1 && fres[j].pair <= -1 && i+1 < j-1)
 					{
 						energy_ij = WMB->get_energy(i+1,j-1);
@@ -3077,25 +3077,25 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 				case 0:
 					//printf("W(%d) case 0: inserting Free (0,%d)\n",j,j-1);
 					insert_node (0, j-1, FREE); break;
-				case 1: 
+				case 1:
 					//printf("W(%d) case 1: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, LOOP);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 2: 
+				case 2:
 					//printf("W(%d) case 2: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, LOOP);
 					if (best_i >= 0)// Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 3: 
+				case 3:
 					//printf("W(%d) case 3: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, LOOP);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 4: 
+				case 4:
 					//printf("W(%d) case 4: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, LOOP);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -3103,25 +3103,25 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 					break;
 					// Hosna: June 28, 2007
 					// the last branch of W, which is WMB_i,j
-				case 5: 
+				case 5:
 					//printf("W(%d) case 5: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, P_WMB);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 6: 
+				case 6:
 					//printf("W(%d) case 6: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 7: 
+				case 7:
 					//printf("W(%d) case 7: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, P_WMB);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 8: 
+				case 8:
 					//printf("W(%d) case 8: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -3137,10 +3137,10 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 			int j = cur_interval->j;
 			int tmp, min = INF;
 			int best_k, best_row;
-			
+
 			if (debug)
 				printf ("\t (%d,%d) M_WM\n", i,j);
-			
+
 			// the if clause added April 3, 2012
 			if (fres[j].pair == i && fres[i].pair == j){
 				tmp = v->get_energy(i,j) +
@@ -3200,9 +3200,9 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 					best_row = 4;
 				}
 			}
-			
+
 			// TODO: April 3, 2012
-			// do I need to change WM to pk_only as well? 
+			// do I need to change WM to pk_only as well?
 			if (fres[i].pair <= -1)
 			{
 				tmp = vm->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
@@ -3221,7 +3221,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 					best_row = 6;
 				}
 			}
-			
+
 			for (int k=i; k < j; k++)
 			{
 				tmp = vm->get_energy_WM (i, k) + vm->get_energy_WM (k+1, j);
@@ -3239,7 +3239,7 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 				min = tmp;
 				best_row = 8;
 			}
-			
+
 			switch (best_row)
 			{
 				case 1: insert_node (i, j, LOOP); break;
@@ -3358,8 +3358,8 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 		default:
 			printf("Should not be here!\n");
 	}
-	
-	
+
+
 }
 
 void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_features *fres){
@@ -3369,11 +3369,11 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 	//Hosna, March 8, 2012
 	// changing nested if to switch for optimality
 	switch (cur_interval->type){
-			// TODO: 
+			// TODO:
 			// April 3, 2012
 			// for the pk only case, I don't think I need to change any part of the LOOP case
 			// April 18, 2012
-			// I think the closing base pairs of the loops are set previously, but the pkonly condition needs to be checked 
+			// I think the closing base pairs of the loops are set previously, but the pkonly condition needs to be checked
 			// for the inner base pairs.
 		case LOOP:
 		{
@@ -3384,12 +3384,12 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 			}
 			if (i >= j)
 				return;
-			f[i].pair = j; 
+			f[i].pair = j;
 			f[j].pair = i;
 
 			get_pmo_usage_percentages(i, j, &pmo_percentage, &rna_percentage);
 			if (int_sequence[i] == 4 || int_sequence[j] == 4 || int_sequence[i+1] == 4 || int_sequence[j+1] == 4 || int_sequence[i-1] == 4 || int_sequence[j-1] == 4)
-				return;			
+				return;
 
 			// Hosna Jun. 28 2007
 			// if the pairing is part of original structure, put '(' and ')' in the structure
@@ -3398,12 +3398,12 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 				structure[i] = '(';
 				structure[j] = ')';
 			}else{
-				printf("Base pairing between %d and %d is pseudoknot free and should not happen here!! \n",i,j);
+				fprintf(stderr, "Base pairing between %d and %d is pseudoknot free and should not happen here!! \n",i,j);
 				exit(0);
 				//structure[i] = '[';
 				//structure[j] = ']';
 			}
-			
+
 			type = v->get_type (i,j);
 			if (debug)
 				printf ("\t(%d,%d) LOOP - type %c\n", i,j,type);
@@ -3420,10 +3420,10 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 					//insert_node (i+1, j-1, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR STACK (i+1 and j-1 are not paired!), i=%d, j=%d\n", i, j);
+						fprintf (stderr, "NOT GOOD RESTR STACK (i+1 and j-1 are not paired!), i=%d, j=%d\n", i, j);
 						exit (0);
 					}
-					
+
 				}
 					break;
 				case HAIRP:
@@ -3444,7 +3444,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 					// Hosna, August 31, 2012
 					// The following restriction misses the long restricted loops, so I am chaning it
 					//for (ip = i+1; ip <= MIN(j-2,i+MAXLOOP+1) ; ip++)  // the -TURN shouldn't be there
-					for (ip = i+1; ip <= j-2 ; ip++)  // the -TURN shouldn't be there						
+					for (ip = i+1; ip <= j-2 ; ip++)  // the -TURN shouldn't be there
 					{
 						// Hosna, August 28, 2012
 						// TODO: cannot understand why we have th efollowing calculations, as it makes the following case be missed!
@@ -3454,7 +3454,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 						// in this example int(5,59,11,27) is falsely missed and is equal to INF
 						// So I am changing it to the be jp=ip+1; jp<j; jp++ instead
 						//minq = MAX (j-i+ip-MAXLOOP-2, ip+1);    // without TURN
-						minq = ip+1;						
+						minq = ip+1;
 						for (jp = minq; jp < j; jp++)
 						{
 							if (exists_restricted (i,ip,fres) || exists_restricted (jp,j,fres))
@@ -3477,7 +3477,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 						insert_node (best_ip, best_jp, LOOP);
 					else
 					{
-						printf ("NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
+						fprintf (stderr, "NOT GOOD RESTR INTER, i=%d, j=%d, best_ip=%d, best_jp=%d\n", i, j, best_ip, best_jp);
 						exit (0);
 					}
 				}
@@ -3500,8 +3500,8 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 						}
 
 						if (fres[i+1].pair <= -1)
-						{	
-							tmp = vm->get_energy_WM (i+2,k) + 
+						{
+							tmp = vm->get_energy_WM (i+2,k) +
 								vm->get_energy_WM (k+1, j-1) +
 								(PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[i]]
 																		[int_sequence[j]]
@@ -3519,11 +3519,11 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 						}
 
 						if (fres[j-1].pair <= -1) {
-							tmp = vm->get_energy_WM (i+1,k) + 
+							tmp = vm->get_energy_WM (i+1,k) +
 								vm->get_energy_WM (k+1, j-2) +
 								(PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[j-1]] + 
+																		[int_sequence[j-1]] +
 												rna_percentage*dangle_bot[int_sequence[i]]
 																		[int_sequence[j]]
 																		[int_sequence[j-1]]) +
@@ -3537,17 +3537,17 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 						}
 
 						if (fres[i+1].pair <= -1 && fres[j-1].pair <= -1) {
-							tmp = vm->get_energy_WM (i+2,k) + 
+							tmp = vm->get_energy_WM (i+2,k) +
 								vm->get_energy_WM (k+1, j-2) +
 								(PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[i+1]] + 
+																		[int_sequence[i+1]] +
 												rna_percentage*dangle_top[int_sequence[i]]
 																		[int_sequence[j]]
 																		[int_sequence[i+1]]) +
 								(PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[i]]
 																		[int_sequence[j]]
-																		[int_sequence[j-1]] + 
+																		[int_sequence[j-1]] +
 												rna_percentage*dangle_bot[int_sequence[i]]
 																		[int_sequence[j]]
 																		[int_sequence[j-1]]) +
@@ -3559,7 +3559,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 								best_row = 4;
 							}
 						}
-						
+
 						// Hosna: June 28, 2007
 						// the last branch of VM, which is WMB_(i+1),(j-1)
 						// Hosna: July 5th, 2007
@@ -3569,7 +3569,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 							min = tmp;
 							best_row = 5;
 						}
-						
+
 					}
 					switch (best_row)
 					{
@@ -3605,17 +3605,17 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 			}
 		}
 			break;
-		case FREE:    
+		case FREE:
 		{
 			int j = cur_interval->j;
-			
+
 			if (j==0) return;
-			
+
 			int min = INF, tmp, best_row, i, best_i, acc, energy_ij;
-			
+
 			if (debug)
 				printf ("\t(0,%d) FREE\n", j);
-			
+
 			// this case is for j unpaired, so I have to check that.
 			if (fres[j].pair <= -1)
 			{
@@ -3630,7 +3630,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 			{
 				get_pmo_usage_percentages(i, j, &pmo_percentage, &rna_percentage);
 				if (int_sequence[i] == 4 || int_sequence[j] == 4 || int_sequence[i+1] == 4 || int_sequence[j+1] == 4 || int_sequence[i-1] == 4 || int_sequence[j-1] == 4)
-					continue;	
+					continue;
 
 				// Don't need to make sure i and j don't have to pair with something else
 				//  it's INF, done in fold_sequence_restricted
@@ -3650,7 +3650,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 						best_row = 1;
 					}
 				}
-				
+
 				if (fres[i].pair <= -1)
 				{
 					energy_ij = (fres[j].pair == i+1 && fres[i+1].pair== j) ? v->get_energy(i+1,j) : INF;
@@ -3660,7 +3660,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j]]
 																		[int_sequence[i+1]]
-																		[int_sequence[i]] + 
+																		[int_sequence[i]] +
 												rna_percentage*dangle_bot[int_sequence[j]]
 																		[int_sequence[i+1]]
 																		[int_sequence[i]]);
@@ -3678,10 +3678,10 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 					if (energy_ij < INF)
 					{
 						tmp = energy_ij + acc + (PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i],int_sequence[j-1]) + rna_percentage*AU_penalty(int_sequence[i],int_sequence[j-1]));
-						
+
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 																		[int_sequence[i]]
-																		[int_sequence[j]] + 
+																		[int_sequence[j]] +
 												rna_percentage*dangle_top[int_sequence[j-1]]
 																		[int_sequence[i]]
 																		[int_sequence[j]]);
@@ -3703,14 +3703,14 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j-1]]
 																		[int_sequence[i+1]]
-																		[int_sequence[i]] + 
+																		[int_sequence[i]] +
 												rna_percentage*dangle_bot[int_sequence[j-1]]
 																		[int_sequence[i+1]]
 																		[int_sequence[i]]);
 
 						tmp += (PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 																		[int_sequence[i+1]]
-																		[int_sequence[j]] + 
+																		[int_sequence[j]] +
 												rna_percentage*dangle_top[int_sequence[j-1]]
 																		[int_sequence[i+1]]
 																		[int_sequence[j]]);
@@ -3723,7 +3723,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 					}
 				}
 			}
-			
+
 			// Hosna: June 28, 2007
 			// the last branch of W, which is WMB_i,j
 			//        energy_ij = WMB->get_energy(0,j);
@@ -3742,15 +3742,15 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 				// Hosna: July 9, 2007
 				// We only chop W to W + WMB when the bases before WMB are free
 				if (i == 0 || (WMB->is_weakly_closed(0,i-1) && WMB->is_weakly_closed(i,j))){
-					
+
 					acc = (i-1>0) ? W[i-1]: 0;
-					
+
 					energy_ij = WMB->get_energy(i,j);
-					
+
 					if (energy_ij < INF)
 					{
 						tmp = energy_ij + PS_penalty + acc;
-						
+
 						if (tmp < min)
 						{
 							min = tmp;
@@ -3758,7 +3758,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 							best_i = i;
 						}
 					}
-					
+
 					// I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
 					if (fres[i].pair <= -1 && i+1 < j)
 					{
@@ -3774,7 +3774,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 							}
 						}
 					}
-					
+
 					// I have to condition on  fres[j].pair <= -1 to make sure that j can be unpaired
 					if (fres[j].pair <= -1 && i < j-1)
 					{
@@ -3790,7 +3790,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 							}
 						}
 					}
-					
+
 					if (fres[i].pair <= -1 && fres[j].pair <= -1 && i+1 < j-1)
 					{
 						energy_ij = WMB->get_energy(i+1,j-1);
@@ -3812,25 +3812,25 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 				case 0:
 					//printf("W(%d) case 0: inserting Free (0,%d)\n",j,j-1);
 					insert_node (0, j-1, FREE); break;
-				case 1: 
+				case 1:
 					//printf("W(%d) case 1: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, LOOP);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 2: 
+				case 2:
 					//printf("W(%d) case 2: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, LOOP);
 					if (best_i >= 0)// Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 3: 
+				case 3:
 					//printf("W(%d) case 3: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, LOOP);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 4: 
+				case 4:
 					//printf("W(%d) case 4: inserting Loop(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, LOOP);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -3838,25 +3838,25 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 					break;
 					// Hosna: June 28, 2007
 					// the last branch of W, which is WMB_i,j
-				case 5: 
+				case 5:
 					//printf("W(%d) case 5: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j,best_i-1);
 					insert_node (best_i, j, P_WMB);
 					if (best_i-1 > 0)     // it was TURN instead of 0  - not sure if TURN shouldn't be here
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 6: 
+				case 6:
 					//printf("W(%d) case 6: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j,best_i);
 					insert_node (best_i+1, j, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
 						insert_node (0, best_i, FREE);
 					break;
-				case 7: 
+				case 7:
 					//printf("W(%d) case 7: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i,j-1,best_i-1);
 					insert_node (best_i, j-1, P_WMB);
 					if (best_i-1 > 0)
 						insert_node (0, best_i-1, FREE);
 					break;
-				case 8: 
+				case 8:
 					//printf("W(%d) case 8: inserting WMB(%d,%d) and Free (0,%d)\n",j,best_i+1,j-1,best_i);
 					insert_node (best_i+1, j-1, P_WMB);
 					if (best_i >= 0) // Hosna, March 26, 2012, was best_i-1 instead of best_i
@@ -3872,14 +3872,14 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 			int j = cur_interval->j;
 			int tmp, min = INF;
 			int best_k, best_row;
-			
+
 			get_pmo_usage_percentages(i, j, &pmo_percentage, &rna_percentage);
 			if (int_sequence[i] == 4 || int_sequence[j] == 4 || int_sequence[i+1] == 4 || int_sequence[j+1] == 4 || int_sequence[i-1] == 4 || int_sequence[j-1] == 4)
-				return;	
+				return;
 
 			if (debug)
 				printf ("\t (%d,%d) M_WM\n", i,j);
-			
+
 			// the if clause added April 3, 2012
 			if (fres[j].pair == i && fres[i].pair == j){
 				tmp = v->get_energy(i,j) +
@@ -3897,7 +3897,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 				(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i+1], int_sequence[j]) + rna_percentage*AU_penalty(int_sequence[i+1], int_sequence[j])) +
 				(PARAMTYPE) round(pmo_percentage*dangle_bot_pmo[int_sequence[j]]
 														[int_sequence[i+1]]
-														[int_sequence[i]] + 
+														[int_sequence[i]] +
 								rna_percentage*dangle_bot[int_sequence[j]]
 														[int_sequence[i+1]]
 														[int_sequence[i]]) +
@@ -3916,7 +3916,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 				(PARAMTYPE) round(pmo_percentage*AU_penalty_pmo(int_sequence[i], int_sequence[j-1]) + rna_percentage*AU_penalty(int_sequence[i], int_sequence[j-1])) +
 				(PARAMTYPE) round(pmo_percentage*dangle_top_pmo[int_sequence[j-1]]
 														[int_sequence[i]]
-														[int_sequence[j]] + 
+														[int_sequence[j]] +
 								rna_percentage*dangle_top[int_sequence[j-1]]
 														[int_sequence[i]]
 														[int_sequence[j]]) +
@@ -3953,9 +3953,9 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 					best_row = 4;
 				}
 			}
-			
+
 			// TODO: April 3, 2012
-			// do I need to change WM to pk_only as well? 
+			// do I need to change WM to pk_only as well?
 			if (fres[i].pair <= -1)
 			{
 				tmp = vm->get_energy_WM (i+1,j) + (PARAMTYPE) round(pmo_percentage*misc_pmo.multi_free_base_penalty + rna_percentage*misc.multi_free_base_penalty);
@@ -3974,7 +3974,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 					best_row = 6;
 				}
 			}
-			
+
 			for (int k=i; k < j; k++)
 			{
 				tmp = vm->get_energy_WM (i, k) + vm->get_energy_WM (k+1, j);
@@ -3992,7 +3992,7 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 				min = tmp;
 				best_row = 8;
 			}
-			
+
 			switch (best_row)
 			{
 				case 1: insert_node (i, j, LOOP); break;
@@ -4111,8 +4111,8 @@ void W_final::backtrack_restricted_pkonly_pmo (seq_interval *cur_interval, str_f
 		default:
 			printf("Should not be here!\n");
 	}
-	
-	
+
+
 }
 
 void W_final::print_result ()

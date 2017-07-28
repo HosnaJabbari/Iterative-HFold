@@ -103,7 +103,7 @@ int main (int argc, char **argv) {
 
 	output_path = (char*) malloc(sizeof(char) * 1000);
 	file = (char*) malloc(sizeof(char) * 1000);
-	
+
 	logFile = fopen(LOGFILEPATH, "w");
 	if (logFile == NULL) {
 		giveup("Could not open logfile", LOGFILEPATH);
@@ -123,7 +123,7 @@ int main (int argc, char **argv) {
 		{
 		case 's':
 			if(sequenceFound){
-				printf("-s is duplicated\n");
+				fprintf(stderr, "-s is duplicated\n");
 				errorFound = true;
 				break;
 			}
@@ -138,12 +138,12 @@ int main (int argc, char **argv) {
 			break;
 		case 'r':
 			if(structureFound || inputPathFound){
-				printf("-r is duplicated\n");
+				fprintf(stderr, "-r is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine -i with -s/-r \n");
 				errorFound = true;
 				break;
 			}
@@ -153,18 +153,18 @@ int main (int argc, char **argv) {
 			break;
 		case 'i':
 			if(structureFound || sequenceFound){
-				printf("Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine -i with -s/-r \n");
 				errorFound = true;
 				break;
 			}
 			strcpy(file,optarg);
 			//printf("file: %s %d\n", file,access(file, F_OK|R_OK));
 			if(access(file, F_OK) == -1) { //if file does not exist
-				printf("Input file not exist\n");
+				fprintf(stderr, "Input file not exist\n");
 				exit(4);
-			}	
+			}
 			if (!get_sequence_structure(file, sequence, structure)) {
-				printf("Input file is invalid\n");
+				fprintf(stderr, "Input file is invalid\n");
 				errorFound = true;
 				break;
 			}
@@ -175,7 +175,7 @@ int main (int argc, char **argv) {
 			//printf("access: %d\n",access(output_path, F_OK));
 			if(access(output_path, F_OK) != -1) { //if file already exist
 				addTimestamp(&output_path);
-			}	
+			}
 			outputPathFound = true;
 			break;
 		default:
@@ -192,7 +192,7 @@ int main (int argc, char **argv) {
 	if(!inputPathFound){
 		//if sequence or structure is missing when input file is not present
 		if(!(sequenceFound && structureFound)){
-			printf("-s/-r is missing\n");
+			fprintf(stderr, "-s/-r is missing\n");
 			printUsage();
 			exit(1);
 		}
@@ -205,7 +205,7 @@ int main (int argc, char **argv) {
 	}
 
 	if(!validateStructure(structure, sequence)){
-		printf("-r is invalid\n");
+		fprintf(stderr, "-r is invalid\n");
 		printUsage();
 		exit(1);
 	}else{
@@ -216,8 +216,8 @@ int main (int argc, char **argv) {
 	if(outputPathFound && inputPathFound){
 		addPath(&output_path, file);
 		//printf("out path: %s\n",output_path);
-		
-	}	
+
+	}
 	//kevin: june 22 2017
 	//end of validation for command line arguments
 
@@ -233,7 +233,7 @@ int main (int argc, char **argv) {
 	method2_structure[0] = NULL;
 	method3_structure[0] = NULL;
 	method4_structure[0] = NULL;
-	final_structure[0] = NULL;		
+	final_structure[0] = NULL;
 
 
         /*************** First Method ***************/
@@ -292,15 +292,15 @@ int main (int argc, char **argv) {
 		final_energy = NULL;
 		exit(6);
 	}
-	
 
-	
-	
+
+
+
 	//kevin: june 22 2017
 	//output to file
 	if(outputPathFound){
 		if(!save_file("", output_path, sequence, structure, final_structure, final_energy, method_chosen)){
-			printf("write to file fail\n");
+			fprintf(stderr, "write to file fail\n");
 			exit(4);
 		}
 	}else{
@@ -311,15 +311,16 @@ int main (int argc, char **argv) {
 		//std::cout << "\nfinal structure: " << final_structure << " final energy: " << final_energy << "\n\n" << std::flush;
 	}
 
-	
+
 
 	write_log_file("Ending Program", "", 'I');
-	
+
 	// Clean up
 
 	free(file);
            	
 	//free(tinfo);
+
 	free(method1_structure);
 	free(method2_structure);
 	free(method3_structure);
@@ -370,7 +371,7 @@ void printUsage(){
 
 void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 	//Need to expand on this.
-    printf("Caught segfault at address %p\n", si->si_addr);
+    fprintf(stderr, "Caught segfault at address %p\n", si->si_addr);
     exit(si->si_errno);
 }
 
@@ -437,17 +438,17 @@ void method2_calculation (char *sequence, char *structure, char *method2_structu
 void method3_calculation (char *sequence, char *structure, char *method3_structure, double *method3_energy) {
 	char sub_sequence[MAXSLEN] = "\0";
 	char sub_structure[MAXSLEN] = "\0";
-	
+
 	char replaced_structure[MAXSLEN] = "\0";
 	char new_input_structure[MAXSLEN] = "\0";
 	char hfold_structure[MAXSLEN] = "\0";
 	char hfold_pkonly_structure[MAXSLEN] = "\0";
 	char simfold_structure[MAXSLEN] = "\0";
 
-	double hfold_energy = 0;	
+	double hfold_energy = 0;
 	double hfold_pkonly_energy = 0;
 	double simfold_energy = 0;
-	
+
 	int begin = -1, end = 0;
 	bool has_pk;
 
@@ -498,24 +499,23 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 	// then only include this structure as input structure, and do as we did in method 3
 	char sub_sequence[MAXSLEN] = "\0";
 	char sub_structure[MAXSLEN] = "\0";
-	
+
 	char replaced_structure[MAXSLEN] = "\0";
 	char new_input_structure[MAXSLEN] = "\0";
 	char hfold_structure[MAXSLEN] = "\0";
 	char hfold_pkonly_structure[MAXSLEN] = "\0";
 	char simfold_structure[MAXSLEN] = "\0";
 
-	double hfold_energy = 0;	
+	double hfold_energy = 0;
 	double hfold_pkonly_energy = 0;
 	double simfold_energy = 0;
-	
+
 	int begin = -1, end = 0, B = 0, Bp = 0;
 	int result_length = 0;
-	bool has_pk;	
+	bool has_pk;
 
-	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);	
+	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);
 	strcpy(replaced_structure, structure);
-	
 	if (!call_simfold(SIMFOLD, sequence, structure, simfold_structure, &simfold_energy)) {
 		*method4_energy = simfold_energy;
 		return;
@@ -532,7 +532,7 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 		//std::cout << "found B = " << B << " and Bp = " << Bp << '\n' << std::flush;
 		replace_simfold_structure_with_original(replaced_structure, simfold_structure, B, Bp);
 	}
-	
+
 	//std::cout << "the replaced structure is: " << replaced_structure << '\n' << std::flush;
 
 	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
@@ -631,7 +631,7 @@ void replace_simfold_partial_structure_with_original (char *input_structure, cha
 
 	strcpy(replaced_structure, input_structure);
 	int j = 0;
-	
+
 	for (int i = begin; i <= end; i++) {
 		replaced_structure[i] = simfold_structure[j++];
 	}
@@ -672,7 +672,7 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
 			write_log_file("Could not read the first sequence", fileName, 'E');
 			return false;
 		}
-		sequenceString.assign(sequenceBuffer, read);		
+		sequenceString.assign(sequenceBuffer, read);
 
 		if((read = getline(&structureBuffer, &len, ioFile)) == -1) {
 			write_log_file("Could not read the first structure", fileName, 'E');
@@ -730,9 +730,9 @@ bool save_file (const char *fileName, char *outputPath, const char *sequence, ch
 
 	// Clean up
 	fclose(ioFile);
-		
+
 	return true;
-} 
+}
 
 void write_log_file(const char *message, const char *fileName, const char option) {
 	time_t now = time(0);
@@ -740,7 +740,7 @@ void write_log_file(const char *message, const char *fileName, const char option
 	char buf[80];
 
 	strftime(buf, sizeof(buf), "%c", &tstruct);
-	
+
 	switch (option) {
 		case 'i':
 		case 'I':
@@ -755,7 +755,7 @@ void write_log_file(const char *message, const char *fileName, const char option
 		case 'e':
 		case 'E':
 			fprintf(logFile, "[%s] Error: %s in file %s\n", buf, message, fileName);
-			break;	
+			break;
 	}
 
 	fflush(logFile);
@@ -766,7 +766,7 @@ __(((____)))_____((((_____(((____)))_____(((_______)))___))))__
 we have more than on B and Bp to consider
 so we need to find each structure's B and Bp
 the output of this function is an array, the first element of the array gives the number of substructures
-then each pair gives their B and Bp 
+then each pair gives their B and Bp
 output must be allocated first with malloc before this function is used.*/
 bool find_each_substructure (char *input_structure, int begin, int end, int **output) {
 	int B, Bp, ip;
@@ -781,17 +781,17 @@ bool find_each_substructure (char *input_structure, int begin, int end, int **ou
 
 		if (input_structure[i] == '(') {
 			if (customStack.empty()) {
-				B = i;	
+				B = i;
 			}
 			customStack.push(i);
 
 		} else if (input_structure[i] == ')') {
 			ip = customStack.top();
 			customStack.pop();
-			
+
 			if (customStack.empty()) {
 				Bp = i;
-		
+
 				if (B != ip) {
 					char error[200];
 					sprintf(error, "There is something wrong with finding B=%d and Bp=%d which pairs with %d\n", B, Bp, ip);
@@ -807,7 +807,7 @@ bool find_each_substructure (char *input_structure, int begin, int end, int **ou
 			}
 		}
 
-	} 
+	}
 
 	std::copy(&result[0][0], &result[0][0] + num_structure*2, &output[0][0]);
 	return true;
@@ -815,7 +815,7 @@ bool find_each_substructure (char *input_structure, int begin, int end, int **ou
 
 /* the structure given to this function is what is returned from simfold restricted, so has . and ( )
 This function gets the beginning and end of the given structure, together with the output structure from simfold restricted when it was given the first structure as input.
-it then goes back from the beginning point till it finds the start of the sequence or 3 unpaired bases, 
+it then goes back from the beginning point till it finds the start of the sequence or 3 unpaired bases,
 and moves forward from the end point till it finds the end f the sequence or 3 unpaired bases.
 it returns the new beginning and end points.*/
 void find_independant_structures (char *structure, int begin, int end, int *B, int *Bp) {
@@ -843,19 +843,19 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 					if ((structure[R_index] == '(') || (R_index == strlen(structure))) {
 						found = 1;
 					}
-				
+
 					unpaired_count++;
 					if (unpaired_count == 3) {
 						found = 1;
 					}
-				}	
-			
+				}
+
 				if (!found) {
 					*B = L_index;
 					*Bp = R_index;
 					L_index--;
 					R_index++;
-				} 
+				}
 
 			} else {
 				found = 1;
@@ -882,7 +882,7 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 				R_index++;
 				L_index--;
 				unpaired_count++;
-	
+
 				if (unpaired_count == 3) {
 					found = 1;
 				}
@@ -898,7 +898,7 @@ void find_independant_structures (char *structure, int begin, int end, int *B, i
 }
 
 void find_sub_sequence_structure (const char *input_sequence, char *input_structure, char *output_sequence, char *output_structure, int *begin, int *end) {
-	int structure_length = strlen(input_structure);	
+	int structure_length = strlen(input_structure);
 	int sub_length = 0;
 	*begin = -1;
 	*end = 0;

@@ -47,7 +47,7 @@ PARAMTYPE s_dangling_energy (int *sequence, char *structure, int i1, int i2, int
     d_top = 0;
     d_bot = 0;
 
-    // on Sep 5, 2008, I removed the minimization, so that 
+    // on Sep 5, 2008, I removed the minimization, so that
     d_top = dangle_top[sequence[i2]] [sequence[i1]] [sequence[i2+1]];
     d_bot = dangle_bot[sequence[i4]] [sequence[i3]] [sequence[i3-1]];
 
@@ -59,7 +59,7 @@ PARAMTYPE s_dangling_energy (int *sequence, char *structure, int i1, int i2, int
             energy = 0;
         else                // >...(
             energy = d_bot;
-    }    
+    }
     else if (structure[i2] == ')' && structure[i3] == '<')   // pseudoknot, ignore dangling end dangling on it
     {
         if (i3 <= i2+2)     // ).< or )<   ignore completely
@@ -70,7 +70,7 @@ PARAMTYPE s_dangling_energy (int *sequence, char *structure, int i1, int i2, int
     else if (structure[i2] == '>' && structure[i3] == '<')  // case >..<  ignore completely
     {
         energy = 0;
-    }                          
+    }
     else if (i2+1 == i3-1)     // see which is smaller
     {
         if (simple_dangling_ends)
@@ -99,11 +99,11 @@ PARAMTYPE s_dangling_energy_left (int *sequence, char *structure, int i1, int i2
     PARAMTYPE energy;
     PARAMTYPE d_top, d_bot;
     d_top = 0;
-    d_bot = 0;            
+    d_bot = 0;
 
     d_top = dangle_top[sequence[i1]] [sequence[i2]] [sequence[i1+1]];
     d_bot = dangle_bot[sequence[i4]] [sequence[i3]] [sequence[i3-1]];
-    
+
 //     d_top = MIN (0, dangle_top[sequence[i1]] [sequence[i2]] [sequence[i1+1]]);
 //     d_bot = MIN (0, dangle_bot[sequence[i4]] [sequence[i3]] [sequence[i3-1]]);
 
@@ -113,12 +113,12 @@ PARAMTYPE s_dangling_energy_left (int *sequence, char *structure, int i1, int i2
             energy = 0;
         else                // (....<
             energy = d_top;
-    }    
+    }
     else if (i1+1 == i3-1)     // see which is smaller
     {
         if (simple_dangling_ends)
             energy = d_top;
-        else    
+        else
             energy = d_top < d_bot ? d_top : d_bot;
     }
     else if (i1+1 < i3-1)
@@ -156,12 +156,12 @@ PARAMTYPE s_dangling_energy_right (int *sequence, char *structure, int i1, int i
             energy = 0;
         else                // >...)
             energy = d_bot;
-    }                              
+    }
     else if (i4+1 == i2-1)     // see which is smaller
     {
         if (simple_dangling_ends)
             energy = d_top;
-        else    
+        else
             energy = d_top < d_bot ? d_top : d_bot;
     }
     else if (i4+1 < i2-1)
@@ -283,13 +283,13 @@ double free_energy_simfold (char *sequence, char *structure)
     int *int_sequence;
     PARAMTYPE en;
     int nb_nucleotides;
-    
-    nb_nucleotides = strlen(sequence); 
 
-    if ((f = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");   
+    nb_nucleotides = strlen(sequence);
+
+    if ((f = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
     // detect the structure features
     detect_structure_features (structure, f);
-    
+
     int_sequence = new int[nb_nucleotides];
     if (int_sequence == NULL) giveup ("Cannot allocate memory", "energy");
     for (i=0; i < nb_nucleotides; i++) int_sequence[i] = nuc_to_int(sequence[i]);
@@ -312,19 +312,19 @@ double free_energy_simfold_restricted (char *sequence, char *structure, char *re
     int *int_sequence;
     PARAMTYPE en;
     int nb_nucleotides;
-        
-    nb_nucleotides = strlen(sequence); 
-    
-    str_features *fres;
-    if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");   
-    // detect the structure features
-    detect_structure_features (restricted, fres);            
-    
 
-    if ((f = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");   
+    nb_nucleotides = strlen(sequence);
+
+    str_features *fres;
+    if ((fres = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
+    // detect the structure features
+    detect_structure_features (restricted, fres);
+
+
+    if ((f = new str_features[nb_nucleotides]) == NULL) giveup ("Cannot allocate memory", "str_features");
     // detect the structure features
     detect_structure_features (structure, f);
-    
+
     int_sequence = new int[nb_nucleotides];
     if (int_sequence == NULL) giveup ("Cannot allocate memory", "energy");
     for (i=0; i < nb_nucleotides; i++) int_sequence[i] = nuc_to_int(sequence[i]);
@@ -373,15 +373,15 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
 // restricted is null if no restrictions
 // restricted to be used for hairpin loops only
 {
-    int i; 
+    int i;
     PARAMTYPE energy, en, AUpen;
     PARAMTYPE dang;
     PARAMTYPE misc_energy;
-    int h,l, nb_nucleotides;    
+    int h,l, nb_nucleotides;
     static int cannot_add_dangling[MAXSLEN];
     int* ptable_restricted = NULL;
-    
-    nb_nucleotides = strlen (csequence);    
+
+    nb_nucleotides = strlen (csequence);
     for (i=0; i < nb_nucleotides; i++) cannot_add_dangling[i] = 0;
 
     if (fres != NULL)
@@ -393,27 +393,27 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
 
     energy = 0;
     AUpen = 0;
-    
+
     for (i=0; i < nb_nucleotides; i++)
-    {    
+    {
         // add some AU_penalties
         if (i==0 && f[i].pair > i)
         {
             AUpen = AU_penalty (sequence[i], sequence[f[i].pair]);
             if (debug)
                 printf ("%d - AUpen1 \t- add energy %6d\n", i, AUpen);
-            energy += AUpen;            
-        }            
+            energy += AUpen;
+        }
         else if ( i > 0 && f[i].pair > i && f[i-1].pair < i-1 &&
              f[i-1].pair != -1 && !cannot_add_dangling[i])
-            //  )(  
-        {            
+            //  )(
+        {
             AUpen = AU_penalty (sequence[i], sequence[f[i].pair]);
             if (debug)
                 printf ("%d - AUpen2 \t- add energy %6d\n", i, AUpen);
-            energy += AUpen;            
-        }            
-    
+            energy += AUpen;
+        }
+
         // add dangling energies and AU_penalties
         if (f[i].pair == -1 && !cannot_add_dangling[i])
         {
@@ -434,10 +434,10 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
                 {
                     printf ("%d - dangle1 \t- add energy %6d\n", i, dang);
                     printf ("%d - AUpen3 \t- add energy %6d\n", i, AUpen);
-                }                    
+                }
                 energy += dang + AUpen;
             }
-            else if ((i == nb_nucleotides-1 || 
+            else if ((i == nb_nucleotides-1 ||
                      (i < nb_nucleotides-1 && f[i+1].pair == -1)) &&
                      i > 0 && f[i-1].pair > -1 && f[i-1].pair < i-1)
                 // ). or )..
@@ -450,12 +450,12 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
                     dang = dangle_top [sequence[i-1]] [sequence[f[i-1].pair]] [sequence[i]];
                     //dang = MIN (0, dangle_top [sequence[i-1]] [sequence[f[i-1].pair]] [sequence[i]]);
                 }
-                if (debug)                
+                if (debug)
                     printf ("%d - dangle2 \t- add energy %6d\n", i, dang);
                 energy += dang;
             }
             else if (i < nb_nucleotides-1 && f[i+1].pair > i+1 && f[i-1].pair < i-1 && f[i-1].pair != -1)
-               // ).( 
+               // ).(
             {
                 if (no_dangling_ends)
                     dang = 0;
@@ -467,10 +467,10 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
                 }
                 AUpen = AU_penalty (sequence[i+1], sequence[f[i+1].pair]);
                 if (debug)
-                {              
+                {
                     printf ("%d - dangle1 \t- add energy %6d\n", i, dang);
                     printf ("%d - AUpen4 \t- add energy %6d\n", i, AUpen);
-                }    
+                }
                 energy += dang + AUpen;
             }
             else
@@ -478,17 +478,17 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
                 continue;
             }
         }
-        
+
         if (f[i].pair < i)
         {
             continue;
-        }       
+        }
 
         if (f[i].type == STACK)
         {
             en = s_stacked_pair::get_energy (i, f[i].pair, sequence);
-            if (debug)            
-                printf ("%d stack \t- add energy %6d\n", i, en);        
+            if (debug)
+                printf ("%d stack \t- add energy %6d\n", i, en);
             energy += en;
         }
         else if (f[i].type == HAIRP)
@@ -513,7 +513,7 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
             cannot_add_dangling[jp+1] = 1;
             en = s_internal_loop::get_energy (i, f[i].pair, ip, jp, sequence, ptable_restricted);
             if (debug)
-                printf ("%d internal \t- add energy %6d\n", i, en);        
+                printf ("%d internal \t- add energy %6d\n", i, en);
             energy += en;
         }
         else  // (f[i].type == MULTI)
@@ -534,7 +534,7 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
             }
             for (l = f[f[i].bri[f[i].num_branches-1]].pair + 1; l < f[i].pair; l++)
                 misc_energy += misc.multi_free_base_penalty;
-                
+
             misc_energy += misc.multi_offset;
             misc_energy += misc.multi_helix_penalty * (f[i].num_branches + 1);
 
@@ -542,7 +542,7 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
             AUpen += AU_penalty (sequence[i], sequence[f[i].pair]);
             for (h=0; h < f[i].num_branches; h++)
                 AUpen += AU_penalty (sequence[f[i].bri[h]],sequence[f[f[i].bri[h]].pair]);
-        
+
             // add dangling energies for multi-loop
             if (no_dangling_ends)
                 dang = 0;
@@ -553,8 +553,8 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
                     dang += s_dangling_energy (sequence, structure, f[i].bri[l], f[f[i].bri[l]].pair, f[i].bri[l+1], f[f[i].bri[l+1]].pair);
                 dang += s_dangling_energy_right (sequence, structure, i, f[i].pair, f[i].bri[f[i].num_branches-1], f[f[i].bri[f[i].num_branches-1]].pair);
             }
-            
-            // add "no-dangling" restriction                                    
+
+            // add "no-dangling" restriction
             for (l=0; l < f[i].num_branches; l++)
             {
                 cannot_add_dangling [f[i].bri[l] -1] = 1;
@@ -562,12 +562,12 @@ PARAMTYPE s_calculate_energy (int *sequence, char *csequence, char *structure, s
             }
             if (debug)
             {
-                printf ("%d - multi m\t- add energy %6d\n", i, misc_energy);            
+                printf ("%d - multi m\t- add energy %6d\n", i, misc_energy);
                 printf ("%d - multi d\t- add energy %6d\n", i, dang);
                 printf ("%d - multi AU\t- add energy %6d\n", i, AUpen);
-            }                
-            energy += misc_energy + dang + AUpen;                           
-        }        
+            }
+            energy += misc_energy + dang + AUpen;
+        }
     }
     if (fres != NULL)
     {
@@ -636,7 +636,7 @@ PARAMTYPE s_calculate_enthalpy (int *sequence, char *csequence, str_features *f)
                 }
                 energy += dang + AUpen;
             }
-            else if ((i == nb_nucleotides-1 || 
+            else if ((i == nb_nucleotides-1 ||
                      (i < nb_nucleotides-1 && f[i+1].pair == -1 )) &&
                      i > 0 && f[i-1].pair > -1 && f[i-1].pair < i-1)
                 // ). or )..
@@ -720,7 +720,7 @@ PARAMTYPE s_calculate_enthalpy (int *sequence, char *csequence, str_features *f)
 
                 misc_energy += enthalpy_misc.multi_offset;
                 misc_energy += enthalpy_misc.multi_helix_penalty * (f[i].num_branches + 1);
-            
+
             // add AU_penalties for multi-loop
             AUpen += AU_penalty_enthalpy (sequence[i], sequence[f[i].pair]);
             for (h=0; h < f[i].num_branches; h++)
@@ -763,13 +763,13 @@ double simfold (char *sequence, char *structure)
     min_fold->return_structure (structure);
     delete min_fold;
     return min_energy;
-}    
+}
 
 
 double simfold_loss_augmented (char *sequence, char *known_structure, char *pred_structure)
 // like simfold, but loss-augmented
 // Returns arg min_y (dG(x,y) - loss(y,y*))
-//  where x is sequence and y* is known_structure            
+//  where x is sequence and y* is known_structure
 {
     double min_energy;
     s_min_folding *min_fold = new s_min_folding (sequence);
@@ -783,7 +783,7 @@ double simfold_loss_augmented (char *sequence, char *known_structure, char *pred
     delete [] pred_pairings;
     delete min_fold;
     return min_energy;
-}    
+}
 
 
 double simfold_restricted (char *sequence, char *restricted, char *structure)
@@ -805,19 +805,19 @@ double simfold_restricted (char *sequence, char *restricted, char *structure)
         if ((restricted[i] == '(' || restricted[i] == ')' || restricted[i] == '.') &&
             (restricted[i] != structure[i]))
         {
-            printf ("ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
-            printf ("  %s\n  %s\n  %s\t%.2lf\n", sequence, restricted, structure, min_energy);
-            printf ("ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
+            fprintf (stderr, "ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
+            fprintf (stderr, "  %s\n  %s\n  %s\t%.2lf\n", sequence, restricted, structure, min_energy);
+            fprintf (stderr, "ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
             exit(1);
-        }    
+        }
     }
     // now check if the free energy obtained with simfold_restricted is correct
     double correct_energy = free_energy_simfold_restricted (sequence, structure, restricted);
     if (fabs (correct_energy-min_energy) > 1.0)
     {
-        printf ("ERROR!!! The dp energy is different from the energy calculated at the end!!\n");
-        printf ("%s\n%s\n%s\n correct_energy=%.2lf, energy=%.2lf\n", sequence, restricted, structure, correct_energy, min_energy);
-        printf ("ERROR!!! The dp energy is different from the energy calculated at the end!!\n");
+        fprintf (stderr, "ERROR!!! The dp energy is different from the energy calculated at the end!!\n");
+        fprintf (stderr, "%s\n%s\n%s\n correct_energy=%.2lf, energy=%.2lf\n", sequence, restricted, structure, correct_energy, min_energy);
+        fprintf (stderr, "ERROR!!! The dp energy is different from the energy calculated at the end!!\n");
         exit(1);
     }
     return min_energy;
@@ -837,23 +837,23 @@ int simfold_unordered_suboptimals_range (char *sequence, double max_energy, char
     min_energy = min_fold->s_simfold();
     min_fold->return_structure (structure);
     delete min_fold;
-                      
+
     if (min_energy >= max_energy)
     {
         strcpy (structures[0], structure);
-        energies[0] = min_energy;    
+        energies[0] = min_energy;
         actual_num_str = 1;
     }
     else
     {
-        energy_range = (int) ((max_energy - min_energy)*100);    
+        energy_range = (int) ((max_energy - min_energy)*100);
         //printf ("R1: %s %d\nR2: %s %d\n\n", sequence1, strlen(sequence1), sequence2, strlen(sequence2));
         s_sub_folding* sub_fold = new s_sub_folding(sequence, energy_range);
         sub_fold->set_limit(num_subopt);
         sub_fold->s_simfold (enthalpy);
         actual_num_str = sub_fold->return_structures(structures, energies);
         delete sub_fold;
-    }    
+    }
     /*
     printf ("%s     %.2lf   %.2lf\n", sequence, max_energy, min_energy);
     for (int i=0; i < actual_num_str; i++)
@@ -863,7 +863,7 @@ int simfold_unordered_suboptimals_range (char *sequence, double max_energy, char
             printf ("%s    %.2lf\n", structures[i], energies[i]);
     }
     */
-    return actual_num_str;      
+    return actual_num_str;
 }
 
 
@@ -884,19 +884,19 @@ int simfold_restricted_unordered_suboptimals_range (char *sequence, char *restri
     if (min_energy >= max_energy)
     {
         strcpy (structures[0], structure);
-        energies[0] = min_energy;    
+        energies[0] = min_energy;
         actual_num_str = 1;
     }
     else
     {
-        energy_range = (int) ((max_energy - min_energy)*100);    
+        energy_range = (int) ((max_energy - min_energy)*100);
         //printf ("R1: %s %d\nR2: %s %d\n\n", sequence1, strlen(sequence1), sequence2, strlen(sequence2));
         s_sub_folding* sub_fold = new s_sub_folding(sequence, restricted, energy_range);
         sub_fold->set_limit(MAXSUBSTR);
         sub_fold->s_simfold_restricted (enthalpy);
         actual_num_str = sub_fold->return_structures(structures, energies);
         delete sub_fold;
-    }    
+    }
     /*
     printf ("%s     %.2lf   %.2lf\n", sequence, max_energy, min_energy);
     for (int i=0; i < actual_num_str; i++)
@@ -906,7 +906,7 @@ int simfold_restricted_unordered_suboptimals_range (char *sequence, char *restri
             printf ("%s    %.2lf\n", structures[i], energies[i]);
     }
     */
-    return actual_num_str;      
+    return actual_num_str;
 }
 
 
@@ -923,14 +923,14 @@ int simfold_unordered_suboptimals (char *sequence, int number, char structures[]
     min_fold->return_structure (structure);
 
     delete min_fold;
-      
+
     if (number == 1)
       {
         strcpy (structures[0], structure);
         energies[0] = min_energy;
       }
     else
-      {    
+      {
         //printf ("R1: %s %d\nR2: %s %d\n\n", sequence1, strlen(sequence1), sequence2, strlen(sequence2));
         s_sub_folding* sub_fold = new s_sub_folding(sequence, 5000);
         sub_fold->set_limit(number);
@@ -940,7 +940,7 @@ int simfold_unordered_suboptimals (char *sequence, int number, char structures[]
         delete sub_fold;
       }
     return actual_num_str;
-      
+
 }
 
 
@@ -971,21 +971,21 @@ int simfold_ordered_suboptimals (char *sequence, int number, char structures[][M
 	printf("in s_specific_functions.cpp: structure=%s \n",structure);
 
     delete min_fold;
-      
+
     if (number == 1)
       {
         strcpy (structures[0], structure);
         energies[0] = min_energy;
       }
     else
-      {    
+      {
         //printf ("R1: %s %d\nR2: %s %d\n\n", sequence1, strlen(sequence1), sequence2, strlen(sequence2));
-        s_sub_folding* sub_fold = new s_sub_folding(sequence, 50000);        
+        s_sub_folding* sub_fold = new s_sub_folding(sequence, 50000);
         sub_fold->set_limit(2*number);
         sub_fold->s_simfold (enthalpy);
         actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
         printf("in s_specific_functions.cpp: sub_fold-> return_structures() DONE! \n");
-		  
+
 		printf("in s_specific_functions.cpp and actual_num_str = %d\n", actual_num_str);
         // added on Oct 16, 2007. The good free energies have to be recomputed here! For some reason it wasn't.
         for (i=0; i < actual_num_str; i++)
@@ -994,19 +994,19 @@ int simfold_ordered_suboptimals (char *sequence, int number, char structures[][M
             //printf ("Unordered S %d: %s   %.2lf\n", i, tmp_structures[i], tmp_energies[i]);
         }
 		printf ("in s_specific_functions.cpp: Actual unordered: %d\n", actual_num_str);
-		  
+
         delete sub_fold;
 
         get_sorted_positions (actual_num_str, tmp_energies, positions);
-		printf ("in s_specific_functions.cpp: get_sorted_positions() DONE!\n");  
-		
+		printf ("in s_specific_functions.cpp: get_sorted_positions() DONE!\n");
+
         int MFE_there, ii;
         MFE_there = 0;
         ii = 0;
-		  
-	
+
+
         printf("in s_specific_functions.cpp, tmp_energies[positions[0]]=%d\n",tmp_energies[positions[0]]);
-		  
+
         if (min_energy != tmp_energies[positions[0]])
           {
             //printf ("MFE1 %s    %.2lf \n =======\n", i+1, structure, energy);
@@ -1014,7 +1014,7 @@ int simfold_ordered_suboptimals (char *sequence, int number, char structures[][M
             energies[ii] = min_energy;
             ii++;
           }
-        else 
+        else
           {
             i = 0;
             while (tmp_energies[positions[i]] == min_energy)
@@ -1044,9 +1044,9 @@ int simfold_ordered_suboptimals (char *sequence, int number, char structures[][M
             strcpy (structures[ii], tmp_structures[positions[i]]);
             energies[ii] = tmp_energies[positions[i]];
             ii++;
-          }                
+          }
       }
-    return actual_num_str;      
+    return actual_num_str;
 }
 
 
@@ -1063,7 +1063,7 @@ int simfold_restricted_unordered_suboptimals (char *sequence, char *restricted, 
 
     delete min_fold;
     printf ("Structure: %s\n", structure);
-      
+
     if (number == 1)
       {
         strcpy (structures[0], structure);
@@ -1071,7 +1071,7 @@ int simfold_restricted_unordered_suboptimals (char *sequence, char *restricted, 
         actual_num_str=1;
       }
     else
-      {    
+      {
         //printf ("R1: %s %d\nR2: %s %d\n\n", sequence1, strlen(sequence1), sequence2, strlen(sequence2));
         s_sub_folding* sub_fold = new s_sub_folding(sequence, restricted, 5000);
         sub_fold->set_limit(number);
@@ -1080,7 +1080,7 @@ int simfold_restricted_unordered_suboptimals (char *sequence, char *restricted, 
         //printf ("Actual unordered: %d\n", actual_num_str);
         delete sub_fold;
       }
-    return actual_num_str;      
+    return actual_num_str;
 }
 
 
@@ -1095,14 +1095,14 @@ int simfold_restricted_all_suboptimals (char *sequence, char *restricted, char s
     min_energy = min_fold->s_simfold_restricted ();
     min_fold->return_structure (structure);
 
-    delete min_fold;      
+    delete min_fold;
     s_sub_folding* sub_fold = new s_sub_folding(sequence, restricted, -(int)(min_energy*100.0));
     sub_fold->set_limit(MAXSUBSTR);
     sub_fold->s_simfold_restricted (enthalpy);
     actual_num_str = sub_fold->return_structures(structures, energies);
     //printf ("Actual unordered: %d\n", actual_num_str);
     delete sub_fold;
-    return actual_num_str;      
+    return actual_num_str;
 }
 
 int simfold_restricted_all_mfe_structures (char *sequence, char *restricted, char structures[][MAXSLEN], double energies[])
@@ -1113,11 +1113,11 @@ int simfold_restricted_all_mfe_structures (char *sequence, char *restricted, cha
     double min_energy, enthalpy, energy;
     char tmp_structures[10][MAXSLEN];
     double tmp_energies[10];
-    
+
     s_min_folding *min_fold = new s_min_folding (sequence, restricted);
     min_energy = min_fold->s_simfold_restricted ();
     min_fold->return_structure (structure);
-    delete min_fold;   
+    delete min_fold;
     //printf ("Res mfe:%s\t%.2lf\n", structure, min_energy);
     // generate the first 10, and recompute free energy
     s_sub_folding* sub_fold = new s_sub_folding(sequence, restricted, 1000);
@@ -1126,7 +1126,7 @@ int simfold_restricted_all_mfe_structures (char *sequence, char *restricted, cha
     actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
     int j = 0;
     for (int i=0; i < actual_num_str; i++)
-    {        
+    {
         energy = free_energy_simfold_restricted (sequence, tmp_structures[i], restricted);
         if (energy == min_energy)
         {
@@ -1137,14 +1137,14 @@ int simfold_restricted_all_mfe_structures (char *sequence, char *restricted, cha
         //printf ("%d\t%s\t%.2lf\t%.2lf\n", i, tmp_structures[i], tmp_energies[i], energy);
     }
     if (j==0)    // if nothing was added, add the mfe structure
-    {    
-        strcpy (structures[j], structure);        
+    {
+        strcpy (structures[j], structure);
         energies[j] = min_energy;
-        j = 1;        
+        j = 1;
     }
     //printf ("Actual unordered: %d\n", actual_num_str);
     delete sub_fold;
-    return j;      
+    return j;
 }
 
 
@@ -1170,7 +1170,7 @@ void simfold_gradient_smart (char *sequence, PFTYPE *grad, int ignore_dangles, i
     PFTYPE pf;
     int i,j;
     s_partition_function *part = new s_partition_function (sequence, ignore_dangles, compute_gradient_dangles);
-    pf = part->compute_partition_function();   
+    pf = part->compute_partition_function();
     part->compute_base_pair_probabilities();
     part->compute_logZ_gradient();
     part->copy_gradient(grad);
@@ -1184,11 +1184,11 @@ PFTYPE simfold_f_and_gradient_smart (char *sequence, char *restricted, PFTYPE *g
     PFTYPE pf;
     int i,j;
     s_partition_function *part = new s_partition_function (sequence, ignore_dangles, compute_gradient_dangles, restricted);
-    
-    //pf = part->compute_partition_function_exhaustively();   
+
+    //pf = part->compute_partition_function_exhaustively();
     //part->compute_logZ_gradient_exhaustively();
     //part->copy_gradient(grad);
-    
+
     pf = part->compute_partition_function();
     part->compute_base_pair_probabilities();
     part->compute_logZ_gradient();
@@ -1213,10 +1213,10 @@ void simfold_partition_function_both (char *sequence)
     //long double pf, pfexhaust;
     int i,j;
     s_partition_function *part = new s_partition_function (sequence);
-    part->compute_partition_function();   
+    part->compute_partition_function();
     part->compute_base_pair_probabilities();
 
-    part->compute_partition_function_exhaustively();   
+    part->compute_partition_function_exhaustively();
     part->verify_partition_function ();
     //part->PS_dot_plot("dot.ps");
     delete part;
@@ -1236,7 +1236,7 @@ PFTYPE simfold_partition_function_approximately (char *sequence)
     //R = 0.00198717;
     //temp = 310.15;
     beta = 1000.0/(1.98717*310.15);
-    //beta = 1; 
+    //beta = 1;
 
     simple_dangling_ends = 1;
     int seqlen = strlen(sequence);
@@ -1245,23 +1245,23 @@ PFTYPE simfold_partition_function_approximately (char *sequence)
     {
         for (j=i+1; i < seqlen; i++)
             papp[i][j] = 0;
-    }    
+    }
     Zexact = simfold_partition_function_smart (sequence);
     int ptable[MAXSLEN];
     PFTYPE strprob;
-        
+
     s_min_folding *min_fold = new s_min_folding (sequence);
     min_energy = min_fold->s_simfold ();
     min_fold->return_structure (structure);
-    delete min_fold;      
-    
+    delete min_fold;
+
     //s_sub_folding* sub_fold = new s_sub_folding(sequence, -(int)(min_energy*100.0));
     s_sub_folding* sub_fold = new s_sub_folding(sequence, 10000);
     sub_fold->set_limit (MAXSUBSTR);
     sub_fold->s_simfold (enthalpy);
     actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
     delete sub_fold;
-    
+
     max_energy = tmp_energies[actual_num_str-1];
     Z = 0.0;
     for (i=0; i < actual_num_str; i++)
@@ -1269,16 +1269,16 @@ PFTYPE simfold_partition_function_approximately (char *sequence)
         // recompute the free energy, i.e. with the correct dangling ends
         energy = free_energy_simfold (sequence, tmp_structures[i]);
         strprob = (PFTYPE)(exp(-1.0 * energy * beta)/Zexact);
-        detect_original_pairs (tmp_structures[i], ptable); 
+        detect_original_pairs (tmp_structures[i], ptable);
         for (ii=0; ii < seqlen; ii++)
         {
-            if (ptable[ii] > ii)    
+            if (ptable[ii] > ii)
             {
                 //printf ("ptable[%d]=%d\n", ii, ptable[ii]);
                 papp[ii][ptable[ii]] += strprob;
             }
-        }   
-        
+        }
+
         printf ("Substr %d: %s\ten=%.2lf \tprob=%Le\n", i, tmp_structures[i], energy, strprob);
         Z += exp (-1.0 * energy * beta);
     }
@@ -1287,21 +1287,21 @@ PFTYPE simfold_partition_function_approximately (char *sequence)
         for (j=i+1; j < seqlen; j++)
             if (papp[i][j] > 0)
                 printf ("papp[%d][%d] = %g\n", i, j, sqrt(papp[i][j]));
-    }    
+    }
 
-    /*    
+    /*
     // try to get the exhaustive up[i,j]
     double up = 0;
     int l;
     for (i=0; i < seqlen; i++)
     {
         for (j=i+TURN+1; j < seqlen; j++)
-        {    
+        {
             up = 0;
             if (can_pair(nuc_to_int(sequence[i]), nuc_to_int(sequence[j])))
             {
                 // compute exhaustive up[i,j]
-                for (k=0; k < actual_num_str; k++)                
+                for (k=0; k < actual_num_str; k++)
                 {
                     if (has_base_pair(i,j, tmp_structures[k]))
                     {
@@ -1315,19 +1315,19 @@ PFTYPE simfold_partition_function_approximately (char *sequence)
                             up += exp_free_energy_partial (i, j, sequence, tmp_structures[k]);
                         //else
                         //    printf ("Str %s identical with other for i=%d, j=%d\n", tmp_structures[k], i, j);
-                    }                        
+                    }
                 }
                 printf ("upexhaust(%d,%d) = %g\n", i, j, up);
             }
         }
     }
     */
-    return Z;    
+    return Z;
 }
 
 
 
-// for now, the following functions exist only if the parameters are [long] double 
+// for now, the following functions exist only if the parameters are [long] double
 
 #ifdef INCLUDE_FUNCTIONS
 #include "s_partition_function_complex.h"
@@ -1368,7 +1368,7 @@ void simfold_gradient_numerical (char *sequence, PFTYPE *grad, int ignore_dangle
     Complex pf;
     int i,j;
     s_partition_function_complex *part = new s_partition_function_complex (sequence, ignore_dangles, compute_gradient_dangles);
-    pf = part->compute_partition_function();   
+    pf = part->compute_partition_function();
     part->compute_logZ_gradient_numerical();
     part->copy_gradient_numerical(grad);
     //part->PS_dot_plot("dot.ps");
@@ -1410,7 +1410,7 @@ PFTYPE simfold_f_and_gradient_smart_double (char *sequence, PFTYPE *grad, int ig
 
 
 PFTYPE simfold_f_and_gradient_smart_numerical (char *sequence, PFTYPE *grad, int ignore_dangles,
-    int compute_gradient_dangles, int which_param)    
+    int compute_gradient_dangles, int which_param)
 // unrestricted for now
 // if which_param is -1, compute gradient for all params, otherwise just for which_param
 {
