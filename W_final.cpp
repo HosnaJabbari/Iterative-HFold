@@ -24,10 +24,12 @@
 W_final::W_final(char *seq, char *res):s_min_folding(seq,res)
 {
 	this->nb_nucleotides = strlen(seq);
-	this->int_sequence = new int[this->nb_nucleotides];
+	/*
+        this->int_sequence = new int[this->nb_nucleotides];
 	if (int_sequence == NULL) giveup ("Cannot allocate memory", "W_final");
 	int i;
-    for (i=0; i < this->nb_nucleotides; i++) int_sequence[i] = nuc_to_int(seq[i]);
+        for (i=0; i < this->nb_nucleotides; i++) int_sequence[i] = nuc_to_int(seq[i]);
+        */
 	space_allocation();
 }
 
@@ -37,7 +39,7 @@ W_final::~W_final()
 	delete vm;
 	delete v;
 	delete WMB;
-	delete [] int_sequence;
+	//delete [] int_sequence;
 
 }
 

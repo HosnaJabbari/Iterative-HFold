@@ -80,7 +80,7 @@
 #define DNA   1
 
 // change these if necessary
-#define MAXSLEN         40001  // maximum of total sequence length. The maximum value that can be used without causing an overflow is 46340. // Hosna: November 16, 2015, changed value from 5000
+#define MAXSLEN         5000  // maximum of total sequence length. The maximum value that can be used without causing an overflow is 46340. // Hosna: November 16, 2015, changed value from 5000
 //Hosna November 16, 2015
 // added this for interacting HFold
 #define OLIGOMAXSLEN    100

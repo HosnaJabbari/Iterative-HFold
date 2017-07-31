@@ -2,6 +2,7 @@
 #define HFOLD_H_
 
 double hfold(char *sequence, char *restricted, char *structure);
+double hfold_pkonly(char *sequence, char *restricted, char *structure);
 double hfold_iterative(char *sequence, char *restricted, char *structure); // April 3, 2012
 
 static void *threadFunction(void *arg);
@@ -9,13 +10,13 @@ static void *threadFunction(void *arg);
 
 void printUsage();
 
-void method1_calculation (const char *sequence, char *structure, char *method1_structure, double *method1_energy);
-void method2_calculation (const char *sequence, char *structure, char *method2_structure, double *method2_energy);
-void method3_calculation (const char *sequence, char *structure, char *method3_structure, double *method3_energy);
-void method4_calculation (const char *sequence, char *structure, char *method4_structure, double *method4_energy, int **result);
+void method1_calculation (char *sequence, char *structure, char *method1_structure, double *method1_energy);
+void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy);
+void method3_calculation (char *sequence, char *structure, char *method3_structure, double *method3_energy);
+void method4_calculation (char *sequence, char *structure, char *method4_structure, double *method4_energy, int **result);
 
-bool call_HFold (const char *programPath, const char *input_sequence, const char *input_structure, char *output_structure, double *output_energy, bool reattempt_run);
-bool call_simfold (const char *programPath, const char *input_sequence, const char *input_structure, char *output_structure, double *output_energy, bool reattempt_run);
+bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy);
+bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy);
 
 void replace_simfold_partial_structure_with_original (char *input_structure, char *simfold_structure, char *replaced_structure, int begin, int end);
 void replace_simfold_structure_with_original (char *replaced_structure, char *simfold_structure, int begin, int end);
@@ -37,3 +38,4 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg);
 
 
 #endif /*HFOLD_H_*/
+

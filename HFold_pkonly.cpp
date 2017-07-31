@@ -34,19 +34,6 @@ int main (int argc, char *argv[])
     char structures[MAXSUBSTR][MAXSLEN];
     double energies[MAXSUBSTR];
 
-/*
-    if (argc != 3)
-    {
-        printf ("Usage: %s <sequence> <restricted_structure>\n", argv[0]);
-        printf ("Example: %s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" \"(____________________________)\"\n", argv[0]);
-        printf ("\tRestricted structure symbols:\n");
-        printf ("\t\t() restricted base pair\n");
-        printf ("\t\t_ no restriction\n");
-        return 0;
-    }
-    strcpy (sequence, argv[1]);
-    strcpy (restricted, argv[2]);
-*/
 
     //kevin: june 22 2017
 	//validation for command line argument
@@ -68,12 +55,12 @@ int main (int argc, char *argv[])
 		{
 		case 's':
 			if(sequenceFound){
-				printf("-s is duplicated\n");
+				fprintf(stderr,"-s is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
+				fprintf(stderr,"Cannot combine -i with -s/-r \n");
 				errorFound = true;
 				break;
 			}
@@ -83,12 +70,12 @@ int main (int argc, char *argv[])
 			break;
 		case 'r':
 			if(restrictedFound || inputPathFound){
-				printf("-r is duplicated\n");
+				fprintf(stderr,"-r is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
+				fprintf(stderr,"Cannot combine -i with -s/-r \n");
 				errorFound = true;
 				break;
 			}
@@ -98,18 +85,18 @@ int main (int argc, char *argv[])
 			break;
 		case 'i':
 			if(restrictedFound || sequenceFound){
-				printf("Cannot combine -i with -s/-r \n");
+				fprintf(stderr,"Cannot combine -i with -s/-r \n");
 				errorFound = true;
 				break;
 			}
 			strcpy(inputPath,optarg);
 			//printf("file: %s %d\n", file,access(file, F_OK|R_OK));
 			if(access(inputPath, F_OK) == -1) { //if file does not exist
-				printf("Input file not exist\n");
+				fprintf(stderr,"Input file not exist\n");
 				exit(4);
 			}
 			if (!validateHFOLDInputFile(inputPath, sequence, restricted)) {
-				printf("Input file is invalid\n");
+				fprintf(stderr,"Input file is invalid\n");
 				errorFound = true;
 				break;
 			}
@@ -221,15 +208,5 @@ int main (int argc, char *argv[])
     return 0;
 }
 
-void printUsage(){
-	printf("Usage ./HFold_pkonly -s <sequence> -r <structure> [-o </path/to/file>]\n");
-	printf("or\n");
-	printf("Usage ./HFold_pkonly -i </path/to/file> [-o </path/to/file>]\n");
-	printf ("  Restricted structure symbols:\n");
-	printf ("    () restricted base pair\n");
-	printf ("    _ no restriction\n");
-	printf("Example:\n");
-	printf("./HFold_pkonly -s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -r \"(____________________________)\"\n");
-	printf("./HFold_pkonly -i \"/home/username/Desktop/myinputfile.txt\" -o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
 
-}
+
