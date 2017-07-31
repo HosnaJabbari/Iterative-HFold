@@ -115,8 +115,8 @@ pseudo_loop::~pseudo_loop()
 
     for(int i = 0; i < nb_nucleotides; i++)
     {
-        delete border_bs[i]; 
-        delete border_bps[i];
+        delete [] border_bs[i]; 
+        delete []  border_bps[i];
     }
     delete [] border_bs;
     delete [] border_bps;
