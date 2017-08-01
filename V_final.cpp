@@ -8,15 +8,9 @@
 #include "V_final.h"
 #include "h_struct.h"
 
-<<<<<<< HEAD
-V_final::V_final(){
-    index = new int [MAXSLEN];
-    int total_length = (MAXSLEN *(MAXSLEN+1))/2;
-=======
 V_final::V_final(int nb_nucleotides){
 	index = new int [nb_nucleotides];
     int total_length = (nb_nucleotides *(nb_nucleotides+1))/2;
->>>>>>> upstream/master
     index[0] = 0;
     int i;
     for (int i=1; i < nb_nucleotides; i++)
