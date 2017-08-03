@@ -617,8 +617,6 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 	// but still getting seg fault!
 	fill_data_structures_with_new_parameters ("simfold/params/parameters_DP09_chopped.txt");
 
-	printf ("Seq: %s\n", input_sequence);
-
 	*output_energy = simfold_restricted (input_sequence, input_structure, output_structure);
 //	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
 	return true;
