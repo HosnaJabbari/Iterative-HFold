@@ -34,6 +34,11 @@
 #include "s_energy_matrix.h"
 #include "simfold.h"
 
+// Ian Wark August 2 2017
+// Compilation doesn't like when you directly put "" into a char * argument of a function
+// give it this instead
+char empty_char[1] = "";
+
 // I played with the following functions to study a bit the parameters
 
 int ignore_AU_penalty = 0;
@@ -1733,7 +1738,7 @@ double get_feature_counts_restricted (char *sequence, char *structure, double *c
     if (ignore_dangles)     no_dangling_ends = 1;
     else                    no_dangling_ends = 0;
     ignore_AU_penalty = ignore_first_AU_penalty;
-    double energy = count_each_structure_type (sequence, structure, "", c, f, reset_c);
+    double energy = count_each_structure_type (sequence, structure, empty_char, c, f, reset_c);
     return energy;
 
     // I tried to some check below, but if reset_c is 0, then it won't work.
@@ -10777,7 +10782,7 @@ void compute_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
             continue;
 
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        count_each_structure_type (sequence, real_structure, "", counter, f, 1);
+        count_each_structure_type (sequence, real_structure, empty_char, counter, f, 1);
         simfold_gradient_smart (sequence, logZ_gradient);
         for (i = 0; i < num_params; i++)
         {
@@ -10838,7 +10843,7 @@ PFTYPE compute_f_and_gradient_f_smart (char *input_file, PFTYPE *f_gradient)
             continue;
 
         //printf ("Seq: |%s|\nStr: |%s|\nRes: |%s|\n", sequence, real_structure, restricted);
-        count_each_structure_type (sequence, real_structure, "", counter, free_value, 1);
+        count_each_structure_type (sequence, real_structure, empty_char, counter, free_value, 1);
         energy = free_energy_simfold (sequence, real_structure);
         Z = simfold_f_and_gradient_smart (sequence, NULL, logZ_gradient);
         neglogli += 1.0*beta*energy + log(Z);
@@ -13240,11 +13245,11 @@ void fill_similarity_rule_with_optical_melting_reference (char *xml_filename)
 
         if (strcmp (sequence0, "") != 0)
         {
-            count_each_structure_type (sequence0, structure0, "", counter0, f, 1);
+            count_each_structure_type (sequence0, structure0, empty_char, counter0, f, 1);
         }
         //printf ("Sequence:  %s\n", sequence);
         //printf ("Structure: %s\n", structure);
-        count_each_structure_type (sequence, structure, "", counter_min, f, 1);
+        count_each_structure_type (sequence, structure, empty_char, counter_min, f, 1);
         //printf ("DONE %s\n", exp_id);
 
         for (i=0; i < num_params; i++)

@@ -3027,7 +3027,9 @@ void s_partition_function::compute_logZ_gradient_exhaustively ()
         {
             energy = free_energy_simfold (csequence, tmp_structures[k]);
             denominator += EXP ((-1) * energy * beta);
-            count_each_structure_type (csequence, tmp_structures[k], "", counter, f, 1);
+
+            char restricted[1] = "";
+            count_each_structure_type (csequence, tmp_structures[k], restricted, counter, f, 1);
             }
         else
         {
