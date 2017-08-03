@@ -60,7 +60,7 @@ void count_penalty_by_size (int size, char type, double *counter);
 
 void IL_count_penalty_by_size_2D (int size1, int size2, double *counter);
 
-int structure_type_index (char type[]);
+int structure_type_index (const char input[]);
   // Mirela: Nov 23, 2003
   // Given the type as a string, return the index in string_params
 
@@ -76,7 +76,7 @@ void save_parameters (const char *filename);
 
 void save_parameters_in_array (PARAMTYPE *array);
 // PRE: parameters have been read
-// save all parameters in the given array  
+// save all parameters in the given array
 
 void save_parameters_pmo (const char *filename);
   // Mirela: Dec 16, 2003
@@ -84,13 +84,13 @@ void save_parameters_pmo (const char *filename);
 
 void save_parameters_in_array_pmo  (PARAMTYPE *array);
 // PRE: parameters have been read
-// save all parameters in the given array  
-  
+// save all parameters in the given array
+
 int create_building_block_strings ();
 // Mirela: Sep 20, 2005
 // For most of the building blocks, write which sequence(s) correspond to each building block
 // also fill string_params
-  
+
 int create_string_params ();
 // Mirela: Nov 23, 2003
 // writes each parameter type, excluding duplicates, in a long vector, containing the names of the parameters
@@ -105,7 +105,7 @@ int get_num_params ();
 
 void save_paramtypes (const char *filename);
 // PRE: call create_string_params ()
-// save all parameter types in the given file  
+// save all parameter types in the given file
 void save_paramtypes_machine_readable (const char *filename);
 
 void set_starters ();
@@ -117,7 +117,7 @@ double get_feature_counts (char *sequence, char *structure, char *restricted, do
 // returns the energy function
 
 double get_feature_counts_quadratic (char *sequence, char *structure, char *restricted, double **quadratic, double *linear, double &f);
-// This function computes the P matrix (quadratic), the c vector (linear) and the f value 
+// This function computes the P matrix (quadratic), the c vector (linear) and the f value
 //    of a quadratic energy function x'Px + c'x + f
 // just a dummy function (we don't have quadratic energy model in MultiRNAFold, equivalent with get_feature_counts
 // Used to test create_structural_constraints_simfold.cpp for the quadratic case
@@ -207,12 +207,12 @@ void fill_data_structures_with_new_parameters_double (const char *filename);
 
 void fill_data_structures_with_new_parameters_fixed_dangles (const char *filename, char *dangfilename);
 // reads all params from filename, except the dangling parameters, which reads from a different file
-// assumes the fm363 model  
+// assumes the fm363 model
 
-int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *restricted);  
+int get_info_from_file (FILE *file, char *sequence, char *real_structure, char *restricted);
 // return 1 if everything was ok
 // return 0 instead of continue;
-  
+
 PFTYPE compute_f (char *input_file);
 // PRE:  the parameters have been read
 // POST: computes the f function, which is sum_{i=1}^N (1/RT G_{i,nat,theta} + logZ)
@@ -276,9 +276,9 @@ int generate_structure_withbb (char *sequence, char *known_structure, char *rest
 //   Return the number of structures found
 //   Look for at most threshold structures
 //   num_params = total number of parameters
-//   true_fe = the estimated free energy of the true structure. 
+//   true_fe = the estimated free energy of the true structure.
 //        We consider only those structures whose energies are <= true_fe
-//   Update old_counts every time I consider a structure 
+//   Update old_counts every time I consider a structure
 
 
 int generate_structure_withbb_many_thresholds (char *sequence, char structures[][MAXSLEN], double energies[], double *old_counts, int many_thresholds[], double true_fe, int num_params);
@@ -291,7 +291,7 @@ void print_parameters_in_almost_mfold_format ();
 // save the parameters in a format that is easy to parse by an external perl script, and which puts the parameters in mfold (or RNAstructure) format.
 // written on Oct 23, 2007
 
-void print_parameters_in_ViennaRNA_format (); 
+void print_parameters_in_ViennaRNA_format ();
 // writes the parameters in Vienna RNA format, on the screen
 // this function is somewhat similar to the function write_parameter_file from the Vienna RNA library
 // see format documentation at http://www.tbi.univie.ac.at/~ivo/RNA/RNAlib/Param-Files.html
@@ -308,11 +308,11 @@ void fill_similarity_rule_with_optical_melting_reference (char *xml_filename);
 void fill_similarity_rules ();
 void fill_similarity_rules_pmo ();
 
-int get_data_from_buffer (char *buffer, char *header, char last_char, char *output);
+int get_data_from_buffer (char *buffer, const char *header, const char last_char, char *output);
 // function to get the sequence, structure etc data from the XML lines
 
 int apply_rule_1 (int i, int j, int &i_rule1, int &j_rule1);
-// check if i-j form a base pair: A-U, C-G or G-U. 
+// check if i-j form a base pair: A-U, C-G or G-U.
 // If they do, return 1, and write the replacement in i_rule1 and j_rule1
 // If they don't, return 0, and i_rule1=i, j_rule1=j.
 
@@ -335,19 +335,19 @@ int is_special_internal_6 (int *sequence, int i, int j, int ip, int jp);
 
 PARAMTYPE special_energy_internal (int *sequence, int i, int j, int ip, int jp);
 PARAMTYPE special_energy_internal_pmo (int *sequence, int i, int j, int ip, int jp);
-// Return the energy obtained when we consider 6 additional parameters for internal loop 3x3 and larger, 
+// Return the energy obtained when we consider 6 additional parameters for internal loop 3x3 and larger,
 //  as described in Chen_Turner_2006b.
-// the arguments are positions in sequence        
+// the arguments are positions in sequence
 
 PARAMTYPE count_special_internal (double *counter, int *sequence, int i, int j, int ip, int jp);
-// Return the energy and counts obtained when we consider 6 additional parameters for internal loop 3x3 and larger, 
+// Return the energy and counts obtained when we consider 6 additional parameters for internal loop 3x3 and larger,
 //  as described in Chen_Turner_2006b.
-// the arguments are positions in sequence                
+// the arguments are positions in sequence
 
 void check_int11_parameters (int i, int j, int k, int l, int m, int n);
 void check_int11_pmo_parameters (int i, int j, int k, int l, int m, int n);
         // check if int11 is the sum up of experimental addition etc.
-        
-        
+
+
 #endif
 
