@@ -865,7 +865,7 @@ void calculate_energies (double temp)
 }
 
 //void init_data (char *config_file, int what, double temperature)
-void init_data(char *arg, char *config_file, int what, double temperature)
+void init_data(const char *arg, char *config_file, int what, double temperature)
 // the function that must be called by the main program to read data files
 // PRE:  None
 // POST: Read all data and configuration files
@@ -1369,7 +1369,7 @@ void calculate_energies_pmo (double temp)
         formula (temp, tloop_pmo[i].energy, enthalpy_tloop_pmo[i].energy);
 }
 
-void init_data_pmo(char *arg, char *config_file, double temperature)
+void init_data_pmo(const char *arg, char *config_file, double temperature)
 // the function that must be called by the main program to read data files
 // PRE:  None
 // POST: Read all data and configuration files

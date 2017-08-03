@@ -37,11 +37,18 @@
 
 #include "hfold_validation.h" //kevin June 22 2017
 
-#define HFOLD 						"./HFold"
-#define HFOLD_PKONLY 				"./HFold_pkonly"
-#define HFOLD_INTERACTING 			"./HFold_interacting"
-#define HFOLD_INTERACTING_PKONLY 	"./HFold_interacting_pkonly"
-#define SIMFOLD 					"./simfold"
+//#define HFOLD 						"./HFold"
+//#define HFOLD_PKONLY 				"./HFold_pkonly"
+//#define HFOLD_INTERACTING 			"./HFold_interacting"
+//#define HFOLD_INTERACTING_PKONLY 	"./HFold_interacting_pkonly"
+//#define SIMFOLD 					"./simfold"
+
+// this causes less compilation warnings than the #defines
+char HFOLD[8] =						"./HFold";
+char HFOLD_PKONLY[15] =				"./HFold_pkonly";
+char HFOLD_INTERACTING[20] =	    "./HFold_interacting";
+char HFOLD_INTERACTING_PKONLY[27] =	"./HFold_interacting_pkonly";
+char SIMFOLD[10] =                  "./simfold";
 
 #define INPUTPATH 			"./it_test/exons/exon_6_mutated_flank_input_PMO_1/"
 #define LOGFILEPATH 		"./logfile.txt"
@@ -90,10 +97,10 @@ int main (int argc, char **argv) {
 
 	int files_length = -1;
         int method_chosen = -1;
-	 
+
 	int **result;
 	char **files_found;
-	
+
         result  = (int**) malloc(sizeof(int*) * MAXSLEN);
         for (int i=0; i < MAXSLEN; i++) {
                 result[i] = (int*) malloc(sizeof(int) * 2);
@@ -229,11 +236,11 @@ int main (int argc, char **argv) {
 	*method3_energy = INF;
 	*method4_energy = INF;
 
-	method1_structure[0] = NULL;
-	method2_structure[0] = NULL;
-	method3_structure[0] = NULL;
-	method4_structure[0] = NULL;
-	final_structure[0] = NULL;
+	method1_structure[0] = '\0';
+	method2_structure[0] = '\0';
+	method3_structure[0] = '\0';
+	method4_structure[0] = '\0';
+	final_structure[0] = '\0';
 
 
         /*************** First Method ***************/
@@ -259,22 +266,22 @@ int main (int argc, char **argv) {
 
         //if (*method2_energy < final_energy) {
         if (*method2_energy < final_energy && *method2_energy != 0) {
-                final_energy = *method2_energy; 
-                strcpy(final_structure, method2_structure);             
+                final_energy = *method2_energy;
+                strcpy(final_structure, method2_structure);
                 method_chosen = 2;
         }
 
         //if (*method3_energy < final_energy) {
         if (*method3_energy < final_energy && *method3_energy != 0) {
-                final_energy = *method3_energy; 
-                strcpy(final_structure, method3_structure);             
+                final_energy = *method3_energy;
+                strcpy(final_structure, method3_structure);
                 method_chosen = 3;
         }
 
        // if (*method4_energy < final_energy) {
         if (*method4_energy < final_energy && *method4_energy != 0) {
-                final_energy = *method4_energy; 
-                strcpy(final_structure, method4_structure);             
+                final_energy = *method4_energy;
+                strcpy(final_structure, method4_structure);
                 method_chosen = 4;
         }
 
@@ -282,7 +289,6 @@ int main (int argc, char **argv) {
 	if (final_energy == INF || method_chosen == -1) {
 		write_log_file("Could not find energy", "", 'E');
 		printf("ERROR: could not find energy\n");
-		final_energy = NULL;
 		exit(6);
 	}
 
@@ -311,7 +317,7 @@ int main (int argc, char **argv) {
 	// Clean up
 
 	free(file);
-           	
+
 	//free(tinfo);
 
 	free(method1_structure);
@@ -370,24 +376,24 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 
 
 void method1_calculation (char *sequence, char *structure, char *method1_structure, double *method1_energy) {
-	char new_input_structure[MAXSLEN] = "\0";	
-	char hfold_structure[MAXSLEN] = "\0";	
-	char hfold_pkonly_structure[MAXSLEN] = "\0";	
-	
-	double hfold_energy = 0;	
+	char new_input_structure[MAXSLEN] = "\0";
+	char hfold_structure[MAXSLEN] = "\0";
+	char hfold_pkonly_structure[MAXSLEN] = "\0";
+
+	double hfold_energy = 0;
 	double hfold_pkonly_energy = 0;
 
 	bool has_pk;
 
 	if (!call_HFold(HFOLD_PKONLY, sequence, structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
-		*method1_energy = hfold_pkonly_energy;		
+		*method1_energy = hfold_pkonly_energy;
 		return;
 	}
 
 	has_pk = find_new_structure(hfold_pkonly_structure, new_input_structure);
 	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
 
-	if (has_pk) {		
+	if (has_pk) {
 		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy)) {
 			std::cout << "HFold failed " << std::endl;
 			*method1_energy = hfold_energy;
@@ -409,10 +415,10 @@ void method1_calculation (char *sequence, char *structure, char *method1_structu
 }
 
 void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy) {
-	char hfold_structure[MAXSLEN] = "\0";	
-	
-	double hfold_energy = 0;	
-	
+	char hfold_structure[MAXSLEN] = "\0";
+
+	double hfold_energy = 0;
+
 	if (!call_HFold(HFOLD, sequence, structure, hfold_structure, &hfold_energy)) {
 		*method2_energy = hfold_energy;
 		return;
@@ -452,7 +458,7 @@ void method3_calculation (char *sequence, char *structure, char *method3_structu
 
 	if (!call_simfold(SIMFOLD, sub_sequence, sub_structure, simfold_structure, &simfold_energy)) {
 //                printf("TEST, method3_calculation's calling simfold result: %lf\n", simfold_energy);
-		*method3_energy = simfold_energy;		
+		*method3_energy = simfold_energy;
 		return;
 	}
 
@@ -575,18 +581,18 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 
 	//init_data ("./HFold", config_file, dna_or_rna, temperature);
 	init_data (programPath, config_file, dna_or_rna, temperature);
-	
+
 	fill_data_structures_with_new_parameters ("./simfold/params/turner_parameters_fm363_constrdangles.txt");
 
 	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
 	// so we add it here
-	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt"); 
-        
+	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt");
+
         if (strcmp(programPath, HFOLD) == 0) {
             *output_energy = hfold(input_sequence, input_structure, output_structure);
         }
         else if (strcmp(programPath, HFOLD_PKONLY) == 0){
-                *output_energy = hfold_pkonly(input_sequence, input_structure, output_structure); 
+                *output_energy = hfold_pkonly(input_sequence, input_structure, output_structure);
         }else{
                 printf("Error: invalid arguments are given: %s \nValid aurgumnets are: HFOLD and HFOLD_PKONLY\n");
                 return false;
@@ -596,18 +602,18 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 }
 
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
-        std::string result = "";	
-	
+        std::string result = "";
+
 	char config_file[200] = "simfold/";
 	strcat(config_file, PARAMS_BASE_PATH);
 	strcat(config_file, "multirnafold.conf");
 	double temperature;
-	temperature = 37; 
-	init_data ("./simfold", config_file, RNA, temperature);         
+	temperature = 37;
+	init_data ("./simfold", config_file, RNA, temperature);
 
         fill_data_structures_with_new_parameters ("simfold/params/turner_parameters_fm363_constrdangles.txt");
 	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
-	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt, 
+	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt,
 	// but still getting seg fault!
 	fill_data_structures_with_new_parameters ("simfold/params/parameters_DP09_chopped.txt");
 
