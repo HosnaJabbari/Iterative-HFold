@@ -22,9 +22,6 @@ set(HFold_iterative_SOURCE
     hfold_iterative.h HFold_iterative.cpp
 )
 
-# get pthread library
-find_package (Threads)
-
 # set path for executable to be created
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # create executables
@@ -33,5 +30,3 @@ add_executable(HFold_iterative ${HFold_iterative_SOURCE})
 # link to simfold
 target_link_libraries(HFold_iterative LINK_PUBLIC simfold)
 
-# link to pthread
-target_link_libraries(HFold_iterative LINK_PUBLIC ${CMAKE_THREAD_LIBS_INIT})
