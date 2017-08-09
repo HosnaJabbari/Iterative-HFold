@@ -38,7 +38,7 @@ struct W_node
     W_node ()
     {
         energy = MAXENERGY;
-        num_branches = 0;        
+        num_branches = 0;
         next_back = -1;
     }
 
@@ -73,7 +73,7 @@ typedef struct
     PARAMTYPE hairpin_AG_mismatch;
     PARAMTYPE hairpin_GA_mismatch;
     PARAMTYPE hairpin_UU_mismatch;
-    
+
     // 3 parameters which replace the tstacki table - added on Dec 20, 2006
     PARAMTYPE internal_AU_closure;   // does not need terminal_AU_penalty to be added to it
     PARAMTYPE internal_GA_AG_mismatch;
@@ -81,12 +81,12 @@ typedef struct
     PARAMTYPE internal_AG_mismatch;
     PARAMTYPE internal_GA_mismatch;
     PARAMTYPE internal_GG_mismatch;
-    
+
     // 6 more parameters for internal loops 3x3 or larger, following Chen_Turner_2006b
     // I only added the ones that would not be included in tstacki
     // These parameters are to be used when !parsi_special
     PARAMTYPE internal_special_3GA;     // 5'-YGGA/GAAR-3' or 5'-GGAR/YGAA-3', in loops 3x3 and larger
-    PARAMTYPE internal_special_2GA;     // 5'-GA/GA-3' next to a closing base pair, or 5'-GG/AA-3' next to a closing base pair, for 3x3, 3x4, 4x4, and 4x5 loops; 
+    PARAMTYPE internal_special_2GA;     // 5'-GA/GA-3' next to a closing base pair, or 5'-GG/AA-3' next to a closing base pair, for 3x3, 3x4, 4x4, and 4x5 loops;
                                 //  ALSO 5'-RGGA/GAAY-3' or 5'-GGAY/YGAA-3' for 3x5, 3x6 and 4x6 loops.
                                 // internal_2GA is USED only if internal_3GA was not used
     PARAMTYPE internal_special_2xGA_GC;  // 5'-GANGC/GANGC-3' in 3x3 loops
@@ -94,30 +94,30 @@ typedef struct
                                     // internal_midGA is USED only if none of internal_3GA and internal_2GA is used.
     PARAMTYPE internal_special_UG_AG;       // once or twice, for each 5'-UG/AG-3' at the terminus of loops 3x3 or larger
     PARAMTYPE internal_special_GU_A;        // first mismatch is GA, and U is 3' of G, for loops 3x3
-            
+
     PARAMTYPE internal_UU_mismatch;
     PARAMTYPE internal22_delta_same_size;
     PARAMTYPE internal22_delta_different_size;
     PARAMTYPE internal22_delta_1stable_1unstable;
     PARAMTYPE internal22_delta_AC;
     PARAMTYPE internal22_match;   // if it has a CG or AU match in the middle
-    
+
     PARAMTYPE internal11_basic_mismatch;
-    PARAMTYPE internal11_GG_mismatch;    
-    
+    PARAMTYPE internal11_GG_mismatch;
+
     PARAMTYPE internal11_AU_closure;
     PARAMTYPE internal11_GU_closure;
-    PARAMTYPE internal11_AG_mismatch;    
+    PARAMTYPE internal11_AG_mismatch;
     PARAMTYPE internal11_UU_mismatch;
     PARAMTYPE internal11_5YRR_5YRR;
     PARAMTYPE internal11_5RYY_5RYY;
     PARAMTYPE internal11_5YYR_5YYR;
     PARAMTYPE internal11_5YRY_5RYR;
-    PARAMTYPE internal11_5RRY_5RYY;    
+    PARAMTYPE internal11_5RRY_5RYY;
 
     PARAMTYPE internal21_match;   // if it has a CG or AU or GU match in the middle
     PARAMTYPE internal21_AU_closure;   // does not need terminal_AU_penalty to be added to it
-    
+
     PARAMTYPE internal21_initiation;
     PARAMTYPE internal21_GU_closure;
     PARAMTYPE internal21_AG_mismatch;    // applied once per loop, not applied to 5'RA/3'YG loops
@@ -131,11 +131,11 @@ typedef struct
     // That is: a U · U pair adjacent to a Y · Y (not U · U),  C · A, or A · C pair
     PARAMTYPE internal22mid_group4;      // group 4 according to Christiansen_Znosko_2008
     // That is: a G · G pair not adjacent to a U · U pair
-    
+
     // 2 more parameters for the case parsi_int22 == 1
     PARAMTYPE internal22_AU_closure;     // as suggested by Christiansen_Znosko_2008
     PARAMTYPE internal22_GU_closure;     // as suggested by Christiansen_Znosko_2008
-   
+
 } miscinfo;
 
 // info from tloop.dat
@@ -167,7 +167,13 @@ typedef struct str_features
     char type;                   // type can be 'H', 'S', 'I', 'M' etc
     short int num_branches;
     int bri[MAX_BRANCHES];      // the i of each branch
-    
+
+    // Ian Wark August 8 2017
+    // exists restricted is a very common function
+    // that is ultimately very time consuming
+    // precompute the results and save in this array
+    std::vector< std::vector<int> > exists_restricted_arr;
+
     str_features()
     {
         pair = -1;
@@ -186,7 +192,7 @@ typedef struct
 
 
 
-// This node is used to keep the intervals that need to be further backtracked 
+// This node is used to keep the intervals that need to be further backtracked
 struct seq_interval
 {
   int i;
@@ -208,13 +214,13 @@ struct seq_interval
 struct struct_node
 {
     minimum_fold* f;                    // an array
-    seq_interval* intervals;            // M: a linked list 
+    seq_interval* intervals;            // M: a linked list
     PARAMTYPE bot_en;                         // not used?
     PARAMTYPE energy;                         // M: min energy of any structure starting with the partial structure so far
     char* structure;
     struct_node* previous;              // M: made doubly linked list, to be able to keep the size < limit
     struct_node* next;
-  
+
     struct_node()
     {
         f = NULL;
@@ -222,7 +228,7 @@ struct struct_node
         structure = NULL;
         previous = NULL;
         next = NULL;
-    }      
+    }
 };
 
 
@@ -275,7 +281,7 @@ typedef struct
     double hairpin_AU_closure;   // does not need terminal_AU_penalty to be added to it
     double hairpin_AG_mismatch;
     double hairpin_UU_mismatch;
-    
+
     // 3 parameters which replace the tstacki table - added on Dec 20, 2006
     double internal_AU_closure;   // does not need terminal_AU_penalty to be added to it
     double internal_AG_mismatch;

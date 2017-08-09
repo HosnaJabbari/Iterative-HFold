@@ -1216,6 +1216,32 @@ void detect_structure_features (char *structure, str_features *f)
             }
         }
     }
+
+    // Ian Wark August 8 2017
+    // exists_restricted is a very time consuming function because it is called so many times.
+    // We will then pre-compute it and store it to save time.
+
+    // Allocate the vectors
+    f->exists_restricted_arr.resize(nb_nucleotides);
+    for (int i = 0; i < nb_nucleotides; ++i) {
+        f->exists_restricted_arr[i].resize(nb_nucleotides);
+
+        // compute whether there are any restricted base pairs between i and j
+        for (int j = i; j < nb_nucleotides; ++j) {
+            // default 0
+            f->exists_restricted_arr[i][j] = 0;
+
+            for (int k = i+1; k < j; ++k)
+            {
+                if (f[k].pair > -1) {
+                    // if restricted base pair, set to 1
+                    f->exists_restricted_arr[i][j] = 1;
+                }
+            }
+
+        }
+    }
+
     /*
     for (i=0; i < nb_nucleotides; i++)
     {
@@ -1292,6 +1318,7 @@ int self_complementary (char *sequence)
 
 int exists_restricted (int i, int j, str_features *fres)
 {
+/*
     int k;
     if (fres == NULL)
         return 0;
@@ -1301,6 +1328,12 @@ int exists_restricted (int i, int j, str_features *fres)
             return 1;
     }
     return 0;
+*/
+    // Ian Wark August 8 2017
+    // this is a very time consuming function because it is called so many times
+    // we have already pre-computed the answer in detect_structure_features
+    // now we must simply retrieve it
+    return fres->exists_restricted_arr[i][j];
 }
 
 int exists_restricted_ptable (int i, int j, int *ptable)
