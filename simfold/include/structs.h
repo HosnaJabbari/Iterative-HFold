@@ -19,6 +19,7 @@
 #define STRUCTS_H
 
 #include "constants.h"
+#include <vector>
 
 typedef struct
 {
