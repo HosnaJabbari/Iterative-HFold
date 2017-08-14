@@ -16,9 +16,9 @@
  ***************************************************************************/
 
 // this file contains mainly the global variables. It's the mirror of externs.h.
-// Include globals.h in the driver, and externs.h in the library files. If you include globals.h 
-// twice, you get linking errors. 
- 
+// Include globals.h in the driver, and externs.h in the library files. If you include globals.h
+// twice, you get linking errors.
+
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
@@ -36,22 +36,21 @@ int *known_pairings = NULL;    // used for the loss-augmented prediction
 int *pred_pairings = NULL;
 
 char similarity_rule[MAXNUMPARAMS][5000];
-char similarity_rule_pmo[MAXNUMPARAMS][5000];
 
 // these variables are used for all models: turner99, parsimonious and lavish
 //  For each of the variables, LAVISH (0) means lavish, PARSI (1) means parsimonious, T99 (2) means turner99 (sometimes they overlap)
-// In addition, I incorporated the Zhang_Liang_2008 model for bulge loop and internal loop length. 
+// In addition, I incorporated the Zhang_Liang_2008 model for bulge loop and internal loop length.
 //      In this case, parsi_length is ZL (3). The only modifications are in params.cpp:extrapolate_parameters.
-// For parsi_special, for now, by default it's only the new ones. To add the old tetraloops, do this: 
+// For parsi_special, for now, by default it's only the new ones. To add the old tetraloops, do this:
 //  cp params/turner-special-hairpins-rna.dat params/turner-special-hairpins-rna-only-new.dat
 //  cp params/turner-special-hairpins-rna-with-T99.dat params/turner-special-hairpins-rna.dat
 int parsi_tstackh = T99;   // 0: lavish and turner99 model for tstackh; 1: parsimonious model
-int parsi_tstacki = T99;   
+int parsi_tstacki = T99;
 int parsi_asymmetry = T99;    // category 3
 int parsi_int11 = T99;      // category 4
 int parsi_int21 = T99;      // category 5
 int parsi_int22 = T99;      // category 6
-int parsi_bulge1 = T99;    // 0: lavish for bulge1; 1: parsi for bulge1, i.e. 4 features; 2: turner99, i.e. no bulge features  
+int parsi_bulge1 = T99;    // 0: lavish for bulge1; 1: parsi for bulge1, i.e. 4 features; 2: turner99, i.e. no bulge features
 int parsi_dangles = T99;      // category 8
 int parsi_length = T99;      // category L
 int parsi_special = T99;      // category S
@@ -62,7 +61,7 @@ int creating_model = 0;     // this is 1 only when I use the thermo xml set to f
 
 //#if (MODEL == EXTENDED)   // I'm not using SIMPLE and EXTENDED model any more
 int start_bulge = 21;
-int start_internal = 25;    
+int start_internal = 25;
 int start_internal11 = 25;
 int start_internal11_C = 25;    //130;
 int start_internal11_G = 25;    //204;
@@ -73,10 +72,10 @@ int start_internal21_AUA = 40;      //46;   // first, second and third
 int start_internal21_AUC = 40;      //142;
 int start_internal21_AUG = 40;      //238;
 int start_internal21_AUU = 40;      //334;
-int start_internal21_CGA = 40;      //430;  
-int start_internal21_CGC = 40;      //526;  
-int start_internal21_CGG = 40;      //622;  
-int start_internal21_CGU = 40;      //718;  
+int start_internal21_CGA = 40;      //430;
+int start_internal21_CGC = 40;      //526;
+int start_internal21_CGG = 40;      //622;
+int start_internal21_CGU = 40;      //718;
 int start_internal21_GCA = 40;      //814;
 int start_internal21_GCC = 40;      //910;
 int start_internal21_GCG = 40;      //1006;
@@ -125,7 +124,7 @@ int start_internal_size = 52;
 int start_bulge_size = 61;
 int start_hairpin_size = 63;
 int start_misc_last = 70;       // the last misc: from misc.terminal_AU_penalty on
-int start_special_hl = 75; 
+int start_special_hl = 75;
 
 //**********************************************************************//
 // Energies information for RNA
@@ -193,110 +192,44 @@ int enthalpy_nb_triloops = 0;
 int enthalpy_nb_tloops = 0;
 //**********************************************************************//
 
-//**********************************************************************//
-// Energies information for PMO
-PARAMTYPE stack_pmo   [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE tstackh_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE tstacki_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE int11_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE int21_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE int22_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE dangle_top_pmo  [NUCL] [NUCL] [NUCL];
-PARAMTYPE dangle_bot_pmo  [NUCL] [NUCL] [NUCL];
-PARAMTYPE internal_penalty_by_size_pmo [MAXLOOP+1];
-PARAMTYPE bulge_penalty_by_size_pmo [MAXLOOP+1];
-PARAMTYPE hairpin_penalty_by_size_pmo [MAXLOOP+1];
-miscinfo misc_pmo;
-
-//#if (MODEL == SIMPLE)
-hairpin_tloop triloop_pmo[MAXTRILOOPNO];
-hairpin_tloop tloop_pmo[MAXTLOOPNO];
-int nb_triloops_pmo = 0;
-int nb_tloops_pmo = 0;
-
-//#elif (MODEL == EXTENDED)
-hairpin_tloop special_hl_pmo[MAX_SPECIAL_LOOP_NO];
-int nb_special_hl_pmo = 0;
-
-// middle of asymmetric internal loops 2x2
-//PARAMTYPE int22mid_pmo[NUCL] [NUCL] [NUCL] [NUCL];    // I'm not using this any more, I'm using int22_experimental_addition_pmo instead
-
-PARAMTYPE int11_experimental_addition_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];       // values to be added to the simple 10-parameter model proposed by Davis_Znosko_2007, so that we use the experimental values for these parameters
-PARAMTYPE int21_experimental_addition_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];       // values to be added to the simple 6-parameter model proposed by Badhwar_Znosko_2007, so that we use the experimental values for these parameters
-PARAMTYPE int22_experimental_addition_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];       // values to be added to the simple 6-parameter model proposed by Christiansen_Znosko_2008, so that we use the experimental values for these parameters
-
-PARAMTYPE internal_asymmetry_initiation_pmo;
-PARAMTYPE internal_asymmetry_slope_pmo;
-PARAMTYPE internal_asymmetry_pmo [MAXLOOP+1];
-//PARAMTYPE internal_symmetry_pmo [MAXLOOP+1];
-//PARAMTYPE internal_penalty_by_size_2D_pmo[MAXLOOP_I][MAXLOOP_I];
-
-PARAMTYPE bulgeA_pmo;
-PARAMTYPE bulgeC_pmo;
-PARAMTYPE bulgeG_pmo;
-PARAMTYPE bulgeU_pmo;
-PARAMTYPE bulge1_pmo[NUCL] [NUCL] [NUCL] [NUCL] [NUCL];     // bulge of size 1     [i][j][k][ip][jp], where k=i+1, ip=k+1, j=jp+1
-//#endif
-//**********************************************************************//
-
-//**********************************************************************//
-// Enthalpies information for PMO
-PARAMTYPE enthalpy_stack_pmo   [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_tstackh_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_tstacki_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_int11_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_int21_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_int22_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_dangle_top_pmo  [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_dangle_bot_pmo  [NUCL] [NUCL] [NUCL];
-PARAMTYPE enthalpy_internal_penalty_by_size_pmo [MAXLOOP+1];
-PARAMTYPE enthalpy_bulge_penalty_by_size_pmo [MAXLOOP+1];
-PARAMTYPE enthalpy_hairpin_penalty_by_size_pmo [MAXLOOP+1];
-miscinfo enthalpy_misc_pmo;
-hairpin_tloop enthalpy_triloop_pmo[MAXTRILOOPNO];
-hairpin_tloop enthalpy_tloop_pmo[MAXTLOOPNO];
-int enthalpy_nb_triloops_pmo = 0;
-int enthalpy_nb_tloops_pmo = 0;
-//**********************************************************************//
-
 // parameters from the configuration file
 int nb_params = 58;
 char par_name [58] [100] = {
             "STD_DIR",
             "RNA_STACK_ENERGY37_V31",
-            "RNA_STACK_ENERGY37_V23",            
-            "RNA_STACK_ENTHALPY",            
+            "RNA_STACK_ENERGY37_V23",
+            "RNA_STACK_ENTHALPY",
             "RNA_LOOP_ENERGY37_V31",
-            "RNA_LOOP_ENERGY37_V23",            
-            "RNA_LOOP_ENTHALPY",            
+            "RNA_LOOP_ENERGY37_V23",
+            "RNA_LOOP_ENTHALPY",
             "RNA_TRILOOP_ENERGY37_V31",
-            "RNA_TRILOOP_ENERGY37_V23",            
-            "RNA_TRILOOP_ENTHALPY",                        
+            "RNA_TRILOOP_ENERGY37_V23",
+            "RNA_TRILOOP_ENTHALPY",
             "RNA_TLOOP_ENERGY37_V31",
-            "RNA_TLOOP_ENERGY37_V23",            
-            "RNA_TLOOP_ENTHALPY",                        
+            "RNA_TLOOP_ENERGY37_V23",
+            "RNA_TLOOP_ENTHALPY",
             "RNA_TSTACKH_ENERGY37_V31",
-            "RNA_TSTACKH_ENERGY37_V23",            
-            "RNA_TSTACKH_ENTHALPY",            
+            "RNA_TSTACKH_ENERGY37_V23",
+            "RNA_TSTACKH_ENTHALPY",
             "RNA_TSTACKI_ENERGY37_V31",
-            "RNA_TSTACKI_ENERGY37_V23",            
-            "RNA_TSTACKI_ENTHALPY",            
+            "RNA_TSTACKI_ENERGY37_V23",
+            "RNA_TSTACKI_ENTHALPY",
             "RNA_INT11_ENERGY37_V31",
-            "RNA_INT11_ENERGY37_V23",            
-            "RNA_INT11_ENTHALPY",            
+            "RNA_INT11_ENERGY37_V23",
+            "RNA_INT11_ENTHALPY",
             "RNA_INT21_ENERGY37_V31",
-            "RNA_INT21_ENERGY37_V23",            
-            "RNA_INT21_ENTHALPY",            
+            "RNA_INT21_ENERGY37_V23",
+            "RNA_INT21_ENTHALPY",
             "RNA_INT22_ENERGY37_V31",
-            "RNA_INT22_ENERGY37_V23",            
-            "RNA_INT22_ENTHALPY",            
+            "RNA_INT22_ENERGY37_V23",
+            "RNA_INT22_ENTHALPY",
             "RNA_MISCLOOP_ENERGY37_V31",
-            "RNA_MISCLOOP_ENERGY37_V23",            
-            "RNA_MISCLOOP_ENTHALPY",            
+            "RNA_MISCLOOP_ENERGY37_V23",
+            "RNA_MISCLOOP_ENTHALPY",
             "RNA_DANGLE_ENERGY37_V31",
-            "RNA_DANGLE_ENERGY37_V23",            
+            "RNA_DANGLE_ENERGY37_V23",
             "RNA_DANGLE_ENTHALPY",
-            
+
             "DNA_STACK_ENERGY37",
             "DNA_STACK_ENTHALPY",
             "DNA_LOOP_ENERGY37",
@@ -406,7 +339,7 @@ char bbstr_left[MAXNUMPARAMS][10];   // the 5' structure of the corresponding bu
 char bbstr_right[MAXNUMPARAMS][10];   // the 3' structure of the corresponding building block
 
 int counter_min_dangle[NUM_DANG][NUM_DANG];    // cell[0][1] says how many times min(dangle0,dangle1) appear, where dangle0 is x213 in the 318 nomenclature
-// there are 48 dangling ends: 24 top and 24 bottom. 
+// there are 48 dangling ends: 24 top and 24 bottom.
 
 // OBSOLETE
 // energies information
