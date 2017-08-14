@@ -50,11 +50,7 @@ char HFOLD_INTERACTING[20] =	    "./HFold_interacting";
 char HFOLD_INTERACTING_PKONLY[27] =	"./HFold_interacting_pkonly";
 char SIMFOLD[10] =                  "./simfold";
 
-#define INPUTPATH 			"./it_test/exons/exon_6_mutated_flank_input_PMO_1/"
 #define LOGFILEPATH 		"./logfile.txt"
-#define OUTPUTPATH 			"./it_test/exons/exon_6_mutated_flank_output_PMO/"
-#define OUTPUTPATH_HFOLD	"./temp/"
-
 
 FILE *logFile;
 char *file;

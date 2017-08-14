@@ -39,17 +39,11 @@
 #define has_AU_penalty(X,Y)  ((((X) != C || (Y) != G) && ((X) != G || (Y) != C))?1:0)
 #define AU_penalty_enthalpy(X,Y)  ((((X) != C || (Y) != G) && ((X) != G || (Y) != C))?enthalpy_misc.terminal_AU_penalty:0)
 
-#define AU_penalty_pmo(X,Y)  ((((X) != C || (Y) != G) && ((X) != G || (Y) != C))?misc_pmo.terminal_AU_penalty:0)
-#define has_AU_penalty_pmo(X,Y)  ((((X) != C || (Y) != G) && ((X) != G || (Y) != C))?1:0)
-#define AU_penalty_enthalpy_pmo(X,Y)  ((((X) != C || (Y) != G) && ((X) != G || (Y) != C))?enthalpy_misc_pmo.terminal_AU_penalty:0)
-
 //#define asymmetry_penalty(size1, size2) (MIN (misc.asymmetry_penalty_max_correction, abs (size1-size2) * misc.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
 
 PARAMTYPE asymmetry_penalty (int size1, int size2);
-PARAMTYPE asymmetry_penalty_pmo (int size1, int size2);
 
 #define asymmetry_penalty_enthalpy(size1, size2) (MIN (enthalpy_misc.asymmetry_penalty_max_correction, abs (size1-size2) * enthalpy_misc.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
-#define asymmetry_penalty_enthalpy_pmo(size1, size2) (MIN (enthalpy_misc_pmo.asymmetry_penalty_max_correction, abs (size1-size2) * enthalpy_misc_pmo.asymmetry_penalty_array [MIN (2, MIN ((size1), (size2)))-1]))
 
 #define IGINF(x) (((x) == INF)?0:(x))
 // ignore infinite values
@@ -116,9 +110,8 @@ int is_nucleotide (char base);
 void check_sequence (char *sequence);
 // check sequence for length and alphabet
 
-    
+
 PARAMTYPE penalty_by_size (int size, char type);
-PARAMTYPE penalty_by_size_pmo (int size, char type);
 // PRE:  size is the size of the loop
 //       type is HAIRP or INTER or BULGE
 // POST: return the penalty by size of the loop
@@ -126,7 +119,6 @@ PARAMTYPE penalty_by_size_pmo (int size, char type);
 //PARAMTYPE IL_penalty_by_size_2D (int size1, int size2);
 
 PARAMTYPE penalty_by_size_enthalpy (int size, char type);
-PARAMTYPE penalty_by_size_enthalpy_pmo (int size, char type);
 
 void substr (char *source, int begin, int end, char *dest);
 // PRE:  begin and end are smaller than strlen(source)
@@ -207,13 +199,12 @@ int loss (int first, int last);
 // Written on August 9, 2008
 // Note: Maybe this measure is better than the Hamming distance:
 //      (# correctly predicted bp - # incorrectly predicted bp) / # true bp.
-//      This will be in (-inf,1], but it only includes the base pairs, 
+//      This will be in (-inf,1], but it only includes the base pairs,
 //      whereas the Hamming distance measure also includes the unpaired bases.
 
 // Added on Sep 3, 2008, for loss-augmented prediction
 double compute_distance (char *ref_structure, char *pred_structure);
 // It has to be the same mathematical function as the one implemented in "loss"
 
-void get_pmo_usage_percentages (int i, int j, double *pmo_percentage, double *rna_percentage);
 
 #endif

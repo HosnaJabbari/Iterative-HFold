@@ -16,7 +16,7 @@
  ***************************************************************************/
 
  // This is the V matrix
- 
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -54,15 +54,15 @@ s_energy_matrix::s_energy_matrix (int *seq, int length)
 
     // this array holds V(i,j), and what (i,j) encloses: hairpin loop, stack pair, internal loop or multi-loop
     nodes = new free_energy_node [total_length];
-    if (nodes == NULL) giveup ("Cannot allocate memory", "s_energy_matrix");       
+    if (nodes == NULL) giveup ("Cannot allocate memory", "s_energy_matrix");
 }
 
 
 s_energy_matrix::~s_energy_matrix ()
 // The destructor
 {
-    delete [] index;     
-    delete [] nodes;                  
+    delete [] index;
+    delete [] nodes;
 }
 
 
@@ -71,9 +71,9 @@ void s_energy_matrix::compute_energy (int i, int j)
 // compute the V(i,j) value
 {
     PARAMTYPE min, min_en[4];
-    int k, min_rank;    
+    int k, min_rank;
     char type;
-    
+
     min_rank = -1;
     min = INF/2;
     min_en[0] = INF;
@@ -90,13 +90,13 @@ void s_energy_matrix::compute_energy (int i, int j)
             min_en[1] = S->compute_energy (i, j);
 
             // TODO: uncomment
-            if (!ignore_internal)           
+            if (!ignore_internal)
                 min_en[2] = VBI->compute_energy (i, j);
             if (!ignore_multi)
                 min_en[3] = VM->compute_energy (i, j);
-        }    
+        }
     }
-    
+
     // see which of them is the minimum
     for (k=0; k<4; k++)
     {
@@ -135,9 +135,9 @@ void s_energy_matrix::compute_energy_restricted (int i, int j, str_features *fre
 // compute the V(i,j) value, if the structure must be restricted
 {
     PARAMTYPE min, min_en[4];
-    int k, min_rank;    
+    int k, min_rank;
     char type;
-    
+
     min_rank = -1;
     min = INF/2;
     min_en[0] = INF;
@@ -148,20 +148,20 @@ void s_energy_matrix::compute_energy_restricted (int i, int j, str_features *fre
 	// Hosna, March 26, 2012
 	// if the restricted base pairs are non-canonical then checking for can_pair only will cause missing those base pairs
 	if (can_pair (sequence[i], sequence[j]) || (fres[i].pair == j && fres[j].pair ==i))
-    {    
+    {
         if (fres[i].pair == i+1)
             min_en[0] = 0;
         else
-        {    
-            if (!exists_restricted (i, j, fres))            
+        {
+            if (!exists_restricted (i, j, fres))
                 min_en[0] = H->compute_energy_restricted (i, j, fres); // there was a stupid bug here, I was calling H->compute_energy instead of the restricted version. Fixed on June 30, 2007.
 
             min_en[1] = S->compute_energy_restricted (i, j,fres);//S->compute_energy (i, j); Hosna, March 26, 2012
             min_en[2] = VBI->compute_energy_restricted (i, j, fres);
             min_en[3] = VM->compute_energy_restricted (i, j, fres);
-        }    
+        }
     }
-   
+
     for (k=0; k<4; k++)
     {
         if (min_en[k] < min)
@@ -188,124 +188,7 @@ void s_energy_matrix::compute_energy_restricted (int i, int j, str_features *fre
         int ij = index[i]+j-i;
         nodes[ij].energy = min;
         nodes[ij].type = type;
-    }       
-}
-
-void s_energy_matrix::compute_energy_restricted_pmo (int i, int j, str_features *fres)
-// compute the V(i,j) value, if the structure must be restricted
-{
-    PARAMTYPE min, min_en[4];
-    int k, min_rank;    
-    char type;
-    
-    min_rank = -1;
-    min = INF/2;
-    min_en[0] = INF;
-    min_en[1] = INF;
-    min_en[2] = INF;
-    min_en[3] = INF;
-
-	// Hosna, March 26, 2012
-	// if the restricted base pairs are non-canonical then checking for can_pair only will cause missing those base pairs
-	if (can_pair (sequence[i], sequence[j]) || (fres[i].pair == j && fres[j].pair ==i)) {    
-        if (fres[i].pair == i+1)
-            min_en[0] = 0;
-        else {    
-            if (!exists_restricted (i, j, fres)) {          
-                min_en[0] = H->compute_energy_restricted_pmo (i, j, fres); // there was a stupid bug here, I was calling H->compute_energy instead of the restricted version. Fixed on June 30, 2007.
-            }
-			min_en[1] = S->compute_energy_restricted_pmo (i, j,fres);//S->compute_energy (i, j); Hosna, March 26, 2012      
-			min_en[2] = VBI->compute_energy_restricted_pmo (i, j, fres);
-            min_en[3] = VM->compute_energy_restricted_pmo (i, j, fres);
-        }    
     }
-   
-    for (k=0; k<4; k++) {
-        if (min_en[k] < min) {
-            min = min_en[k];
-            min_rank = k;
-        }
-    }
-
-    switch (min_rank) {
-        case  0: type = HAIRP; break;
-        case  1: type = STACK; break;
-        case  2: type = INTER; break;
-        case  3: type = MULTI; break;
-        default: type = NONE;
-    }
-
-    if (min_rank > -1 && debug) {
-    	printf ("V(%d,%d) type %c energy %d\n", i, j, type, min);
-   	}
-
-    if (min < INF/2) {
-        int ij = index[i]+j-i;
-        nodes[ij].energy = min;
-        nodes[ij].type = type;
-    }     
-}
-
-//TODO: PK
-void s_energy_matrix::compute_energy_restricted_pkonly_pmo (int i, int j, str_features *fres)
-// compute the V(i,j) value, if the structure must be restricted
-{
-    PARAMTYPE min, min_en[4];
-    int k, min_rank;    
-    char type;
-    
-    min_rank = -1;
-    min = INF/2;
-    min_en[0] = INF;
-    min_en[1] = INF;
-    min_en[2] = INF;
-    min_en[3] = INF;
-
-	if (i == 565 && j == 605) {
-		int t = 0;
-	}
-
-	// Hosna, March 26, 2012
-	// if the restricted base pairs are non-canonical then checking for can_pair only will cause missing those base pairs
-	if (fres[i].pair == j && fres[j].pair ==i)
-    {    
-        if (fres[i].pair == i+1)
-            min_en[0] = 0;
-        else {    
-            if (!exists_restricted (i, j, fres)) {          
-                min_en[0] = H->compute_energy_restricted_pmo (i, j, fres); // there was a stupid bug here, I was calling H->compute_energy instead of the restricted version. Fixed on June 30, 2007.
-            }
-
-			min_en[1] = S->compute_energy_restricted_pkonly_pmo (i, j,fres);
-            min_en[2] = VBI->compute_energy_restricted_pkonly_pmo (i, j, fres);
-            min_en[3] = VM->compute_energy_restricted_pmo (i, j, fres);
-        }    
-    }
-   
-    for (k=0; k<4; k++) {
-        if (min_en[k] < min) {
-            min = min_en[k];
-            min_rank = k;
-        }
-    }
-
-    switch (min_rank) {
-        case  0: type = HAIRP; break;
-        case  1: type = STACK; break;
-        case  2: type = INTER; break;
-        case  3: type = MULTI; break;
-        default: type = NONE;
-    }
-
-    if (min_rank > -1 && debug) {
-    	printf ("V(%d,%d) type %c energy %d\n", i, j, type, min);
-   	}
-
-    if (min < INF/2) {
-        int ij = index[i]+j-i;
-        nodes[ij].energy = min;
-        nodes[ij].type = type;
-    }       
 }
 
 // Hosna, April 18, 2012
@@ -314,31 +197,31 @@ void s_energy_matrix::compute_energy_restricted_pkonly (int i, int j, str_featur
 // compute the V(i,j) value, if the structure must be restricted
 {
     PARAMTYPE min, min_en[4];
-    int k, min_rank;    
+    int k, min_rank;
     char type;
-    
+
     min_rank = -1;
     min = INF/2;
     min_en[0] = INF;
     min_en[1] = INF;
     min_en[2] = INF;
     min_en[3] = INF;
-	
+
 	if (fres[i].pair == j && fres[j].pair ==i)
-    {    
+    {
         if (fres[i].pair == i+1)
             min_en[0] = 0;
         else
-        {    
-            if (!exists_restricted (i, j, fres))            
+        {
+            if (!exists_restricted (i, j, fres))
                 min_en[0] = H->compute_energy_restricted (i, j, fres);
-            
+
             min_en[1] = S->compute_energy_restricted_pkonly (i, j,fres);
             min_en[2] = VBI->compute_energy_restricted_pkonly (i, j, fres);
             min_en[3] = VM->compute_energy_restricted (i, j, fres); // should be left as is, Hosna April 18, 2012
-        }    
+        }
     }
-	
+
     for (k=0; k<4; k++)
     {
         if (min_en[k] < min)
@@ -347,7 +230,7 @@ void s_energy_matrix::compute_energy_restricted_pkonly (int i, int j, str_featur
             min_rank = k;
         }
     }
-	
+
     switch (min_rank)
     {
         case  0: type = HAIRP; break;
@@ -356,19 +239,19 @@ void s_energy_matrix::compute_energy_restricted_pkonly (int i, int j, str_featur
         case  3: type = MULTI; break;
         default: type = NONE;
     }
-	
+
     if (min_rank > -1)
     {
         if (debug)
             printf ("V(%d,%d) type %c energy %d\n", i, j, type, min);
     }
-	
+
     if (min < INF/2)
     {
         int ij = index[i]+j-i;
         nodes[ij].energy = min;
         nodes[ij].type = type;
-    }       
+    }
 }
 
 
@@ -383,7 +266,7 @@ void s_energy_matrix::compute_energy_sub (int i, int j)
     min = INF;
     min_rank = -1;
 
- 
+
     min_en[0] = INF;
     min_en[1] = INF;
     min_en[2] = INF;
@@ -393,7 +276,7 @@ void s_energy_matrix::compute_energy_sub (int i, int j)
     {
         min_en[0] = H->compute_energy (i, j);
         if (i<=j-TURN-1)
-        {        
+        {
             min_en[1] = S->compute_energy (i, j);
             // TODO: uncomment
             if (!ignore_internal)
@@ -404,7 +287,7 @@ void s_energy_matrix::compute_energy_sub (int i, int j)
     }
 
     for (k=0; k<4; k++)
-    {                
+    {
         if (min_en[k] < min)
         {
             min = min_en[k];
@@ -422,12 +305,12 @@ void s_energy_matrix::compute_energy_sub (int i, int j)
     }
 
     if (min < INF/2)
-    {    
+    {
         ij = index[i]+j-i;
         nodes[ij].energy = min;
         nodes[ij].type = type;
         //    printf ("V(%d,%d) = %d, type=%c\n", i,j, nodes[ij].energy, nodes[ij].type);
-    }    
+    }
 }
 
 
@@ -437,9 +320,9 @@ void s_energy_matrix::compute_energy_sub_restricted (int i, int j, str_features 
 // compute the V(i,j) value - suboptimals and restricted
 {
     PARAMTYPE min, min_en[4];
-    int k, min_rank;    
+    int k, min_rank;
     char type;
-    
+
     min_rank = -1;
     min = INF/2;
     min_en[0] = INF;
@@ -448,14 +331,14 @@ void s_energy_matrix::compute_energy_sub_restricted (int i, int j, str_features 
     min_en[3] = INF;
 
     if (can_pair (sequence[i], sequence[j]))
-    {    
+    {
         min_en[0] = H->compute_energy_restricted (i, j, fres);
         min_en[1] = S->compute_energy (i, j);
         min_en[2] = VBI->compute_energy_restricted (i, j, fres);
         // I don't need restricted for VM_sub because I include dangling ends all the time
         min_en[3] = VM_sub->compute_energy (i, j);
     }
-   
+
     for (k=0; k<4; k++)
     {
         if (min_en[k] < min)

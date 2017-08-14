@@ -16,8 +16,6 @@
 // Hosna, May 3rd, 2012
 #include "hfold_pkonly.h"
 // Hosna, November 16, 2015
-//#include "hfold_interacting.h"
-
 
 /*
  * This function is just the same as detect_original_pairs
@@ -903,26 +901,6 @@ double hfold_pkonly(char *sequence, char *restricted, char *structure){
 	W_final *min_fold = new W_final (sequence, restricted);
 	if (min_fold == NULL) giveup ("Cannot allocate memory", "HFoldPKonly");
 	double energy = min_fold->hfold_pkonly();
-    min_fold->return_structure (structure);
-    delete min_fold;
-    return energy;
-}
-
-// Hosna, November 16, 2015
-// added function for the interacting version
-double hfold_interacting(char *sequence, char *restricted, char *structure){
-    W_final *min_fold = new W_final (sequence, restricted);
-    if (min_fold == NULL) giveup ("Cannot allocate memory", "HFoldInteracting");
-    double energy = min_fold->hfold_interacting();
-    min_fold->return_structure (structure);
-    delete min_fold;
-    return energy;   
-}
-
-double hfold_interacting_pkonly(char *sequence, char *restricted, char *structure){
-    W_final *min_fold = new W_final (sequence, restricted);
-    if (min_fold == NULL) giveup ("Cannot allocate memory", "HFoldInteracting");
-    double energy = min_fold->hfold_interacting_pkonly();
     min_fold->return_structure (structure);
     delete min_fold;
     return energy;

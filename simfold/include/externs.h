@@ -16,10 +16,10 @@
  ***************************************************************************/
 
 // this file contains the "extern" version of the global variables. It's the mirror of globals.h.
-// Include globals.h in the driver, and externs.h in the library files. If you include globals.h 
+// Include globals.h in the driver, and externs.h in the library files. If you include globals.h
 // twice, you get linking errors.
- 
- 
+
+
 #ifndef EXTERNS_H
 #define EXTERNS_H
 
@@ -57,7 +57,7 @@ extern int creating_model;
 
 //#if (MODEL == EXTENDED)
 extern int start_bulge;
-extern int start_internal;    
+extern int start_internal;
 extern int start_internal11;
 extern int start_internal11_C;
 extern int start_internal11_G;
@@ -68,10 +68,10 @@ extern int start_internal21_AUA;   // first, second and third
 extern int start_internal21_AUC;
 extern int start_internal21_AUG;
 extern int start_internal21_AUU;
-extern int start_internal21_CGA;  
-extern int start_internal21_CGC;  
-extern int start_internal21_CGG;  
-extern int start_internal21_CGU;  
+extern int start_internal21_CGA;
+extern int start_internal21_CGC;
+extern int start_internal21_CGG;
+extern int start_internal21_CGU;
 extern int start_internal21_GCA;
 extern int start_internal21_GCC;
 extern int start_internal21_GCG;
@@ -120,7 +120,7 @@ extern int start_internal_size;
 extern int start_bulge_size;
 extern int start_hairpin_size;
 extern int start_misc_last;       // the last misc: from misc.terminal_AU_penalty on
-extern int start_special_hl; 
+extern int start_special_hl;
 //#endif
 
 
@@ -128,7 +128,7 @@ extern char similarity_rule[MAXNUMPARAMS][2000];
 
 // for playing with the parameters
 extern char string_params[MAXNUMPARAMS][MAXPNAME];
-extern char string_params_human_readable[MAXNUMPARAMS][MAXPNAME]; 
+extern char string_params_human_readable[MAXNUMPARAMS][MAXPNAME];
 extern int num_params;
 
 extern char bbseq_left[MAXNUMPARAMS][10];   // the 5' sequence of the corresponding building block
@@ -138,7 +138,7 @@ extern char bbstr_right[MAXNUMPARAMS][10];   // the 3' structure of the correspo
 
 // this is used for parameter learning only
 extern int counter_min_dangle[NUM_DANG][NUM_DANG];                    // cell[0][1] says how many times min(dangle0,dangle1) appear, where dangle0 is x213 in the 318 nomenclature
-// there are 48 dangling ends: 24 top and 24 bottom. 
+// there are 48 dangling ends: 24 top and 24 bottom.
 
 //**********************************************************************//
 // Energies information for RNA
@@ -166,7 +166,7 @@ extern hairpin_tloop special_hl[MAX_SPECIAL_LOOP_NO];
 extern int nb_special_hl;
 
 // middle of asymmetric internal loops 2x2
-//extern PARAMTYPE int22mid[NUCL] [NUCL] [NUCL] [NUCL]; 
+//extern PARAMTYPE int22mid[NUCL] [NUCL] [NUCL] [NUCL];
 
 extern PARAMTYPE int11_experimental_addition   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];       // values to be added to the simple 10-parameter model proposed by Davis_Znosko_2007, so that we use the experimental values for these parameters
 extern PARAMTYPE int21_experimental_addition   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];       // values to be added to the simple 6-parameter model proposed by Badhwar_Znosko_2007, so that we use the experimental values for these parameters
@@ -205,69 +205,7 @@ extern int enthalpy_nb_triloops;
 extern int enthalpy_nb_tloops;
 //**********************************************************************//
 
-//**********************************************************************//
-// Energies information for PMO
-extern PARAMTYPE stack_pmo   [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE tstackh_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE tstacki_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE int11_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE int21_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE int22_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE dangle_top_pmo  [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE dangle_bot_pmo  [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE internal_penalty_by_size_pmo [MAXLOOP+1];
-extern PARAMTYPE bulge_penalty_by_size_pmo [MAXLOOP+1];
-extern PARAMTYPE hairpin_penalty_by_size_pmo [MAXLOOP+1];
-extern miscinfo misc_pmo;
 
-//#if (MODEL == SIMPLE)
-extern hairpin_tloop triloop_pmo[MAXTRILOOPNO];
-extern hairpin_tloop tloop_pmo[MAXTLOOPNO];
-extern int nb_triloops_pmo;
-extern int nb_tloops_pmo;
-
-//#elif (MODEL == EXTENDED)
-extern hairpin_tloop special_hl_pmo[MAX_SPECIAL_LOOP_NO];
-extern int nb_special_hl_pmo;
-
-// middle of asymmetric internal loops 2x2
-//extern PARAMTYPE int22mid_pmo[NUCL] [NUCL] [NUCL] [NUCL]; 
-
-extern PARAMTYPE int11_experimental_addition_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];       // values to be added to the simple 10-parameter model proposed by Davis_Znosko_2007, so that we use the experimental values for these parameters
-extern PARAMTYPE int21_experimental_addition_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];       // values to be added to the simple 6-parameter model proposed by Badhwar_Znosko_2007, so that we use the experimental values for these parameters
-extern PARAMTYPE int22_experimental_addition_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-
-extern PARAMTYPE internal_asymmetry_initiation_pmo;
-extern PARAMTYPE internal_asymmetry_slope_pmo;
-extern PARAMTYPE internal_asymmetry_pmo [MAXLOOP+1];
-//extern PARAMTYPE internal_symmetry_pmo [MAXLOOP/2+1];
-
-extern PARAMTYPE bulgeA_pmo;
-extern PARAMTYPE bulgeC_pmo;
-extern PARAMTYPE bulgeG_pmo;
-extern PARAMTYPE bulgeU_pmo;
-extern PARAMTYPE bulge1_pmo[NUCL] [NUCL] [NUCL] [NUCL] [NUCL];     // bulge of size 1
-//#endif
-//**********************************************************************//
-
-//**********************************************************************//
-// Enthalpies information for PMO
-extern PARAMTYPE enthalpy_stack_pmo   [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_tstackh_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_tstacki_pmo [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_int11_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_int21_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_int22_pmo   [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_dangle_top_pmo  [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_dangle_bot_pmo  [NUCL] [NUCL] [NUCL];
-extern PARAMTYPE enthalpy_internal_penalty_by_size_pmo [MAXLOOP+1];
-extern PARAMTYPE enthalpy_bulge_penalty_by_size_pmo [MAXLOOP+1];
-extern PARAMTYPE enthalpy_hairpin_penalty_by_size_pmo [MAXLOOP+1];
-extern miscinfo enthalpy_misc_pmo;
-extern hairpin_tloop enthalpy_triloop_pmo[MAXTRILOOPNO];
-extern hairpin_tloop enthalpy_tloop_pmo[MAXTLOOPNO];
-extern int enthalpy_nb_triloops_pmo;
-extern int enthalpy_nb_tloops_pmo;
 //**********************************************************************//
 
 // parameters from the configuration file
@@ -355,8 +293,5 @@ extern int linker_length;
 extern char structure_one_type[3];
 extern char structure_two_type[3];
 extern bool is_hybrid;
-
-// AP
-extern double PMO_RNA_penalty;
 
 #endif

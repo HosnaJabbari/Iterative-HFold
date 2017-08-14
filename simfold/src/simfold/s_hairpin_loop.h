@@ -34,36 +34,33 @@ class s_hairpin_loop
         // compute the free energy if this hairpin loop, closed at (i,j)
 
         PARAMTYPE compute_energy_restricted (int i, int j, str_features *fres);
-        // compute the free energy if this is restricted to be a hairpin loop, closed at (i,j)        
-        
-		PARAMTYPE compute_energy_restricted_pmo (int i, int j, str_features *fres);
-        // compute the free energy if this is restricted to be a hairpin loop, closed at (i,j) 
+        // compute the free energy if this is restricted to be a hairpin loop, closed at (i,j)
 
         static PARAMTYPE get_energy (int i, int j, int *sequence, char *csequence, int *ptable=NULL);
         // returns the free energy of the hairpin loop closed at (i,j)
-        
+
         static PARAMTYPE get_enthalpy (int i, int j, int *sequence, char *csequence);
         // returns the enthalpy of the hairpin loop closed at (i,j)
-        
+
         static void count_get_energy (int i, int j, int* sequence, char *csequence, double *counter);
         // PRE:  csequence is the sequence of the loop; important for tetraloops
         //       I assume i-j can pair
-        // POST: Increment the counter vector accordingly                
-        
+        // POST: Increment the counter vector accordingly
+
 
     // better to have protected variable rather than private, it's necessary for Hfold
     protected:
     //private:
- 
-        int *sequence;             // the entire sequence for which we compute the energy. 
+
+        int *sequence;             // the entire sequence for which we compute the energy.
                                    //     Each base is converted into integer, because it's faster.
-                                   
-        char *csequence;           // the sequence a array of chars. We need it here for triloops and tetraloops  
-                                   
+
+        char *csequence;           // the sequence a array of chars. We need it here for triloops and tetraloops
+
         int seqlen;                // sequence length
-        
+
         // we don't need to store the energy value(i,j), we just compute and return it
-        
+
 };
 
 

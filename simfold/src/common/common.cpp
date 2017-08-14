@@ -79,57 +79,6 @@ PARAMTYPE asymmetry_penalty (int size1, int size2)
     return internal_asymmetry[MAXLOOP_I-2];    */
 }
 
-PARAMTYPE asymmetry_penalty_pmo (int size1, int size2)
-{
-    PARAMTYPE penalty = 0;
-    if (parsi_asymmetry == T99)
-        penalty = MIN (misc_pmo.asymmetry_penalty_max_correction, abs (size1-size2) * misc_pmo.asymmetry_penalty_array [MIN (2, MIN (size1, size2))-1]);
-    //printf ("Asym penalty real: %d\n", penalty);
-    else
-    {
-        if (size1 == size2) return 0;
-        if (parsi_asymmetry == PARSI)
-        {
-            penalty = (PARAMTYPE) (internal_asymmetry_initiation_pmo + internal_asymmetry_slope_pmo * log (abs (size1-size2)));
-        }
-        else if (parsi_asymmetry == LAVISH)
-        {
-            if (abs (size1-size2) < MAXLOOP_ASYM)
-            {
-                // we assume the following model: from asymmetry 1 to 4, we use initiation, slope and int_asym (like an addition)
-                if (abs (size1-size2) <= MAX_EXP_ASYM)
-                {
-                    penalty += internal_asymmetry_initiation_pmo;
-                    penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope_pmo);
-                    penalty += internal_asymmetry_pmo[(int)(abs (size1-size2))];
-                }
-                else
-                {
-                    penalty += internal_asymmetry_pmo[(int)(abs (size1-size2))];
-                }
-            }
-            else
-            {
-                penalty += internal_asymmetry_initiation_pmo;
-                penalty += (PARAMTYPE) (log (abs (size1-size2)) * internal_asymmetry_slope_pmo);
-            }
-        }
-    }
-    return penalty;
-
-    // I tried the following for MODEL == EXTENDED, but I changed my mind
-/*    // assume the size1 + size2 <= MAXLOOP_I. If it's greater, just use the value of the last parameter
-    // first symmetric
-    if (size1 == size2)
-    {
-        if (size1 <= MAXLOOP_I/2)        return  internal_symmetry[size1];
-        return internal_symmetry[MAXLOOP_I/2];
-    }
-    // next asymmetric
-    if (size1 + size2 <= MAXLOOP_I)      return internal_asymmetry [abs (size1-size2)];
-    return internal_asymmetry[MAXLOOP_I-2];    */
-}
-
 void get_sorted_positions (int n, double numbers[], int positions[])
 // used by suboptimal sorting
 // does not modify numbers
@@ -788,87 +737,6 @@ PARAMTYPE penalty_by_size (int size, char type)
     return penalty;
 }
 
-PARAMTYPE penalty_by_size_pmo (int size, char type)
-// PRE:  size is the size of the loop
-//       type is HAIRP or INTER or BULGE
-// POST: return the penalty by size of the loop
-{
-    PARAMTYPE penalty30, penalty;
-    double logval;
-    //return 500.0;
-    int end;
-
-    if (parsi_length == T99)
-    {
-        if (type == 'H')    end = MAXLOOP_H_T99;
-        if (type == 'B')    end = MAXLOOP_B_T99;
-        if (type == 'I')    end = MAXLOOP_I_T99;
-    }
-    else if (parsi_length == PARSI || parsi_length == ZL)
-    {
-        if (type == 'H')    end = MAXLOOP_H_PARSI;
-        if (type == 'B')    end = MAXLOOP_B_PARSI;
-        if (type == 'I')    end = MAXLOOP_I_PARSI;
-    }
-    else if (parsi_length == LAVISH)
-    {
-        if (type == 'H')    end = MAXLOOP_H_LAVISH;
-        if (type == 'B')    end = MAXLOOP_B_LAVISH;
-        if (type == 'I')    end = MAXLOOP_I_LAVISH;
-    }
-
-    // the penalties for size <= MAXLOOP _H, _B, _I should be read from the file "loop"
-    //if (size <= MAXLOOP)
-    if (type == 'H' && size <= end)
-    {
-        //printf ("real:   size=%d, penalty=%g\n", size, hairpin_penalty_by_size[size]);
-        //return 50.0;
-        //return hairpin_penalty_by_size[size]/100;
-        return hairpin_penalty_by_size_pmo[size];
-    }
-    if (type == 'I' && size <= end)
-    {
-        //return 50.0;
-        return internal_penalty_by_size_pmo[size];
-    }
-    if (type == 'B' && size <= end)
-    {
-        //return 50.0;
-        return bulge_penalty_by_size_pmo[size];
-    }
-
-    //return 50.0;
-    // size > MAXLOOP _H, _B, _I
-    if (type == 'H')
-    {
-        penalty30 = hairpin_penalty_by_size_pmo[end];
-        logval = log (1.0*size/end);
-    }
-    else if (type == 'I')
-    {
-        penalty30 = internal_penalty_by_size_pmo[end];
-        logval = log (1.0*size/end);
-    }
-    else if (type == 'B')
-    {
-        penalty30 = bulge_penalty_by_size_pmo[end];
-        logval = log (1.0*size/end);
-    }
-    else
-    {
-        fprintf (stderr, "ERROR! type is not valid, ABORT!\n");
-        exit(1);
-    }
-
-    penalty = (PARAMTYPE) (penalty30 + 100.0*misc_pmo.param_greater30 * logval);
-    //if (type == 'H')
-    //    printf ("real:   size=%d, penalty=%g\n", size, penalty);
-    //printf ("penalty big = %d\n", penalty);
-    //printf ("gr30: %.2lf, logval=%.2lf, penalty of %d = %d\n", misc.param_greater30, logval, size, penalty);
-
-    return penalty;
-}
-
 PARAMTYPE penalty_by_size_enthalpy (int size, char type)
 // PRE:  size is the size of the loop
 //       type is HAIRP or INTER or BULGE
@@ -897,38 +765,6 @@ PARAMTYPE penalty_by_size_enthalpy (int size, char type)
         penalty30 = enthalpy_bulge_penalty_by_size[MAXLOOP];
 
     penalty = (int) (penalty30 + round(enthalpy_misc.param_greater30 * log(((double)size)/30)));
-
-    return penalty;
-}
-
-PARAMTYPE penalty_by_size_enthalpy_pmo (int size, char type)
-// PRE:  size is the size of the loop
-//       type is HAIRP or INTER or BULGE
-// POST: return the penalty by size of the loop
-{
-
-    // TODO: if I want to use this for parameter learning, I have to replace MAXLOOP by _B, _I, _H.
-    PARAMTYPE penalty30, penalty;
-
-    // the penalties for size <= MAXLOOP should be read from the file "loop"
-    if (size <= MAXLOOP)
-    {
-        if (type == 'H')
-            return enthalpy_hairpin_penalty_by_size_pmo[size];
-        if (type == 'I')
-            return enthalpy_internal_penalty_by_size_pmo[size];
-        return enthalpy_bulge_penalty_by_size_pmo[size];
-    }
-
-    // size > MAXLOOP
-    if (type == 'H')
-        penalty30 = enthalpy_hairpin_penalty_by_size_pmo[MAXLOOP];
-    else if (type == 'I')
-        penalty30 = enthalpy_internal_penalty_by_size_pmo[MAXLOOP];
-    else
-        penalty30 = enthalpy_bulge_penalty_by_size_pmo[MAXLOOP];
-
-    penalty = (int) (penalty30 + round(enthalpy_misc_pmo.param_greater30 * log(((double)size)/30)));
 
     return penalty;
 }
@@ -1414,30 +1250,3 @@ void read_parsi_options_from_file (char *filename)
 
 }
 
-// AP: This function is used to determine what percentage of pmo or rna are needed for each i.j that is passed in.
-void get_pmo_usage_percentages(int i, int j, double *pmo_percentage, double *rna_percentage) {
-	if ((i < linker_pos) && (j < linker_pos)) {
-		if (strcmp(structure_one_type, OLIGO) == 0) {
-			*pmo_percentage = 0.5;
-			*rna_percentage = 0.5;
-		} else {
-			*pmo_percentage = 0.0;
-			*rna_percentage = 1.0;
-		}
-	} else if ((i > linker_pos+linker_length-1) && (j > linker_pos+linker_length-1)) {
-		if (strcmp(structure_two_type, OLIGO) == 0) {
-			*pmo_percentage = 0.5;
-			*rna_percentage = 0.5;
-		} else {
-			*pmo_percentage = 0.0;
-			*rna_percentage = 1.0;
-		}
-	} else if ((i < linker_pos) && (j > linker_pos+linker_length-1)) {
-		*pmo_percentage = 0.25;
-		*rna_percentage = 0.75;
-		is_hybrid = true;
-	} else {
-		*pmo_percentage = 0.0;
-		*rna_percentage = 0.0;
-	}
-}
