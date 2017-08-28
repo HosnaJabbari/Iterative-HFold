@@ -32,8 +32,8 @@
 #include "hfold_iterative.h"
 
 #include <ctime>
-#include <regex>
-#include <regex.h>
+//#include <regex>
+//#include <regex.h>
 
 #include "hfold_validation.h" //kevin June 22 2017
 
@@ -55,10 +55,10 @@ char SIMFOLD[10] =                  "./simfold";
 FILE *logFile;
 char *file;
 int timeout = 1200;
-static std::smatch match;
-static std::regex sequenceRegex;
-static std::regex structureRegex;
-static std::regex replacedRegex;
+//static std::smatch match;
+//static std::regex sequenceRegex;
+//static std::regex structureRegex;
+//static std::regex replacedRegex;
 static std::string sequenceString;
 static std::string structureString;
 static std::string replacementText;
@@ -619,91 +619,158 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 }
 
 void replace_simfold_partial_structure_with_original (char *input_structure, char *simfold_structure, char *replaced_structure, int begin, int end) {
-	replacementText = "_";
-	replacedRegex = "\\.";
+        //replacementText = "_";
+        //replacedRegex = "\\.";
 
-	strcpy(replaced_structure, input_structure);
-	int j = 0;
+        //printf("input_structure %s\n",input_structure);
+        //printf("simfold_structure %s\n",simfold_structure);
 
-	for (int i = begin; i <= end; i++) {
-		replaced_structure[i] = simfold_structure[j++];
-	}
+        strcpy(replaced_structure, input_structure);
+        int j = 0;
 
-	structureString.assign(replaced_structure, strlen(replaced_structure));
-	std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
-	strcpy(replaced_structure, regexResult.c_str());
+        for (int i = begin; i <= end; i++) {
+                //kevin 28 Aug
+                //added the if to replace what the following regex does
+                if(simfold_structure[j] == '.'){
+                        replaced_structure[i] = '_';
+                        j++;
+                }else{
+                        replaced_structure[i] = simfold_structure[j++];
+                }
+        }
+
+//kevin 28 Aug
+//added the if in the for loop to replace the following
+/*
+        structureString.assign(replaced_structure, strlen(replaced_structure))
+e
+        std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
+        strcpy(replaced_structure, regexResult.c_str());
+*/
+
+        //printf("replaced_structure %s\n",replaced_structure);
 }
+
 
 void replace_simfold_structure_with_original (char *replaced_structure, char *simfold_structure, int begin, int end) {
-	replacementText = "_";
-	replacedRegex = "\\.";
+        //replacementText = "_";
+        //replacedRegex = "\\.";
 
-	for (int i = begin; i <= end; i++) {
-		replaced_structure[i] = simfold_structure[i];
-	}
+        for (int i = begin; i <= end; i++) {
+                //kevin 28 Aug
+                //added the if to replace what the following regex does
 
-	structureString.assign(replaced_structure, strlen(replaced_structure));
-	std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
-	strcpy(replaced_structure, regexResult.c_str());
+                if(simfold_structure[i] == '.'){
+                        replaced_structure[i] = '_';
+
+                }else{
+                        replaced_structure[i] = simfold_structure[i];
+                }
+        }
+
+//kevin 28 Aug
+////added the if in the for loop to replace the following
+/*      
+//printf("before replaced_structure %s\n",replaced_structure);
+
+        structureString.assign(replaced_structure, strlen(replaced_structure));
+
+        std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
+        strcpy(replaced_structure, regexResult.c_str());
+//printf("replaced_structure %s\n",replaced_structure);
+*/
 }
+
+//kevin 28 Aug
+// Function to remove all spaces from a given string
+void removeSpaces(char *str)
+{
+    // To keep track of non-space character count
+    int count = 0;
+
+    // Traverse the given string. If current character
+    // is not space, then place it at index 'count++'
+    for (int i = 0; str[i]; i++)
+        if (str[i] != ' ' || str[i] != '\n' || str[i] != '\t' || str[i] != '\r')
+            str[count++] = str[i]; // here count is incremented
+    str[count-1] = '\0';
+}
+
 
 bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
-	FILE *ioFile;
-	size_t len = 0;
-	ssize_t read = 0;
-	char *sequenceBuffer = NULL;
-	char *structureBuffer = NULL;
+        FILE *ioFile;
+        size_t len = 0;
+        ssize_t read = 0;
+        char *sequenceBuffer = NULL;
+        char *structureBuffer = NULL;
 
-	replacementText = "";
-	sequenceRegex = "(\\s|\n|\r)";
-	structureRegex = "(\\s|\n|\r|\Z)";
+        //replacementText = "";
+        //sequenceRegex = "(\\s|\n|\r)";
+        //structureRegex = "(\\s|\n|\r|\Z)";
 
-	// Get structure and sequence from file
-	ioFile = fopen(fileName, "r");
-	if (ioFile != NULL) {
-		if((read = getline(&sequenceBuffer, &len, ioFile)) == -1) {
-			write_log_file("Could not read the first sequence", fileName, 'E');
-			return false;
-		}
-		sequenceString.assign(sequenceBuffer, read);
+        // Get structure and sequence from file
+        ioFile = fopen(fileName, "r");
+        if (ioFile != NULL) {
+                if((read = getline(&sequenceBuffer, &len, ioFile)) == -1) {
+                        write_log_file("Could not read the first sequence", fileName, 'E');
+                        return false;
+                }
+                //sequenceString.assign(sequenceBuffer, read);
 
-		if((read = getline(&structureBuffer, &len, ioFile)) == -1) {
-			write_log_file("Could not read the first structure", fileName, 'E');
-			return false;
-		}
-		structureString.assign(structureBuffer, read);
+                if((read = getline(&structureBuffer, &len, ioFile)) == -1) {
+                        write_log_file("Could not read the first structure", fileName, 'E');
+                        return false;
+                }
+                //structureString.assign(structureBuffer, read);
 
-	} else {
-		write_log_file("Could not open file", fileName, 'E');
-		return false;
-	}
+        } else {
+                write_log_file("Could not open file", fileName, 'E');
+                return false;
+        }
 
-	// Format sequence
-	sequenceString = std::regex_replace(sequenceString, sequenceRegex, replacementText);
-	std::cout << "Sequence:  " << sequenceString << " Length: " << sequenceString.length() << '\n' << std::flush;
+		//kevin 28 Aug 2017 
+        //added removeSpaces to replace the following regex things
+        removeSpaces(sequenceBuffer);
+        //printf("new: %s \n",sequenceBuffer);
+        removeSpaces(structureBuffer);
+        //printf("new: %s \n",structureBuffer);
+        strcpy(sequence, sequenceBuffer);
+        strcpy(structure, structureBuffer);
 
-	// Format structure
-	structureString = std::regex_replace(structureString, structureRegex, replacementText);
-	std::cout << "Structure: " << structureString << " Length: " << structureString.length() << '\n' << std::flush;
+/*
+        sequenceString = std::regex_replace(sequenceString, sequenceRegex, replacementText);
+        std::cout << "Sequence:  " << sequenceString << " Length: " << sequenceString.length() << '\n' << std::flush;
 
-	// Copy strings
-	strcpy(sequence, sequenceString.c_str());
-	strcpy(structure, structureString.c_str());
+        // Format structure
+        structureString = std::regex_replace(structureString, structureRegex, replacementText);
+        std::cout << "Structure: " << structureString << " Length: " << structureString.length() << '\n' << std::flush;
 
-	// Clean up
-	fclose(ioFile);
-	if (sequenceBuffer)
+        // Copy strings
+        strcpy(sequence, sequenceString.c_str());
+        strcpy(structure, structureString.c_str());
+*/
+        // Clean up
+        fclose(ioFile);
+        if (sequenceBuffer)
         free(sequenceBuffer);
-	if (structureBuffer)
+        if (structureBuffer)
         free(structureBuffer);
+/*
+        if(sequenceString.length() != structureString.length()) {
+                write_log_file("Sequence and structure length do not match", fileName, 'E');
+                return false;
+        }
+*/
+        //kevin 28 Aug 2017
+        //changed from sequenceString.length to strlen(sequence)
+        if(strlen(sequence) != strlen(structure)) {
+                write_log_file("Sequence and structure length do not match", fileName, 'E');
+                return false;
+        }
 
-	if(sequenceString.length() != structureString.length()) {
-		write_log_file("Sequence and structure length do not match", fileName, 'E');
-		return false;
-	}
-
-	return true;
+        return true;
 }
+
 
 bool save_file (const char *fileName, char *outputPath, const char *sequence, char *restricted, char *structure, double energy, int chosen_method) {
 	FILE *ioFile;
@@ -914,6 +981,43 @@ void find_sub_sequence_structure (const char *input_sequence, char *input_struct
 }
 
 bool find_new_structure (char *input_structure, char *output_structure) {
+        //kevin 28 Aug 2017
+        //rewrote the following commented section without regex 
+        int found = 0;
+        for(int i = 0; i < strlen(input_structure); i++){
+                //check of '[' exist, if not return false later
+                if(input_structure[i] == '['){
+                        found = 1;
+                        break;
+                }
+        }
+
+        //if '[' exist
+        strcpy(output_structure,input_structure);
+        if(found){
+                for(int i = 0; i < strlen(output_structure); i++){
+                        //replace .() with _
+                        if(output_structure[i] == '.' || output_structure[i] == '(' || output_structure[i] == ')' ){
+                                output_structure[i] = '_';
+                        }
+                }
+                for(int i = 0; i < strlen(output_structure); i++){
+                        //replace [ with (
+                        if(output_structure[i] == '['){
+                                output_structure[i] = '(';
+                        }
+                        //replace ] with )
+                        if(output_structure[i] == ']'){
+                                output_structure[i] = ')';
+                        }
+
+                }
+                return true;
+        }else{
+                return false;
+        }
+
+/*
 	structureString.assign(input_structure, strlen(input_structure));
 	structureRegex = "\\[";
 
@@ -939,6 +1043,7 @@ bool find_new_structure (char *input_structure, char *output_structure) {
 	strcpy(output_structure, structureString.c_str());
 	//std::cout << "New Structure String: " << structureString << '\n' << std::flush;
 	return true;
+*/
 }
 
 int find_no_base_pairs (char *structure) {
