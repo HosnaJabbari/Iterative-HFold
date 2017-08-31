@@ -238,18 +238,15 @@ int main (int argc, char **argv) {
 	method4_structure[0] = '\0';
 	final_structure[0] = '\0';
 
-
-        /*************** First Method ***************/
-        method1_calculation(sequence, structure, method1_structure, method1_energy);
-
-        /*************** Second Method ***************/
-        method2_calculation(sequence, structure, method2_structure, method2_energy);
-
-        /*************** Third Method ***************/
-        method3_calculation(sequence, structure, method3_structure, method3_energy);
-
-        /*************** Fourth Method ***************/
-        method4_calculation(sequence, structure, method4_structure, method4_energy, result);
+	printf("method1\n");
+	*method1_energy = method1(sequence, structure, method1_structure);
+	printf("method2\n");
+	*method2_energy = method2(sequence, structure, method2_structure);
+	printf("method3\n");
+	*method3_energy = method3(sequence, structure, method3_structure);
+	printf("method4\n");
+	*method4_energy = method4(sequence, structure, method4_structure);
+       
 
 
         //We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
@@ -371,192 +368,6 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 }
 
 
-void method1_calculation (char *sequence, char *structure, char *method1_structure, double *method1_energy) {
-	char new_input_structure[MAXSLEN] = "\0";
-	char hfold_structure[MAXSLEN] = "\0";
-	char hfold_pkonly_structure[MAXSLEN] = "\0";
-
-	double hfold_energy = 0;
-	double hfold_pkonly_energy = 0;
-
-	bool has_pk;
-
-	if (!call_HFold(HFOLD_PKONLY, sequence, structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
-		*method1_energy = hfold_pkonly_energy;
-		return;
-	}
-
-	has_pk = find_new_structure(hfold_pkonly_structure, new_input_structure);
-	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
-
-	if (has_pk) {
-		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy)) {
-			std::cout << "HFold failed " << std::endl;
-			*method1_energy = hfold_energy;
-			return;
-		}
-		*method1_energy = hfold_energy;
-		strcpy(method1_structure, hfold_structure);
-
-	} else {
-		*method1_energy = hfold_pkonly_energy;
-		strcpy(method1_structure, hfold_pkonly_structure);
-	}
-
-	//std::cout << "method1_structure = " << method1_structure << " method1_energy = " << *method1_energy << '\n' << std::flush;
-
-	if (method1_structure == "") {
-		write_log_file("The structure should not be null.", file, 'E');
-	}
-}
-
-void method2_calculation (char *sequence, char *structure, char *method2_structure, double *method2_energy) {
-	char hfold_structure[MAXSLEN] = "\0";
-
-	double hfold_energy = 0;
-
-	if (!call_HFold(HFOLD, sequence, structure, hfold_structure, &hfold_energy)) {
-		*method2_energy = hfold_energy;
-		return;
-	}
-	*method2_energy = hfold_energy;
-	strcpy(method2_structure, hfold_structure);
-
-	//std::cout << "method2_structure = " << method2_structure << " method2_energy = " << *method2_energy << '\n' << std::flush;
-
-	if (method2_structure == "") {
-		write_log_file("The structure should not be null.", file, 'E');
-	}
-}
-
-
-void method3_calculation (char *sequence, char *structure, char *method3_structure, double *method3_energy) {
-	char sub_sequence[MAXSLEN] = "\0";
-	char sub_structure[MAXSLEN] = "\0";
-
-	char replaced_structure[MAXSLEN] = "\0";
-	char new_input_structure[MAXSLEN] = "\0";
-	char hfold_structure[MAXSLEN] = "\0";
-	char hfold_pkonly_structure[MAXSLEN] = "\0";
-	char simfold_structure[MAXSLEN] = "\0";
-
-	double hfold_energy = 0;
-	double hfold_pkonly_energy = 0;
-	double simfold_energy = 0;
-
-	int begin = -1, end = 0;
-	bool has_pk;
-
-	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);
-
-
-//	std::cout << "found sub sequence = " << sub_sequence << " and sub structure = " << sub_structure << "  with begin = " << begin << " and end = " << end << '\n' << std::flush;
-
-	if (!call_simfold(SIMFOLD, sub_sequence, sub_structure, simfold_structure, &simfold_energy)) {
-//                printf("TEST, method3_calculation's calling simfold result: %lf\n", simfold_energy);
-		*method3_energy = simfold_energy;
-		return;
-	}
-
-	replace_simfold_partial_structure_with_original(structure, simfold_structure, replaced_structure, begin, end);
-	//std::cout << "the replaced string is: " << replaced_structure << '\n' << std::flush;
-
-	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
-		*method3_energy = hfold_pkonly_energy;
-		return;
-	}
-	has_pk = find_new_structure(hfold_pkonly_structure, new_input_structure);
-	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
-
-	if (has_pk) {
-		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy)) {
-			*method3_energy = hfold_energy;
-			return;
-		}
-		*method3_energy = hfold_energy;
-		strcpy(method3_structure, hfold_structure);
-
-	} else {
-		*method3_energy = hfold_pkonly_energy;
-		strcpy(method3_structure, hfold_pkonly_structure);
-	}
-
-	//std::cout << "method3_structure = " << method3_structure << " method3_energy = " << *method3_energy << '\n' << std::flush;
-
-	if (method3_structure == "") {
-		write_log_file("The structure should not be null.", file, 'E');
-	}
-}
-
-void method4_calculation (char *sequence, char *structure, char *method4_structure, double *method4_energy, int **result) {
-	// we know the beginning and end of the given input substructure in the structure
-	// now we need to run simfold restricted with the given structure, find the stem which contains the given substructure
-	// then only include this structure as input structure, and do as we did in method 3
-	char sub_sequence[MAXSLEN] = "\0";
-	char sub_structure[MAXSLEN] = "\0";
-
-	char replaced_structure[MAXSLEN] = "\0";
-	char new_input_structure[MAXSLEN] = "\0";
-	char hfold_structure[MAXSLEN] = "\0";
-	char hfold_pkonly_structure[MAXSLEN] = "\0";
-	char simfold_structure[MAXSLEN] = "\0";
-
-	double hfold_energy = 0;
-	double hfold_pkonly_energy = 0;
-	double simfold_energy = 0;
-
-	int begin = -1, end = 0, B = 0, Bp = 0;
-	int result_length = 0;
-	bool has_pk;
-
-	find_sub_sequence_structure(sequence, structure, sub_sequence , sub_structure, &begin, &end);
-	strcpy(replaced_structure, structure);
-	if (!call_simfold(SIMFOLD, sequence, structure, simfold_structure, &simfold_energy)) {
-		*method4_energy = simfold_energy;
-		return;
-	}
-
-	if (!find_each_substructure(structure, begin, end, result)) {
-		return;
-	}
-
-	result_length = sizeof(result) / sizeof(result[0]);
-	strcpy(replaced_structure, structure);
-	for (int i = 0; i < result_length; i++) {
-		find_independant_structures (simfold_structure, result[i][0], result[i][1], &B, &Bp);
-		//std::cout << "found B = " << B << " and Bp = " << Bp << '\n' << std::flush;
-		replace_simfold_structure_with_original(replaced_structure, simfold_structure, B, Bp);
-	}
-
-	//std::cout << "the replaced structure is: " << replaced_structure << '\n' << std::flush;
-
-	if (!call_HFold(HFOLD_PKONLY, sequence, replaced_structure, hfold_pkonly_structure, &hfold_pkonly_energy)) {
-		*method4_energy = hfold_pkonly_energy;
-		return;
-	}
-	has_pk = find_new_structure(hfold_pkonly_structure, new_input_structure);
-	//std::cout << "hfold_pkonly_structure = " << hfold_pkonly_structure << " new_input_structure = " << new_input_structure << " has_pk = " << has_pk << '\n' << std::flush;
-
-	if (has_pk) {
-		if (!call_HFold(HFOLD, sequence, new_input_structure, hfold_structure, &hfold_energy)) {
-			*method4_energy = hfold_energy;
-			return;
-		}
-
-		*method4_energy = hfold_energy;
-		strcpy(method4_structure, hfold_structure);
-
-	} else {
-		*method4_energy = hfold_pkonly_energy;
-		strcpy(method4_structure, hfold_pkonly_structure);
-	}
-
-	//std::cout << "method4_structure = " << method4_structure << " method4_energy = " << *method4_energy << '\n' << std::flush;
-
-	if (method4_structure == "") {
-		write_log_file("The structure should not be null.", file, 'E');
-	}
-}
 
 //Calling HFold: programPath = HFOLD
 //Calling HFold_PKonly: programPath = HFOLD_PKONLY
@@ -593,6 +404,12 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
                 printf("Error: invalid arguments are given: %s \nValid aurgumnets are: HFOLD and HFOLD_PKONLY\n");
                 return false;
          }
+	if(is_invalid_restriction(input_structure,output_structure)){
+		fprintf(stderr,"ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
+        fprintf(stderr,"  %s\n  %s\n  %s\t%.2lf\n", input_sequence, input_structure, output_structure, *output_energy);
+        fprintf(stderr,"ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
+		exit(11);
+	}
 	return true;
 
 }
@@ -615,71 +432,18 @@ bool call_simfold (char *programPath, char *input_sequence, char *input_structur
 
 	*output_energy = simfold_restricted (input_sequence, input_structure, output_structure);
 //	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
+	if(is_invalid_restriction(input_structure,output_structure)){
+			fprintf(stderr,"ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
+			fprintf(stderr,"  %s\n  %s\n  %s\t%.2lf\n", input_sequence, input_structure, output_structure, *output_energy);
+			fprintf(stderr,"ERROR!!! There is something wrong with the structure, doesn't match restricted\n");
+			exit(11);
+	}
 	return true;
 }
 
-void replace_simfold_partial_structure_with_original (char *input_structure, char *simfold_structure, char *replaced_structure, int begin, int end) {
-        //replacementText = "_";
-        //replacedRegex = "\\.";
-
-        //printf("input_structure %s\n",input_structure);
-        //printf("simfold_structure %s\n",simfold_structure);
-
-        strcpy(replaced_structure, input_structure);
-        int j = 0;
-
-        for (int i = begin; i <= end; i++) {
-                //kevin 28 Aug
-                //added the if to replace what the following regex does
-                if(simfold_structure[j] == '.'){
-                        replaced_structure[i] = '_';
-                        j++;
-                }else{
-                        replaced_structure[i] = simfold_structure[j++];
-                }
-        }
-
-//kevin 28 Aug
-//added the if in the for loop to replace the following
-/*
-        structureString.assign(replaced_structure, strlen(replaced_structure))
-e
-        std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
-        strcpy(replaced_structure, regexResult.c_str());
-*/
-
-        //printf("replaced_structure %s\n",replaced_structure);
-}
 
 
-void replace_simfold_structure_with_original (char *replaced_structure, char *simfold_structure, int begin, int end) {
-        //replacementText = "_";
-        //replacedRegex = "\\.";
 
-        for (int i = begin; i <= end; i++) {
-                //kevin 28 Aug
-                //added the if to replace what the following regex does
-
-                if(simfold_structure[i] == '.'){
-                        replaced_structure[i] = '_';
-
-                }else{
-                        replaced_structure[i] = simfold_structure[i];
-                }
-        }
-
-//kevin 28 Aug
-////added the if in the for loop to replace the following
-/*      
-//printf("before replaced_structure %s\n",replaced_structure);
-
-        structureString.assign(replaced_structure, strlen(replaced_structure));
-
-        std::string regexResult(std::regex_replace(structureString, replacedRegex, replacementText));
-        strcpy(replaced_structure, regexResult.c_str());
-//printf("replaced_structure %s\n",replaced_structure);
-*/
-}
 
 //kevin 28 Aug
 // Function to remove all spaces from a given string
@@ -821,256 +585,242 @@ void write_log_file(const char *message, const char *fileName, const char option
 	fflush(logFile);
 }
 
-/* in cases like the following
-__(((____)))_____((((_____(((____)))_____(((_______)))___))))__
-we have more than on B and Bp to consider
-so we need to find each structure's B and Bp
-the output of this function is an array, the first element of the array gives the number of substructures
-then each pair gives their B and Bp
-output must be allocated first with malloc before this function is used.*/
-bool find_each_substructure (char *input_structure, int begin, int end, int **output) {
-	int B, Bp, ip;
-	int num_structure = 0;
-	int result[end-begin+1][2];
-	for (auto &component : result) {
-		component[0] = 0;
-		component[1] = 0;
-	}
 
-	for (int i = begin; i <= end; i++) {
 
-		if (input_structure[i] == '(') {
-			if (customStack.empty()) {
-				B = i;
+//---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
+//kevin 19 july (verified by Mahyar 19 july 2017)
+//count+1 when open bracket, count-1 when close bracket
+//whgen count is 0, we have a substructure
+//assume valid structure
+void find_disjoint_substructure(char* structure, std::vector< std::pair<int,int> > &pair_vector){
+	int length = strlen(structure);
+	int count = 0;
+	int first_time = 1; //flag for first time getting a open bracket for substructure
+	int i = 0;
+	int j = 0;
+	for(int k=0; k<length;k++){
+		if(structure[k] == '(' || structure[k] == '['){
+			if(first_time && count == 0){
+				first_time = 0;
+				i = k;
 			}
-			customStack.push(i);
+			count += 1;
 
-		} else if (input_structure[i] == ')') {
-			ip = customStack.top();
-			customStack.pop();
-
-			if (customStack.empty()) {
-				Bp = i;
-
-				if (B != ip) {
-					char error[200];
-					sprintf(error, "There is something wrong with finding B=%d and Bp=%d which pairs with %d\n", B, Bp, ip);
-					write_log_file(error, "N/A", 'E');
-					return false;
-				} else {
-					result[num_structure][0] = B;
-					result[num_structure][1] = Bp;
-					B = -1;
-					Bp = -1;
-					num_structure++;
-				}
+		}else if(structure[k] == ')' || structure[k] == ']'){
+			count -= 1;
+			j = k;
+			if(count == 0){
+				std::pair <int,int> ij_pair (i,j);
+				pair_vector.push_back(ij_pair);
+				first_time = 1;
 			}
 		}
-
 	}
-
-	std::copy(&result[0][0], &result[0][0] + num_structure*2, &output[0][0]);
-	return true;
 }
 
-/* the structure given to this function is what is returned from simfold restricted, so has . and ( )
-This function gets the beginning and end of the given structure, together with the output structure from simfold restricted when it was given the first structure as input.
-it then goes back from the beginning point till it finds the start of the sequence or 3 unpaired bases,
-and moves forward from the end point till it finds the end f the sequence or 3 unpaired bases.
-it returns the new beginning and end points.*/
-void find_independant_structures (char *structure, int begin, int end, int *B, int *Bp) {
-	*B = begin;
-	*Bp = end;
-	int found = 0;
-	int unpaired_count = 0;
-	int L_index = *B-1;
-	int R_index = *Bp+1;
-
-	while (L_index >= 0 && R_index < strlen(structure) && !found) {
-		if (structure[L_index] == '(') {
-			if (structure[R_index] == ')') {
-				*B = L_index;
-				*Bp = R_index;
-				L_index--;
-				R_index++;
-
-			} else if (structure[R_index] == '.') {
-				R_index++;
-
-				while (structure[R_index] != ')' && R_index < strlen(structure) && !found) {
-					R_index++;
-
-					if ((structure[R_index] == '(') || (R_index == strlen(structure))) {
-						found = 1;
-					}
-
-					unpaired_count++;
-					if (unpaired_count == 3) {
-						found = 1;
-					}
-				}
-
-				if (!found) {
-					*B = L_index;
-					*Bp = R_index;
-					L_index--;
-					R_index++;
-				}
-
-			} else {
-				found = 1;
+//---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
+//31 Aug 2017 kevin and Mahyar
+//input[i] is _ or . and it did not turn into a . in the output structure, then it is not empty
+int is_empty_structure(char* input_structure, char* output_structure){
+	for(int i=0; i<strlen(input_structure);i++){
+		if(input_structure[i] != output_structure[i]){
+			if((input_structure[i] == '_' || input_structure[i] == '.' ) && output_structure[i] != '.'){
+				return 0;
 			}
-
-		} else if (structure[L_index] == '.') {
-			if (structure[R_index] == ')') {
-				while (structure[L_index] != '(' && L_index >= 0 && !found) {
-					L_index--;
-
-					if ((structure[L_index] == ')') || (L_index < 0)){
-						found = 1;
-					}
-				}
-
-				if (!found) {
-					*B = L_index;
-					*Bp = R_index;
-					L_index--;
-					R_index++;
-				}
-
-			} else if (structure[R_index] == '.') {
-				R_index++;
-				L_index--;
-				unpaired_count++;
-
-				if (unpaired_count == 3) {
-					found = 1;
-				}
-
-			} else {
-				found = 1;
-			}
-		} else {
-			found = 1;
 		}
 	}
-
+	return 1;
 }
 
-void find_sub_sequence_structure (const char *input_sequence, char *input_structure, char *output_sequence, char *output_structure, int *begin, int *end) {
-	int structure_length = strlen(input_structure);
-	int sub_length = 0;
-	*begin = -1;
-	*end = 0;
 
-	for (int i=0; i < structure_length; i++) {
-		if ((input_structure[i] == '(') && (*begin == -1)) {
-			*begin = i;
-		}
+//---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
+//kevin 18 July
+int paired_structure(int i, int j, int *pair_index, int length){
+	if(i >= 0 && j < length && (pair_index[i] == j) && (pair_index[j] == i) ){
+		return 1;
+	}
+	return 0;
+}
 
-		if (input_structure[i] == ')') {
-			*end = i;
+//---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
+//kevin 18 July
+void obtainRelaxedStems(char* G1, char* G2, char* Gresult){
+	int length = strlen(G1);
+	int G1_pair[length];
+	int G2_pair[length];
+
+	//Gresult <- G1
+	strncpy(Gresult,G1,length);
+
+	detect_original_pairs(G1, G1_pair);
+	detect_original_pairs(G2, G2_pair);
+
+	//for(int d=0;d<length;d++){
+	//	printf("%c %d\n",G2[d],G2_pair[d]);
+	//}
+
+	int i = 0;
+	int j = 0;
+
+	for(int k=0;k<length;k++){
+		if(G2_pair[k] > -1){
+			i = k;
+			j = G2_pair[k];
+			if(i < j){ //for each ij in G2
+				if( (G1[i] != G2[i]) && (G1[j] != G2[j]) ){//if ij not in G1
+					//include bulges of size 1
+					if(paired_structure(i-1,j+1,G1_pair,length) || paired_structure(i+1,j-1,G1_pair,length) ){
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+					//include loops of size 1x1
+					}else if( paired_structure(i-2,j+1,G1_pair,length) || paired_structure(i-1,j+2,G1_pair,length) || \
+							paired_structure(i+1,j-2,G1_pair,length) || paired_structure(i+2,j-1,G1_pair,length) ){
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+					//include loops of size 1x2 or 2x1
+					}else if( paired_structure(i-2,j+2,G1_pair,length) || paired_structure(i+2,j-2,G1_pair,length) ){
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+					}else if( paired_structure(i-3,j+2,G1_pair,length) || paired_structure(i-2,j+3,G1_pair,length) || \
+							paired_structure(i+2,j-3,G1_pair,length) || paired_structure(i+3,j-2,G1_pair,length) ){
+
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+					}
+				}
+			}
 		}
 	}
-
-	sub_length = *end - *begin + 1;
-	strncpy(output_sequence, &input_sequence[*begin], sub_length);
-	strncpy(output_structure, &input_structure[*begin], sub_length);
-	output_sequence[sub_length] = '\0';
-	output_structure[sub_length] = '\0';
 }
 
-bool find_new_structure (char *input_structure, char *output_structure) {
-        //kevin 28 Aug 2017
-        //rewrote the following commented section without regex 
-        int found = 0;
-        for(int i = 0; i < strlen(input_structure); i++){
-                //check of '[' exist, if not return false later
-                if(input_structure[i] == '['){
-                        found = 1;
-                        break;
-                }
+//---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
+//kevin 30 Aug 2017
+//check if the computed structure matches the restricted structure
+int is_invalid_restriction(char* restricted_structure, char* current_structure){
+	for (int i=0; i < strlen(restricted_structure); i++){
+        if ((restricted_structure[i] == '(' || restricted_structure[i] == ')' || restricted_structure[i] == '.') &&
+            (restricted_structure[i] != current_structure[i])){
+				return 1;
         }
+    }
+	return 0;
+}
 
-        //if '[' exist
-        strcpy(output_structure,input_structure);
-        if(found){
-                for(int i = 0; i < strlen(output_structure); i++){
-                        //replace .() with _
-                        if(output_structure[i] == '.' || output_structure[i] == '(' || output_structure[i] == ')' ){
-                                output_structure[i] = '_';
-                        }
-                }
-                for(int i = 0; i < strlen(output_structure); i++){
-                        //replace [ with (
-                        if(output_structure[i] == '['){
-                                output_structure[i] = '(';
-                        }
-                        //replace ] with )
-                        if(output_structure[i] == ']'){
-                                output_structure[i] = ')';
-                        }
 
-                }
-                return true;
-        }else{
-                return false;
-        }
+//30 Aug 2017 kevin and Mahyar
+double method1(char *sequence, char *restricted, char *structure){
+	double energy = 0;
+	call_HFold(HFOLD, sequence, restricted, structure, &energy);
+	//printf("method1: %s\n",structure);
+	return energy;
+}
 
-/*
-	structureString.assign(input_structure, strlen(input_structure));
-	structureRegex = "\\[";
 
-	if(!std::regex_search(structureString, match, structureRegex)) {
-		return false;
+//30 Aug 2017 kevin and Mahyar
+double method2(char *sequence, char *restricted, char *structure){
+	double energy = 0;
+	
+	call_HFold(HFOLD_PKONLY, sequence, restricted, structure, &energy);
+
+	//printf("restricted: %s\nstructure: %s\n",restricted,structure);
+	if(is_empty_structure(restricted,structure)){
+		//printf("is empty\n");
+		return energy;
+	}else{
+		//printf("is not empty\n");
+		char G_prime[strlen(structure)];
+		remove_structure_intersection(structure,restricted, G_prime);
+		//printf("G_prime: %s\n",G_prime);
+		energy = method1(sequence, G_prime, structure);
+		return energy;
 	}
 
-	//substitute all ".()" to "_"
-	replacementText = "_";
-	structureRegex = "(\\.|\\(|\\))";
-	structureString = std::regex_replace(structureString, structureRegex, replacementText);
-
-	// substitute all [ to (
-	replacementText = "(";
-	structureRegex = "\\[";
-	structureString = std::regex_replace(structureString, structureRegex, replacementText);
-
-	// substitute all ] to )
-	replacementText = ")";
-	structureRegex = "\\]";
-	structureString = std::regex_replace(structureString, structureRegex, replacementText);
-
-	strcpy(output_structure, structureString.c_str());
-	//std::cout << "New Structure String: " << structureString << '\n' << std::flush;
-	return true;
-*/
 }
 
-int find_no_base_pairs (char *structure) {
-	structureString.assign(structure, strlen(structure));
-	return std::count(structureString.begin(), structureString.end(), '(');
+//30 Aug 2017 kevin and Mahyar
+double method3(char *sequence, char *restricted, char *structure){
+	double energy = 0;
+	int length = strlen(sequence);
+	char simfold_structure[length];
+
+	call_simfold(SIMFOLD, sequence, restricted, simfold_structure, &energy);
+
+	//^ G' simfold_structure <- SimFold(S sequence, G restricted)
+	char G_updated[length+1];
+	G_updated[length] = '\0';
+	obtainRelaxedStems(restricted ,simfold_structure, G_updated);
+	//^Gupdated G_updated<- ObtainRelaxedStems(G restricted,G' simfold_structure)
+	energy = method2(sequence, G_updated, structure);
+
+	return energy;
 }
 
+//30 Aug 2017 kevin and Mahyar
+double method4(char *sequence, char *restricted, char *structure){
+	int KEVIN_DEBUG = 0;
+	double energy = 0;
+	int length = strlen(sequence);
+	char G_updated[length+1];
+	int k = 1;
+	//^k <- 1
+	strcpy(G_updated, restricted);
+	//^Gupdated <- G
+	std::vector< std::pair<int,int> > disjoint_substructure_index; //contain pair(i,j) in a vector, ij are index of begin and end of substructure
+	find_disjoint_substructure(restricted, disjoint_substructure_index);
+	//^get disjoint substructure
+	int i = 0;
+	int j = 0;
+	
+	//31 Aug 2017 kevin and Mahyar 
+	if(disjoint_substructure_index.size() == 0){
+		return INF;
+	}
+	
+	for(auto current_substructure_index : disjoint_substructure_index){
+		i = current_substructure_index.first;
+		j = current_substructure_index.second;
+		char subsequence[length+1];
+		char substructure[length+1];
+		char simfold_structure[length+1];
 
-// gets a seq and structure
-// runs simfold on the sequence
-// compares the number of base pairs in the simfold_seq with the input sequence
-// returns the ratio of the counts;
-double find_structure_sparsity (char *sequence, char *structure) {
-	double ratio = 0.0;
-	char simfold_sequence[MAXSLEN];
-	char simfold_structure[MAXSLEN];
-	double simfold_energy;
-	int input_structure_basepair_count;
-	int simfold_structure_basepair_count;
+		strncpy(subsequence, sequence+i,j-i+1);
+		subsequence[j-i+1] = '\0';
+		//^Sk
+		strncpy(substructure, restricted+i,j-i+1);
+		substructure[j-i+1] = '\0';
+		//^Gk
 
-	call_simfold(SIMFOLD, sequence, NULL, simfold_structure, &simfold_energy);
-	input_structure_basepair_count = find_no_base_pairs(structure);
-	simfold_structure_basepair_count = find_no_base_pairs(simfold_structure);
-	ratio = (double) input_structure_basepair_count/simfold_structure_basepair_count;
+		call_simfold(SIMFOLD, subsequence, substructure, simfold_structure, &energy);
 
-	//std::cout << "Sparsity ratio is: " << ratio << '\n' << std::flush;
+		//^ SimFold(Sk,Gk,Gk')
+		char Gp_k_updated[length];
+		obtainRelaxedStems(substructure, simfold_structure, Gp_k_updated);
+		//^obtainRelaxedStems(Gk,Gk',G'kupdated)
 
-	return ratio;
+		int m = 0; //index for going through Gp_k_updated
+        for(int k =i;k<j;k++){
+			if(G_updated[k] != Gp_k_updated[m]){
+				G_updated[k] = Gp_k_updated[m];
+			}
+			m++;
+		}
+		//^Gupdated <- Gupdated U G'kupdated
+	}
+	energy = method2(sequence, G_updated, structure);
+
+	return energy;
 }
 
+//---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
+// Aug 31, 2017 kevin and Mahyar
+//does G_p = G1-G
+void remove_structure_intersection(char* G1, char* G, char* G_p){
+	strcpy(G_p,G1);
+	for(int i=0; i< strlen(G1); i++){  
+		if (G1[i] != G[i]){
+			continue;
+		}else{
+			G_p[i] = '.';
+		}
+	}
+}

@@ -5,9 +5,6 @@ double hfold(char *sequence, char *restricted, char *structure);
 double hfold_pkonly(char *sequence, char *restricted, char *structure);
 double hfold_iterative(char *sequence, char *restricted, char *structure); // April 3, 2012
 
-static void *threadFunction(void *arg);
-
-
 void printUsage();
 
 void method1_calculation (char *sequence, char *structure, char *method1_structure, double *method1_energy);
@@ -18,24 +15,27 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy);
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy);
 
-void replace_simfold_partial_structure_with_original (char *input_structure, char *simfold_structure, char *replaced_structure, int begin, int end);
-void replace_simfold_structure_with_original (char *replaced_structure, char *simfold_structure, int begin, int end);
 bool get_sequence_structure (char *fileName, char *sequence, char *structure);
-bool get_sequence_structure_interacting (char *fileName, char *sequence_one, char *structure_one, char *sequence_two, char *structure_two);
 bool save_file (const char *fileName, char *outputPath, const char *sequence, char *restricted, char *structure, double energy, int chosen_method);
 void write_log_file(const char *message, const char *file, const char option);
 
-bool find_each_substructure (char *input_structure, int begin, int end, int **output);
-void find_independant_structures (char *structure, int begin, int end, int *B, int *Bp);
-void find_sub_sequence_structure (const char *input_sequence, char *input_structure, char *output_sequence, char *output_structure, int *begin, int *end);
-bool find_new_structure (char *input_structure, char *output_structure);
-int find_no_base_pairs (char *structure);
-
-double find_structure_sparsity (char *sequence, char *structure); // Unused. keep for now.
-std::string exec(const char* cmd);
-
 void segfault_sigaction(int signal, siginfo_t *si, void *arg);
 
+
+//30 Aug 2017 kevin and Mahyar
+//---------------------------------------the enclosed functions are suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
+void remove_structure_intersection(char* G1, char* G, char* G_p);
+int is_invalid_restriction(char* restricted_structure, char* current_structure);
+void obtainRelaxedStems(char* G1, char* G2, char* Gresult);
+int paired_structure(int i, int j, int *pair_index, int length);
+int is_empty_structure(char* input_structure, char* output_structure);
+void find_disjoint_substructure(char* structure, std::vector< std::pair<int,int> > &pair_vector);
+//---------------------------------------end of enclosed functions --------------------
+//30 Aug 2017 kevin and Mahyar
+double method1(char *sequence, char *restricted, char *structure);
+double method2(char *sequence, char *restricted, char *structure);
+double method3(char *sequence, char *restricted, char *structure);
+double method4(char *sequence, char *restricted, char *structure);
 
 #endif /*HFOLD_H_*/
 
