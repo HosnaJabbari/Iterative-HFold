@@ -693,15 +693,27 @@ void obtainRelaxedStems(char* G1, char* G2, char* Gresult){
 	}
 }
 
+
+
+
 //---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
 //kevin 30 Aug 2017
 //check if the computed structure matches the restricted structure
 int is_invalid_restriction(char* restricted_structure, char* current_structure){
+	std::string openBracketArray ("({[");
+	std::string closeBracketArray (")}]");
+
 	for (int i=0; i < strlen(restricted_structure); i++){
-        if ((restricted_structure[i] == '(' || restricted_structure[i] == ')' || restricted_structure[i] == '.') &&
-            (restricted_structure[i] != current_structure[i])){
+        if(restricted_structure[i] != '_' && restricted_structure[i] != current_structure[i]){
+			if( (openBracketArray.find_first_of(restricted_structure[i]) != -1) && ((openBracketArray.find_first_of(current_structure[i]) != -1)) ){
+				continue;
+			}else if ( (closeBracketArray.find_first_of(restricted_structure[i]) != -1) && ((closeBracketArray.find_first_of(current_structure[i]) != -1)) ){
+				continue;
+			}else{
 				return 1;
-        }
+			}
+		}
+		
     }
 	return 0;
 }
