@@ -238,15 +238,15 @@ int main (int argc, char **argv) {
 	method4_structure[0] = '\0';
 	final_structure[0] = '\0';
 
-	printf("method1\n");
+	//printf("method1\n");
 	*method1_energy = method1(sequence, structure, method1_structure);
-	printf("method2\n");
+	//printf("method2\n");
 	*method2_energy = method2(sequence, structure, method2_structure);
-	printf("method3\n");
+	//printf("method3\n");
 	*method3_energy = method3(sequence, structure, method3_structure);
-	printf("method4\n");
+	//printf("method4\n");
 	*method4_energy = method4(sequence, structure, method4_structure);
-       
+
 
 
         //We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
@@ -492,7 +492,7 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
                 return false;
         }
 
-		//kevin 28 Aug 2017 
+		//kevin 28 Aug 2017
         //added removeSpaces to replace the following regex things
         removeSpaces(sequenceBuffer);
         //printf("new: %s \n",sequenceBuffer);
@@ -719,7 +719,7 @@ double method1(char *sequence, char *restricted, char *structure){
 //30 Aug 2017 kevin and Mahyar
 double method2(char *sequence, char *restricted, char *structure){
 	double energy = 0;
-	
+
 	call_HFold(HFOLD_PKONLY, sequence, restricted, structure, &energy);
 
 	//printf("restricted: %s\nstructure: %s\n",restricted,structure);
@@ -770,12 +770,12 @@ double method4(char *sequence, char *restricted, char *structure){
 	//^get disjoint substructure
 	int i = 0;
 	int j = 0;
-	
-	//31 Aug 2017 kevin and Mahyar 
+
+	//31 Aug 2017 kevin and Mahyar
 	if(disjoint_substructure_index.size() == 0){
 		return INF;
 	}
-	
+
 	for(auto current_substructure_index : disjoint_substructure_index){
 		i = current_substructure_index.first;
 		j = current_substructure_index.second;
@@ -816,7 +816,7 @@ double method4(char *sequence, char *restricted, char *structure){
 //does G_p = G1-G
 void remove_structure_intersection(char* G1, char* G, char* G_p){
 	strcpy(G_p,G1);
-	for(int i=0; i< strlen(G1); i++){  
+	for(int i=0; i< strlen(G1); i++){
 		if (G1[i] != G[i]){
 			continue;
 		}else{

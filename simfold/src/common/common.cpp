@@ -883,8 +883,10 @@ void detect_original_pairs(char *structure, int *p_table)
         int i, j, struct_len;
         stack_ds st;
         init (&st);
+
         remove_space (structure);
         struct_len = strlen (structure);
+
         for (i=0; i < struct_len; i++)
           {
             if (structure[i] == '.')
@@ -893,9 +895,9 @@ void detect_original_pairs(char *structure, int *p_table)
               p_table[i] = -2;
             else if ((structure[i] == 'x') || (structure[i] == 'X'))
               p_table[i] = -3;
-            else if (structure[i] == '(' || structure[i] == '<')
+            else if (structure[i] == '(' || structure[i] == '[' || structure[i] == '{' || structure[i] == '<')
               push (&st, i);
-            else if (structure[i] == ')' || structure[i] == '>')
+            else if (structure[i] == ')' || structure[i] == ']' || structure[i] == '}' || structure[i] == '>')
               {
                 j = pop (&st);
                 p_table[i] = j;
@@ -950,8 +952,10 @@ void detect_structure_features (char *structure, str_features *f)
     for (i=0; i < nb_nucleotides; i++)
     {
         f[i].pair = p_table[i];
+
         if (p_table[i] > i)
         {
+
             f[p_table[i]].pair = i;
             // this base pair might be angle brackets or parentheses.
             if (structure[i] == '<')
@@ -978,9 +982,9 @@ void detect_structure_features (char *structure, str_features *f)
             }
             // if we got here, it means the base pair was ()
             // just make sure the partner is )
-            if (structure[p_table[i]] != ')')
+            if (!(structure[p_table[i]] == ')' || structure[p_table[i]] == ']' || structure[p_table[i]] == '}'))
             {
-                fprintf (stderr, "ERROR! structure is not valid, position %d should be ) and is %c\n%s\n", p_table[i], structure[p_table[i]], structure);
+                fprintf (stderr, "ERROR! structure is not valid, position %d should be ) or ] and is %c\n%s\n", p_table[i], structure[p_table[i]], structure);
                 exit(1);
             }
 
