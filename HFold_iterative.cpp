@@ -238,13 +238,13 @@ int main (int argc, char **argv) {
 	method4_structure[0] = '\0';
 	final_structure[0] = '\0';
 
-	//printf("method1\n");
+	printf("method1\n");
 	*method1_energy = method1(sequence, structure, method1_structure);
-	//printf("method2\n");
+	printf("method2\n");
 	*method2_energy = method2(sequence, structure, method2_structure);
-	//printf("method3\n");
+	printf("method3\n");
 	*method3_energy = method3(sequence, structure, method3_structure);
-	//printf("method4\n");
+	printf("method4\n");
 	*method4_energy = method4(sequence, structure, method4_structure);
 
 
@@ -723,6 +723,7 @@ int is_invalid_restriction(char* restricted_structure, char* current_structure){
 
 //30 Aug 2017 kevin and Mahyar
 double method1(char *sequence, char *restricted, char *structure){
+	//printf("inside method1 restricrted:\n%s\n",restricted);
 	double energy = 0;
 	call_HFold(HFOLD, sequence, restricted, structure, &energy);
 	//printf("method1: %s\n",structure);
@@ -732,10 +733,11 @@ double method1(char *sequence, char *restricted, char *structure){
 
 //30 Aug 2017 kevin and Mahyar
 double method2(char *sequence, char *restricted, char *structure){
+	//printf("inside method2 restricrted:\n%s\n",restricted);
 	double energy = 0;
 
 	call_HFold(HFOLD_PKONLY, sequence, restricted, structure, &energy);
-
+	//printf("inside method2 structure:\n%s\n",structure);
 	//printf("restricted: %s\nstructure: %s\n",restricted,structure);
 	if(is_empty_structure(restricted,structure)){
 		//printf("is empty\n");
@@ -831,10 +833,17 @@ double method4(char *sequence, char *restricted, char *structure){
 void remove_structure_intersection(char* G1, char* G, char* G_p){
 	strcpy(G_p,G1);
 	for(int i=0; i< strlen(G1); i++){
-		if (G1[i] != G[i]){
-			continue;
-		}else{
-			G_p[i] = '.';
+		if(G_p[i] == '.'){
+			G_p[i] = '_';
+		}
+		if (G1[i] == G[i]){
+			G_p[i] = '_';
+		}
+		if (G_p[i] == '[' || G_p[i] == '{'){
+			G_p[i] = '(';
+		}
+		if (G_p[i] == ']' || G_p[i] == '}'){
+			G_p[i] = ')';
 		}
 	}
 }
