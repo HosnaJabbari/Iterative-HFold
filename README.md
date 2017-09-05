@@ -103,6 +103,7 @@ This can be useful if you are getting errors about your compiler not having C++1
     3	    thread error
     4       i/o error
     5       pipe error
+    6       positive energy error
     error code with special meaning: http://tldp.org/LDP/abs/html/exitcodes.html
     2	    Misuse of shell builtins (according to Bash documentation)
     126	    Command invoked cannot execute
