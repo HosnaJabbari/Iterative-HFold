@@ -250,29 +250,29 @@ int main (int argc, char **argv) {
 
 
         //We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
-        //if (*method1_energy < final_energy) {
-        if (*method1_energy < final_energy && *method1_energy != 0) {
+        if (*method1_energy < final_energy) {
+        //if (*method1_energy < final_energy && *method1_energy != 0) {
                 final_energy = *method1_energy;
                 strcpy(final_structure, method1_structure);
                 method_chosen = 1;
         }
 
-        //if (*method2_energy < final_energy) {
-        if (*method2_energy < final_energy && *method2_energy != 0) {
+        if (*method2_energy < final_energy) {
+        //if (*method2_energy < final_energy && *method2_energy != 0) {
                 final_energy = *method2_energy;
                 strcpy(final_structure, method2_structure);
                 method_chosen = 2;
         }
 
-        //if (*method3_energy < final_energy) {
-        if (*method3_energy < final_energy && *method3_energy != 0) {
+        if (*method3_energy < final_energy) {
+        //if (*method3_energy < final_energy && *method3_energy != 0) {
                 final_energy = *method3_energy;
                 strcpy(final_structure, method3_structure);
                 method_chosen = 3;
         }
 
-       // if (*method4_energy < final_energy) {
-        if (*method4_energy < final_energy && *method4_energy != 0) {
+        if (*method4_energy < final_energy) {
+        //if (*method4_energy < final_energy && *method4_energy != 0) {
                 final_energy = *method4_energy;
                 strcpy(final_structure, method4_structure);
                 method_chosen = 4;
