@@ -24,7 +24,7 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg);
 
 //30 Aug 2017 kevin and Mahyar
 //---------------------------------------the enclosed functions are suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
-void remove_structure_intersection(char* G1, char* G, char* G_p);
+void remove_structure_intersection(char* G1, char* G0, char* G_p);
 int is_invalid_restriction(char* restricted_structure, char* current_structure);
 void obtainRelaxedStems(char* G1, char* G2, char* Gresult);
 int paired_structure(int i, int j, int *pair_index, int length);
