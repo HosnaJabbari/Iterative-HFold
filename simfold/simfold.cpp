@@ -203,6 +203,7 @@ int main (int argc, char *argv[])
         if (num_subopt == 1)
         {
             energy = simfold_restricted (sequence, restricted, structure);
+            printf ("Seq: %s\n", sequence);
             printf ("RES: %s  %.2lf\n", structure, energy);
         }
         else    // also suboptimal structures
