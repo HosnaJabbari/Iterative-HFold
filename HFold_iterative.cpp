@@ -39,6 +39,9 @@
 #include "hfold_validation.h"
 #include <getopt.h>
 
+// Ian Wark September 13 2017
+#include "shape_data.h"
+
 //#define HFOLD 						"./HFold"
 //#define HFOLD_PKONLY 				"./HFold_pkonly"
 //#define HFOLD_INTERACTING 			"./HFold_interacting"
@@ -125,21 +128,23 @@ int main (int argc, char **argv) {
 	int option;
 
 	//kevin: june 23 2017 https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
-        static struct option long_options[] = 
-                {
-                        {"s", required_argument, 0, 's'},
-                        {"r", required_argument, 0, 'r'},
-                        {"i", required_argument, 0, 'i'},
-                        {"o", required_argument, 0, 'o'},
-                        {0, 0, 0, 0}
-                };
-
-
 	while (1){
+                static struct option long_options[] = 
+                        {
+                                {"s", required_argument, 0, 's'},
+                                {"r", required_argument, 0, 'r'},
+                                {"i", required_argument, 0, 'i'},
+                                {"o", required_argument, 0, 'o'},
+                                {"shape", required_argument, 0, 'g'},
+                                {"b", required_argument, 0, 'h'},
+                                {"m", required_argument, 0, 'm'},
+                                {0, 0, 0, 0}
+                        };
+
 		// getopt_long stores the option index here.
                 int option_index = 0;
 
-		option = getopt_long (argc, argv, "s:r:i:o:", long_options, &option_index);
+		option = getopt_long (argc, argv, "", long_options, &option_index);
 
 		// Detect the end of the options
 		if (option == -1)
@@ -148,6 +153,7 @@ int main (int argc, char **argv) {
 		switch (option)
 		{
 		case 's':
+std::cout << "optarg " << optarg << " done " << std::endl;
 			if(sequenceFound){
 				fprintf(stderr, "-s is duplicated\n");
 				errorFound = true;
@@ -204,6 +210,28 @@ int main (int argc, char **argv) {
 			}
 			outputPathFound = true;
 			break;
+                case 'g': //--shape (shape file path)
+                        if(!sequenceFound){
+				fprintf(stderr, "Must define sequence before shape file\n");
+				errorFound = true;
+				break;
+			}
+                        // important that this is before set_shape_file
+                        shape.set_sequence_length(strlen(sequence));
+                        shape.set_shape_file(std::string(optarg));
+                        break;
+                case 'h': //--b (shape intercept)
+                        if (shape.is_number(optarg))
+                                shape.set_b(atof(optarg));
+                        else
+                                errorFound = true;
+                        break;
+                case 'm': //--m (shape slope)
+                        if (shape.is_number(optarg))
+                                shape.set_m(atof(optarg));
+                        else
+                                errorFound = true;
+                        break;
 		default:
 			errorFound = true;
 			break;

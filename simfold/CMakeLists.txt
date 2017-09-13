@@ -9,6 +9,7 @@ SET(SOURCE
   src/simfold/s_energy_matrix.cpp src/simfold/s_internal_loop.cpp	
   src/simfold/s_multi_loop.cpp src/simfold/s_multi_loop_sub.cpp		
   src/simfold/s_sub_folding.cpp src/simfold/s_partition_function.cpp
+  shape_data.cpp
 )
 
 # set location to make .a file
