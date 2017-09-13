@@ -35,7 +35,9 @@
 //#include <regex>
 //#include <regex.h>
 
-#include "hfold_validation.h" //kevin June 22 2017
+//kevin June 22 2017
+#include "hfold_validation.h"
+#include <getopt.h>
 
 //#define HFOLD 						"./HFold"
 //#define HFOLD_PKONLY 				"./HFold_pkonly"
@@ -119,9 +121,30 @@ int main (int argc, char **argv) {
 	bool inputPathFound = false;
 	bool outputPathFound = false;
 	bool errorFound = false;
+
 	int option;
-	//kevin: june 22 2017 https://www.gnu.org/software/libc/manual/html_node/Example-of-Getopt.html#Example-of-Getopt
-	while ((option = getopt (argc, argv, "s:r:i:o:")) != -1){
+
+	//kevin: june 23 2017 https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
+        static struct option long_options[] = 
+                {
+                        {"s", required_argument, 0, 's'},
+                        {"r", required_argument, 0, 'r'},
+                        {"i", required_argument, 0, 'i'},
+                        {"o", required_argument, 0, 'o'},
+                        {0, 0, 0, 0}
+                };
+
+
+	while (1){
+		// getopt_long stores the option index here.
+                int option_index = 0;
+
+		option = getopt_long (argc, argv, "s:r:i:o:", long_options, &option_index);
+
+		// Detect the end of the options
+		if (option == -1)
+			break;
+
 		switch (option)
 		{
 		case 's':
