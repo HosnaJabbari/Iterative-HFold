@@ -56,17 +56,17 @@ This can be useful if you are getting errors about your compiler not having C++1
 #### How to use:
     Arguments:
         HFold_iterative:
-            -s <sequence>
-            -r <structure>
-            -i </path/to/file>
-            -o </path/to/file>
+            --s <sequence>
+            --r <structure>
+            --i </path/to/file>
+            --o </path/to/file>
 
         Remarks:
-            make sure the <arguments> are enclosed in "", for example -r "..().." instead of -r ..()..
-            input file for -i must be .txt
-            if -i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
-            if -o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
-            if -o is provided with just a file name without a path, and if -i is provided, then the output file will be generated in the directory where the input file is located
+            make sure the <arguments> are enclosed in "", for example --r "..().." instead of --r ..()..
+            input file for --i must be .txt
+            if --i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
+            if --o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
+            if --o is provided with just a file name without a path, and if --i is provided, then the output file will be generated in the directory where the input file is located
     
     Sequence requirements:
         containing only characters GCAUT
@@ -89,12 +89,12 @@ This can be useful if you are getting errors about your compiler not having C++1
 
 #### Example:
     assume you are in the directory where the HFold_iterative executable is loacted
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt"
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative -s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)"
-    ./HFold_iterative -s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
-    ./HFold_iterative -s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
+    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
+    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
 
     
 #### Exit code:
