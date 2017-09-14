@@ -407,7 +407,8 @@ void printUsage(){
 	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n\n");
 
 	printf("You can also include SHAPE data to be used.\n");
-        printf("The SHAPE data must be in a file with 1 number per line, starting with the first sequence, 5 lines of 0's, and then the data for the second sequence\n");
+        printf("The SHAPE data must be in a file with 1 number per line.\n");
+	printf("The number corresponds with each nucleotide in order, and the file must be exactly the same length as the sequence.\n");
         printf("--shape (\"filename\") to specify a file for shape data\n");
         printf("--b (number) to specify an intercept for the shape data (default is -0.600000)\n");
         printf("--m (number) to specify a slope for the shape data (default is 1.800000)\n\n");
