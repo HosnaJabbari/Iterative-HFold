@@ -419,7 +419,7 @@ void printUsage(){
 
 	printf("Example:\n");
         printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -r \"(____________________________)\" --shape \"shapefile\" --b -0.4 --m 1.3\n\n");
-s
+
 	printf("Please read README for more details\n\n");
 }
 
