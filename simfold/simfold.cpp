@@ -132,15 +132,7 @@ int main (int argc, char *argv[])
 
     // configuration file, the path should be relative to the location of this executable
     char config_file[200];
-    //strcpy (config_file, "params/multirnafold.conf");
-
-    //kevin 26 june 2017
-    //occurs in /simfold/melting_temp.cpp, /simfold/simfold.cpp, /simfold/simfold_pf.cpp, /simfold/test_get_counts.cpp
-    //changed strcpy to str cat beacause with installed simfold, it is trying to look at /simfold/.libs/params/multirnafold.conf
-    //PARAMS_BASE_PATH is in constants.h to be ../params/ to get away from .libs directory
-    strcat(config_file, PARAMS_BASE_PATH);
-    strcat(config_file, "multirnafold.conf");
-
+    strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
     // initialize the thermodynamic parameters
     // call init_data only once for the same dna_or_rna and same temperature
@@ -182,7 +174,7 @@ int main (int argc, char *argv[])
         if (strlen (parameter_filename) > 0)
             fill_data_structures_with_new_parameters (parameter_filename);
         else
-            fill_data_structures_with_new_parameters ("params/turner_parameters_fm363_constrdangles.txt");
+            fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
     }
     //misc.terminal_AU_penalty = 0.0;
 
@@ -194,7 +186,7 @@ int main (int argc, char *argv[])
 	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
 	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt,
 	// but still getting seg fault!
-	fill_data_structures_with_new_parameters ("params/parameters_DP09_chopped.txt");
+	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/parameters_DP09_chopped.txt");
 
     // if this structure must be restricted
     if (strlen (restricted) == strlen (sequence))

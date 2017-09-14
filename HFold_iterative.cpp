@@ -125,7 +125,7 @@ int main (int argc, char **argv) {
 	int option;
 
 	//kevin: june 23 2017 https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
-        static struct option long_options[] = 
+        static struct option long_options[] =
                 {
                         {"s", required_argument, 0, 's'},
                         {"r", required_argument, 0, 'r'},
@@ -398,7 +398,7 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 //Calling HFold_PKonly: programPath = HFOLD_PKONLY
 bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
 	char config_file[200];
-	strcpy (config_file, "./simfold/params/multirnafold.conf");
+	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
 	//what to fold: RNA or DNA
 	int dna_or_rna;
@@ -414,11 +414,11 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 	//init_data ("./HFold", config_file, dna_or_rna, temperature);
 	init_data (programPath, config_file, dna_or_rna, temperature);
 
-	fill_data_structures_with_new_parameters ("./simfold/params/turner_parameters_fm363_constrdangles.txt");
+	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
 
 	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
 	// so we add it here
-	fill_data_structures_with_new_parameters ("./simfold/params/parameters_DP09.txt");
+	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/parameters_DP09.txt");
 
         if (strcmp(programPath, HFOLD) == 0) {
             *output_energy = hfold(input_sequence, input_structure, output_structure);
@@ -442,18 +442,17 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
         std::string result = "";
 
-	char config_file[200] = "simfold/";
-	strcat(config_file, PARAMS_BASE_PATH);
-	strcat(config_file, "multirnafold.conf");
+	char config_file[200] = SIMFOLD_HOME "/params/multirnafold.conf";
+
 	double temperature;
 	temperature = 37;
 	init_data ("./simfold", config_file, RNA, temperature);
 
-        fill_data_structures_with_new_parameters ("simfold/params/turner_parameters_fm363_constrdangles.txt");
+        fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
 	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
 	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt,
 	// but still getting seg fault!
-	fill_data_structures_with_new_parameters ("simfold/params/parameters_DP09_chopped.txt");
+	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/parameters_DP09_chopped.txt");
 
 	*output_energy = simfold_restricted (input_sequence, input_structure, output_structure);
 //	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
@@ -738,7 +737,7 @@ int is_invalid_restriction(char* restricted_structure, char* current_structure){
 				return 1;
 			}
 		}
-		
+
     }
 	return 0;
 }

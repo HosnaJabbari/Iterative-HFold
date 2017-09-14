@@ -53,6 +53,8 @@ cmake --build build
 ```   
 This can be useful if you are getting errors about your compiler not having C++11 features.
 
+After installing you can move the executables wherever you wish, but you should not delete or move the simfold folder, or you must recompile the executables. If you move the folders and wish to recompile, you should first delete the created "build" folder before recompiling.
+
 #### How to use:
     Arguments:
         HFold_iterative:
