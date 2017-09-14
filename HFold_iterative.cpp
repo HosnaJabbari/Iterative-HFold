@@ -153,7 +153,6 @@ int main (int argc, char **argv) {
 		switch (option)
 		{
 		case 's':
-std::cout << "optarg " << optarg << " done " << std::endl;
 			if(sequenceFound){
 				fprintf(stderr, "-s is duplicated\n");
 				errorFound = true;
@@ -289,13 +288,9 @@ std::cout << "optarg " << optarg << " done " << std::endl;
 	method4_structure[0] = '\0';
 	final_structure[0] = '\0';
 
-	printf("method1\n");
 	*method1_energy = method1(sequence, structure, method1_structure);
-	printf("method2\n");
 	*method2_energy = method2(sequence, structure, method2_structure);
-	printf("method3\n");
 	*method3_energy = method3(sequence, structure, method3_structure);
-	printf("method4\n");
 	*method4_energy = method4(sequence, structure, method4_structure);
 
 
