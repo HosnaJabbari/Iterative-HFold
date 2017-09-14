@@ -71,7 +71,8 @@ After installing you can move the executables wherever you wish, but you should 
             if --o is provided with just a file name without a path, and if --i is provided, then the output file will be generated in the directory where the input file is located
 
         You can also include SHAPE data to be used. 
-        The SHAPE data must be in a file with 1 number per line, starting with the first sequence, 5 lines of 0's, and then the data for the second sequence
+        The SHAPE data must be in a file with 1 number per line.
+        The number corresponds with each nucleotide in order, and the file must be exactly the same length as the sequence.
         --shape ("filename") to specify a file for shape data
         --b (number) to specify an intercept for the shape data (default is -0.600000)
         --m (number) to specify a slope for the shape data (default is 1.800000)
