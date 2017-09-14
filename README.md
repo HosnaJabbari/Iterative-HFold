@@ -69,6 +69,12 @@ After installing you can move the executables wherever you wish, but you should 
             if --i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
             if --o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
             if --o is provided with just a file name without a path, and if --i is provided, then the output file will be generated in the directory where the input file is located
+
+        You can also include SHAPE data to be used. 
+        The SHAPE data must be in a file with 1 number per line, starting with the first sequence, 5 lines of 0's, and then the data for the second sequence
+        --shape ("filename") to specify a file for shape data
+        --b (number) to specify an intercept for the shape data (default is -0.600000)
+        --m (number) to specify a slope for the shape data (default is 1.800000)
     
     Sequence requirements:
         containing only characters GCAUT
@@ -94,9 +100,10 @@ After installing you can move the executables wherever you wish, but you should 
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" 
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" --shape "shapefile" --b -0.4 --m 1.3
 
     
 #### Exit code:
