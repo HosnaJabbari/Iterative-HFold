@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# only continue if we know we already have boost
 # create simfold library
 add_subdirectory(simfold)
 
