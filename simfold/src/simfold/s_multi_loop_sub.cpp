@@ -15,8 +15,8 @@
  *                                                                         *
  ***************************************************************************/
 
-// this class represents multi-loops for suboptimal pairfold, it implements the Wuchty complete suboptimal paper 
- 
+// this class represents multi-loops for suboptimal pairfold, it implements the Wuchty complete suboptimal paper
+
 #include <stdio.h>
 //Hosna, March 5, 2012
 // malloc.h is not needed on my mac as stdlib.h does the same
@@ -34,8 +34,8 @@ s_multi_loop_sub::s_multi_loop_sub (int *seq, int length)
     sequence = seq;
     seqlen = length;
     this->V = NULL;
-    
-    index = new int[length];    
+
+    index = new int[length];
     // an array with indexes, such that we don't work with a 2D array, but with a 1D array of length (n*(n+1))/2
     int total_length;
     total_length = (length *(length+1))/2;
@@ -54,7 +54,7 @@ s_multi_loop_sub::s_multi_loop_sub (int *seq, int length)
 
 s_multi_loop_sub::~s_multi_loop_sub ()
 // The destructor
-{  
+{
     delete [] index;
     delete [] FM;
     delete [] FM1;
@@ -65,7 +65,7 @@ void s_multi_loop_sub::compute_energy_FM1 (int j)
 {
     int i, tmp_k, ij, k;
     PARAMTYPE tmp, min_e;
-        
+
     tmp=INF;
     for (i=j-1; i>=0; i--)
     {
@@ -75,17 +75,17 @@ void s_multi_loop_sub::compute_energy_FM1 (int j)
         min_e = INF;
         for (k=i+1; k <= j; k++) // RANGE OF K<=j-TURN-2
           {
-            tmp = V->get_energy(i, k) + (j-k)*misc.multi_free_base_penalty+ 
+            tmp = V->get_energy(i, k) + (j-k)*misc.multi_free_base_penalty+
               misc.multi_helix_penalty+
               AU_penalty(sequence[i], sequence[k]);
-            
+
             if(i>0)
               {
                 tmp += dangle_bot [sequence[k]]  // M: changed: it was i,k,i-1
                   [sequence[i]]
                   [sequence[i-1]];
               }
-            
+
             if(k<seqlen-1)
               {
                 tmp += dangle_top [sequence [k]]  // M: changed: it was k,i,k+1
@@ -130,7 +130,7 @@ void s_multi_loop_sub::compute_energy_FM (int j)
         // second branch
         for (k=i; k < j; k++)
           {
-            tmp = get_FM1_energy (k,j) + (k-i)*misc.multi_free_base_penalty; 
+            tmp = get_FM1_energy (k,j) + (k-i)*misc.multi_free_base_penalty;
             if (tmp < min_e)
                 min_e = tmp;
           }// k for loop
@@ -154,7 +154,7 @@ PARAMTYPE s_multi_loop_sub::compute_energy (int i, int j)
         if(tmp < min_en)
           {
             min_en = tmp;
-          }                    
+          }
       }
     if(min_en < INF)
       {
@@ -174,7 +174,7 @@ void s_multi_loop_sub::compute_energy_FM1_restricted (int j, str_features *fres)
 {
     int i, tmp_k, ij, k;
     PARAMTYPE tmp, min_e;
-        
+
     tmp=INF;
     for (i=j-1; i>=0; i--)
     {
@@ -185,18 +185,18 @@ void s_multi_loop_sub::compute_energy_FM1_restricted (int j, str_features *fres)
         for (k=i+1; k <= j; k++) // RANGE OF K<=j-TURN-2
           {
             if (exists_restricted (k, j+1, fres))
-                continue;  
-            tmp = V->get_energy(i, k) + (j-k)*misc.multi_free_base_penalty+ 
+                continue;
+            tmp = V->get_energy(i, k) + (j-k)*misc.multi_free_base_penalty+
               misc.multi_helix_penalty+
               AU_penalty(sequence[i], sequence[k]);
-            
+
             if(i>0)
               {
                 tmp += dangle_bot [sequence[k]]  // M: changed: it was i,k,i-1
                   [sequence[i]]
                   [sequence[i-1]];
               }
-            
+
             if(k<seqlen-1)
               {
                 tmp += dangle_top [sequence [k]]  // M: changed: it was k,i,k+1
@@ -240,9 +240,9 @@ void s_multi_loop_sub::compute_energy_FM_restricted (int j, str_features *fres)
         // second branch
         for (k=i; k < j; k++)
           {
-            if (exists_restricted (i-1, k, fres))
-                continue;              
-            tmp = get_FM1_energy (k,j) + (k-i)*misc.multi_free_base_penalty; 
+            if (i > 0 && exists_restricted (i-1, k, fres))
+                continue;
+            tmp = get_FM1_energy (k,j) + (k-i)*misc.multi_free_base_penalty;
             if (tmp < min_e)
                 min_e = tmp;
           }// k for loop
