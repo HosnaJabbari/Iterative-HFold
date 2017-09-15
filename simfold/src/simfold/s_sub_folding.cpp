@@ -36,7 +36,6 @@
 s_sub_folding::s_sub_folding(char *sequence, PARAMTYPE var)
 // CONSTRUCTOR
 {
-	printf("in s_subfolding.cpp: calling allocate_space()\n");
     allocate_space (sequence, var);
 }
 
@@ -267,7 +266,7 @@ double s_sub_folding::fold_sequence (double &enthalpy)
         // Add result to result_list.
         if(folding_list != NULL && folding_list->intervals == NULL)
         {
-            //if (debug)
+            if (debug)
             {
                 printf ("------\nConstruction of one structure has finished ---- 2 \n------\n");
             }
@@ -296,7 +295,6 @@ double s_sub_folding::fold_sequence (double &enthalpy)
     }// outer while
 
     energy = W[nb_nucleotides-1];
-	printf("in s_sub_folding.cpp ->fold_sequence(): energy=%f \n",energy);
     return energy;
 }
 

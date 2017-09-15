@@ -59,7 +59,7 @@ void usage (const char *prog)
     printf ("Examples:\n");
     printf ("\t%s -s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -n 10 \n", prog);
     printf ("\t%s -s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -n 10 -r \"(____________________________)\"\n", prog);
-    printf ("\t%s -s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -p params/CG_best_parameters_ISMB2007.txt\n");
+    printf ("\t%s -s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -p params/CG_best_parameters_ISMB2007.txt\n", prog);
     exit (0);
 }
 

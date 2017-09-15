@@ -276,7 +276,6 @@ double free_energy_simfold (char *sequence, char *structure)
 // POST: returns the free energy of sequence folded into structure
 //       Worst case complexity = n^2 (n = length of sequence)
 {
-	printf("in s_specific_functions.cpp -> free_energy_simfold \n");
     int i;
     str_features *f;
     double energy;
@@ -968,7 +967,6 @@ int simfold_ordered_suboptimals (char *sequence, int number, char structures[][M
     s_min_folding *min_fold = new s_min_folding (sequence);
     min_energy = min_fold->s_simfold();
     min_fold->return_structure (structure);
-	printf("in s_specific_functions.cpp: structure=%s \n",structure);
 
     delete min_fold;
 
@@ -984,28 +982,21 @@ int simfold_ordered_suboptimals (char *sequence, int number, char structures[][M
         sub_fold->set_limit(2*number);
         sub_fold->s_simfold (enthalpy);
         actual_num_str = sub_fold->return_structures(tmp_structures, tmp_energies);
-        printf("in s_specific_functions.cpp: sub_fold-> return_structures() DONE! \n");
 
-		printf("in s_specific_functions.cpp and actual_num_str = %d\n", actual_num_str);
         // added on Oct 16, 2007. The good free energies have to be recomputed here! For some reason it wasn't.
         for (i=0; i < actual_num_str; i++)
         {
             tmp_energies[i] = free_energy_simfold (sequence, tmp_structures[i]);
             //printf ("Unordered S %d: %s   %.2lf\n", i, tmp_structures[i], tmp_energies[i]);
         }
-		printf ("in s_specific_functions.cpp: Actual unordered: %d\n", actual_num_str);
 
         delete sub_fold;
 
         get_sorted_positions (actual_num_str, tmp_energies, positions);
-		printf ("in s_specific_functions.cpp: get_sorted_positions() DONE!\n");
 
         int MFE_there, ii;
         MFE_there = 0;
         ii = 0;
-
-
-        printf("in s_specific_functions.cpp, tmp_energies[positions[0]]=%d\n",tmp_energies[positions[0]]);
 
         if (min_energy != tmp_energies[positions[0]])
           {
@@ -1062,7 +1053,6 @@ int simfold_restricted_unordered_suboptimals (char *sequence, char *restricted, 
     min_fold->return_structure (structure);
 
     delete min_fold;
-    printf ("Structure: %s\n", structure);
 
     if (number == 1)
       {
