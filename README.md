@@ -1,4 +1,4 @@
-# HFold_iterative
+# HFold Iterative
 
 #### Description:
 Iterative HFold is an algorithm for predicting the pseudoknotted secondary structures of RNA using relaxed Hierarchical Folding. 
