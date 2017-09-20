@@ -1,7 +1,11 @@
 # HFold_iterative
 
 #### Description:
-This software is still under development
+Iterative HFold is an algorithm for predicting the pseudoknotted secondary structures of RNA using relaxed Hierarchical Folding. 
+
+Paper: https://www.researchgate.net/publication/262810273_A_fast_and_robust_iterative_algorithm_for_prediction_of_RNA_pseudoknotted_secondary_structures
+
+On the dataset tested in this paper, Iterative HFold generally has better accuracy that its predecessor, [HFold](https://github.com/HosnaJabbari/HFold)
 
 #### Supported OS: 
 Linux, macOS
