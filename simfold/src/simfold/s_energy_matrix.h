@@ -30,7 +30,7 @@
 class s_energy_matrix
 {
     public:
-
+        void test(int nb_nucleotides, int* iseq);
         friend class s_stacked_pair;
         friend class s_internal_loop;
         friend class s_multi_loop;
