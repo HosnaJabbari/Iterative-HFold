@@ -911,5 +911,7 @@ double hfold_pkonly(char *sequence, char *restricted, char *structure){
 //kevin 27 Sept 2017
 //comparison function for hotspot so we can use it when sorting
 bool compare_result_ptr(Result* a, Result* b){
-    return (a->get_energy() < b->get_energy()); 
+	//todo kevin: redo this
+    return 1;
+    //return (a->get_energy() < b->get_energy()); 
 }

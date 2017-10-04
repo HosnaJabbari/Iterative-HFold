@@ -58,7 +58,7 @@ class s_min_folding
         void return_structure (char *structure) { strcpy (structure, this->structure); }        
         // writes the predicted MFE structure into structure       
 
-        //kevin 26 September 2017
+        //kevin 4 oct 2017
         void get_hotspots(std::vector<Hotspot*>* hotspot_list);
 
     // better to have protected variable rather than private, it's necessary for Hfold
@@ -113,6 +113,10 @@ class s_min_folding
         // POST: Prints details of each elementary structure        
 
         void hotspot_backtrack (seq_interval *cur_interval, std::vector<Hotspot*> &hotspot_list);
+
+        //kevin 4 oct 2017
+        int distance(int left, int right);
+        void expand_hotspot(Hotspot* hotspot);
         
 };
 

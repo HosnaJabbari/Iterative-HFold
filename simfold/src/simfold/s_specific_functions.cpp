@@ -750,12 +750,12 @@ PARAMTYPE s_calculate_enthalpy (int *sequence, char *csequence, str_features *f)
     return energy;
 }
 
-//kevin 27 Sept 2017
+
+//kevin 4 oct 2017
 //comparison function for hotspot so we can use it when sorting
 bool compare_hotspot_ptr(Hotspot* a, Hotspot* b) { 
     return (a->get_energy() < b->get_energy()); 
 }
-
 
 
 //kevin 26 Sept 2017 

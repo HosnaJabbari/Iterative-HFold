@@ -275,6 +275,9 @@ if(!(sequenceFound)){
 	}else{
 		printf("getting hotspot\n");
 		get_hotspots(sequence, &hotspot_list);
+
+		printf("done hotspot\n");
+		exit(999);
 	}
 
 	//if we have output path and input path, try to combine both
@@ -296,6 +299,8 @@ if(!(sequenceFound)){
 		result = new Result(sequence,structure,final_structure,final_energy,method_chosen);
 		result_list.push_back(result);
 	}else{
+		//todo kevin: fix this
+		/*
 		printf("number of hotspots: %d\n",hotspot_list.size());
 		for (int i=0; i < hotspot_list.size(); i++){
 			printf("hotspot #%d\n",i);
@@ -305,19 +310,9 @@ if(!(sequenceFound)){
 			//printf("%s\n%s\n%s\n%lf%d\n",result->get_sequence(),result->get_restricted(),result->get_final_structure(),result->get_energy(),result->get_method_chosen());
 			result_list.push_back(result);
 		}
-		/*
-		printf("before\n");
-		for (int i=0; i < result_list.size(); i++) {
-			printf("%s %lf\n",result_list[i]->get_restricted(),result_list[i]->get_energy());
-		}
-		printf("after\n");
-		*/
+	
 		std::sort(result_list.begin(), result_list.end(),compare_result_ptr);
-		/*
-		for (int i=0; i < result_list.size(); i++) {
-			printf("%s %lf\n",result_list[i]->get_restricted(),result_list[i]->get_energy());
-		}
-		*/
+
 		int number_of_output;
 		printf("number_of_suboptimal_structure: %d\n",number_of_suboptimal_structure);
 		if(number_of_suboptimal_structure != 0){
@@ -328,7 +323,7 @@ if(!(sequenceFound)){
 		for (int i=0; i < number_of_output; i++) {
 			printf("%s %lf\n",result_list[i]->get_final_structure(),result_list[i]->get_energy());
 		}
-		
+		*/
 	}
 
 	//kevin: june 22 2017

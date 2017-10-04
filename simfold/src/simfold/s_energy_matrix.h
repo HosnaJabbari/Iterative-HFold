@@ -77,6 +77,10 @@ class s_energy_matrix
         char get_type (int i, int j) { int ij = index[i]+j-i; return nodes[ij].type; }
         // return the type at V(i,j)
 
+        //kevin 4 oct 2017
+        void compute_hotspot_energy (int i, int j, int is_stack);
+
+
 
     // better to have protected variable rather than private, it's necessary for Hfold
     protected:

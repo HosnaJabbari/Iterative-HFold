@@ -87,6 +87,25 @@ void s_energy_matrix::test(int nb_nucleotides, int* iseq){
     }
 }
 
+//kevin 4 oct 2017
+void s_energy_matrix::compute_hotspot_energy (int i, int j, int is_stack)
+{
+    //printf("in compute_hotspot_energy i:%d j:%d\n",i,j);
+    PARAMTYPE energy = 0;
+    if(is_stack){
+        energy = S->compute_energy (i, j);
+        //printf("stack: %d\n",energy);
+    }else{
+        energy = H->compute_energy (i, j);
+        //printf("hairpin: %d\n",energy);
+    }
+        
+    //printf ("V(%d,%d) is_stack: %d energy %d\n", i, j, is_stack, energy);
+    
+    int ij = index[i]+j-i;
+    nodes[ij].energy = energy;
+    return;
+}
 
 void s_energy_matrix::compute_energy (int i, int j)
 // compute the V(i,j) value
