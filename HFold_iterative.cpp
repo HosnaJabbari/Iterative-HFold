@@ -44,6 +44,9 @@
 #include "Hotspot.h"
 #include "h_common.h"
 
+// Ian Wark September 13 2017
+#include "shape_data.h"
+
 //#define HFOLD 						"./HFold"
 //#define HFOLD_PKONLY 				"./HFold_pkonly"
 //#define HFOLD_INTERACTING 			"./HFold_interacting"
@@ -128,23 +131,25 @@ int main (int argc, char **argv) {
 	int option;
 
 	//kevin: june 23 2017 https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
-        static struct option long_options[] =
-                {
-                        {"s", required_argument, 0, 's'},
-                        {"r", required_argument, 0, 'r'},
-                        {"i", required_argument, 0, 'i'},
-                        {"o", required_argument, 0, 'o'},
-						{"n", required_argument, 0, 'n'},
-                        {0, 0, 0, 0}
-                };
-
-
 	while (1){
+                static struct option long_options[] = 
+                        {
+                                {"s", required_argument, 0, 's'},
+                                {"r", required_argument, 0, 'r'},
+                                {"i", required_argument, 0, 'i'},
+                                {"o", required_argument, 0, 'o'},
+                                {"n", required_argument, 0, 'n'},
+                                {"shape", required_argument, 0, 'g'},
+                                {"b", required_argument, 0, 'h'},
+                                {"m", required_argument, 0, 'm'},
+                                {0, 0, 0, 0}
+                        };
+
 		// getopt_long stores the option index here.
                 int option_index = 0;
 
-		option = getopt_long (argc, argv, "s:r:i:o:n:", long_options, &option_index);
-
+    option = getopt_long (argc, argv, "", long_options, &option_index);
+    
 		// Detect the end of the options
 		if (option == -1)
 			break;
@@ -227,6 +232,28 @@ int main (int argc, char **argv) {
 				break;
 			}
 			break;
+    case 'g': //--shape (shape file path)
+      if(!sequenceFound){
+				fprintf(stderr, "Must define sequence before shape file\n");
+				errorFound = true;
+				break;
+			}
+                        // important that this is before set_shape_file
+                        shape.set_sequence_length(strlen(sequence));
+                        shape.set_shape_file(std::string(optarg));
+                        break;
+                case 'h': //--b (shape intercept)
+                        if (shape.is_number(optarg))
+                                shape.set_b(atof(optarg));
+                        else
+                                errorFound = true;
+                        break;
+                case 'm': //--m (shape slope)
+                        if (shape.is_number(optarg))
+                                shape.set_m(atof(optarg));
+                        else
+                                errorFound = true;
+                        break;
 		default:
 			errorFound = true;
 			break;
@@ -401,14 +428,10 @@ double hfold_iterative(char* input_sequence, char* input_restricted, char* outpu
 	method3_structure[0] = '\0';
 	method4_structure[0] = '\0';
 	memset(output_structure,'\0',strlen(input_restricted));
-
-	printf("method1\n");
+  
 	*method1_energy = method1(input_sequence, input_restricted, method1_structure);
-	printf("method2\n");
 	*method2_energy = method2(input_sequence, input_restricted, method2_structure);
-	printf("method3\n");
 	*method3_energy = method3(input_sequence, input_restricted, method3_structure);
-	printf("method4\n");
 	*method4_energy = method4(input_sequence, input_restricted, method4_structure);
 	//We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
 	if (*method1_energy < final_energy) {
@@ -417,7 +440,7 @@ double hfold_iterative(char* input_sequence, char* input_restricted, char* outpu
 			strcpy(output_structure, method1_structure);
 			*method_chosen = 1;
 	}
-
+  
 	if (*method2_energy < final_energy) {
 	//if (*method2_energy < final_energy && *method2_energy != 0) {
 			final_energy = *method2_energy;
@@ -487,8 +510,19 @@ void printUsage(){
 	printf ("    _ no restriction\n");
 	printf("Example:\n");
 	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
-	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
-	printf("Please read README for more details\n");
+	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n\n");
+
+	printf("You can also include SHAPE data to be used.\n");
+        printf("The SHAPE data must be in a file with 1 number per line.\n");
+	printf("The number corresponds with each nucleotide in order, and the file must be exactly the same length as the sequence.\n");
+        printf("--shape (\"filename\") to specify a file for shape data\n");
+        printf("--b (number) to specify an intercept for the shape data (default is -0.600000)\n");
+        printf("--m (number) to specify a slope for the shape data (default is 1.800000)\n\n");
+
+	printf("Example:\n");
+        printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -r \"(____________________________)\" --shape \"shapefile\" --b -0.4 --m 1.3\n\n");
+
+	printf("Please read README for more details\n\n");
 }
 
 
