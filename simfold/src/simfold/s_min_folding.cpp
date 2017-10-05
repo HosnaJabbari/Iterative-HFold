@@ -33,6 +33,11 @@
 #include "s_specific_functions.h"
 #include "s_min_folding.h"
 
+#include <iostream>
+#include <vector>
+#include "Hotspot.h"
+
+
 
 s_min_folding::s_min_folding (char *sequence)
 // constructor for the unrestricted mfe case
@@ -117,6 +122,43 @@ double s_min_folding::s_simfold ()
     return energy;
 }
 
+void s_min_folding::get_hotspots(std::vector<Hotspot*>* hotspot_list){
+    int max_hotspot = 20;
+    fold_sequence (hotspot_list);
+    
+    //printf("structure is: %s\n",structure);
+
+
+    //make sure we only keep top 20 hotspot with lowest energy
+    std::sort(hotspot_list->begin(), hotspot_list->end(),compare_hotspot_ptr);
+    while(hotspot_list->size() > max_hotspot){
+        delete hotspot_list->back();
+        hotspot_list->pop_back();
+    }
+  
+    //set the structure now because we dont know the final structure until the end
+    for (int i=0; i < hotspot_list->size(); i++){
+        //printf("hotspot i: %d j: %d\n",(*hotspot_list)[i]->get_begin_index(),(*hotspot_list)[i]->get_end_index());
+        (*hotspot_list)[i]->set_structure(structure);
+        //printf("hotspot substructure: %s %lf\n",(*hotspot_list)[i]->get_structure(),(*hotspot_list)[i]->get_energy());
+    }
+
+    printf("inside get hotspot: size: %d\n",hotspot_list->size());
+    //if no hotspot found, add all _ as restricted
+    if(hotspot_list->size() == 0){
+        Hotspot* hotspot = new Hotspot(0,nb_nucleotides);
+        char* default_structure = (char*)malloc(sizeof(char)*(nb_nucleotides+1));
+        memset(default_structure, '_', nb_nucleotides);
+        default_structure[nb_nucleotides] = '\0';
+        
+        hotspot->set_structure(default_structure);
+        hotspot_list->push_back(hotspot);
+    }
+    
+    
+    return;
+}
+
 
 double s_min_folding::s_simfold_restricted ()
 // PRE:  the init_data function has been called;
@@ -129,19 +171,26 @@ double s_min_folding::s_simfold_restricted ()
 }
 
 
-double s_min_folding::fold_sequence ()
+//kevin 26 Sept 2017 
+//added optional argument, if it is passed in, that we will  store hotspots in it
+double s_min_folding::fold_sequence (std::vector<Hotspot*>* hotspot_list)
 // helper function, it folds sequence, returns structure and free energy
 {
     double energy;
     int i, j;
+
+    //V->test(nb_nucleotides, int_sequence);
+    //exit(999);
 
     for (j=0; j < nb_nucleotides; j++)
     {
         // if (constraints[j]) continue;
         for (i=0; i<j; i++)
         {
+            //printf("i: %d j: %d\n",i,j);
             // if (constraints[i]) continue;
             V->compute_energy (i,j);
+            //printf("i: %d j: %d V= %d\n",i,j,V->get_energy(i,j));
         }
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM (j);
@@ -160,7 +209,6 @@ double s_min_folding::fold_sequence ()
         }
     }
 
-
     // backtrack
     // first add (0,n-1) on the stack
     stack_interval = new seq_interval;
@@ -172,13 +220,25 @@ double s_min_folding::fold_sequence ()
 
     seq_interval *cur_interval = stack_interval;
 
+    //std::vector<Hotspot*> hotspot_list;
+
     while ( cur_interval != NULL)
     {
+        
         stack_interval = stack_interval->next;
         backtrack (cur_interval);
+        //kevin 26 Sept 2017 
+        //if optional argument is passed in, that we will  store hotspots in it
+        if(hotspot_list != NULL){
+            s_min_folding::hotspot_backtrack (cur_interval,*hotspot_list);
+        }
+        //printf("hotspot size outside: %d\n",hotspot_list.size());
         delete cur_interval;    // this should make up for the new in the insert_node
         cur_interval = stack_interval;
     }
+
+    
+
     if (debug)
     {
         print_result ();
@@ -215,6 +275,7 @@ double s_min_folding::fold_sequence_restricted ()
             if (fres[i].pair == -1 || fres[j].pair == -1)   // i or j MUST be unpaired
                 continue;
             V->compute_energy_restricted (i, j, fres);
+            printf("i: %d j: %d V= %d\n",i,j,V->get_energy(i,j));
         }
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM_restricted (j, fres);
@@ -275,12 +336,66 @@ void s_min_folding::insert_node (int i, int j, char type)
     stack_interval = tmp;
 }
 
+//kevin 26 Sept 2017
+//add hotspot to list according to backtrack trace
+//must be called before changing cur_interval in order to have the same trace as backtrack
+void s_min_folding::hotspot_backtrack (seq_interval *cur_interval, std::vector<Hotspot*> &hotspot_list){
+    int debug = 0;
+    char type = V->get_type (cur_interval->i,cur_interval->j);
+    Hotspot* current_hotspot;
+    //if it is a loop
+    if(cur_interval->type == LOOP){
+        //if the list is empty, create a new hotspot object and add to list
+        if(hotspot_list.empty()){
+            //printf("case 1\n");
+            current_hotspot = new Hotspot(cur_interval->i,cur_interval->j);
+            //printf("address: %p\n",current_hotspot);
+            hotspot_list.push_back(current_hotspot);
+            //printf("after pushback size: %d\n",hotspot_list.size());
+        }else{
+            //uses the last element from the list as current hotspot, is_complete_hotspot indicate we hit a loop that is not stack and we should closes this hotspot stack interval, so we 
+            //need to create a new hotspot object and add to the list
+            //printf("case 2\n");
+            current_hotspot = hotspot_list.back();
+            //printf("address: %p\n",current_hotspot);
+            if(current_hotspot->is_complete_hotspot()){
+                current_hotspot = new Hotspot(cur_interval->i,cur_interval->j);
+                hotspot_list.push_back(current_hotspot);
+            }
+        }
+    }
+
+    if(cur_interval->type == LOOP){
+        current_hotspot->increment_size();
+        if (type == STACK){
+            if(debug){
+                printf("hotspot_backtrack V->get_type (cur_interval->i,cur_interval->j) == stack\n");
+            }
+            
+        }
+        else {
+            //we hit a loop that is not stack and we should closes this hotspot stack interval
+            //remove if it has energy >= 0 or has less than 5 basepairs
+            current_hotspot->set_complete_hotspot();
+            current_hotspot->set_inner_begin_index(cur_interval->i);
+            current_hotspot->set_inner_end_index(cur_interval->j);
+            current_hotspot->set_energy(cur_interval->i,cur_interval->j, V);
+            if(!(current_hotspot->is_strong_stack() && current_hotspot->is_valid_energy(cur_interval->i,cur_interval->j))){
+                //printf("poped one\n");
+                hotspot_list.pop_back();
+            }
+            
+        }
+    }
+
+}
 
 
 void s_min_folding::backtrack (seq_interval *cur_interval)
 // PRE:  All matrixes V, VM, WM and W have been filled
 // POST: Discover the MFE path
 {
+    int debug = 0;
     char type;
 
     if(cur_interval->type == LOOP)
@@ -1229,7 +1344,7 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
         // We don't need to make sure i and j don't have to pair with something else,
         //  because that would be INF - done in fold_sequence_restricted
         acc = (i-1>0) ? W[i-1]: 0;
-
+        printf("i: %d acc: %d\n",i,acc);
         energy_ij = V->get_energy(i,j);
         if (energy_ij < INF)
         {
@@ -1243,6 +1358,9 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //             }
             if (tmp < min)
             {
+                
+                printf("min #1\n");
+                printf("tmp: %d %d %d %d\n",energy_ij , AU_penalty (int_sequence[i],int_sequence[j]) ,acc, 0);
                 min = tmp;
                 chosen = 21;        best_i = i;
                 if (fres[i].pair == j)  must_choose_this_branch = 1;
@@ -1256,6 +1374,7 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
             energy_ij = V->get_energy(i+1,j);
             if (energy_ij < INF)
             {
+                
                 tmp = energy_ij + AU_penalty (int_sequence[i+1],int_sequence[j]) + acc;
                 tmp += dangle_bot [int_sequence[j]]
                                 [int_sequence[i+1]]
@@ -1269,6 +1388,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                 }
                 if (tmp < min)
                 {
+                    printf("min #2\n");
+                    printf("tmp: %d %d %d %d\n",energy_ij , AU_penalty (int_sequence[i+1],int_sequence[j]) ,acc, dangle_bot [int_sequence[j]][int_sequence[i+1]][int_sequence[i]]);
                     min = tmp;
                     chosen = 22;  best_i = i;
                     if (fres[i+1].pair == j)  must_choose_this_branch = 1;
@@ -1287,6 +1408,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
                 tmp += dangle_top [int_sequence [j-1]]
                                 [int_sequence [i]]
                                 [int_sequence [j]];
+                                             
+                
                 // May 16, 2007: I don't think I need this
 //                 if (fres[i].pair == j-1)
 //                 {
@@ -1296,6 +1419,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                 }
                 if (tmp < min)
                 {
+                    printf("min #3\n");
+                    printf("tmp: %d %d %d %d\n",energy_ij , AU_penalty (int_sequence[i],int_sequence[j-1]) ,acc, dangle_top [int_sequence [j-1]][int_sequence [i]][int_sequence [j]]);
                     min = tmp;
                     chosen = 23;  best_i = i;
                     if (fres[i].pair == j-1)  must_choose_this_branch = 1;
@@ -1325,6 +1450,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                 }
                 if (tmp < min)
                 {
+                    printf("min #4\n");
+                    printf("tmp: %d %d %d %d\n",energy_ij , AU_penalty (int_sequence[i+1],int_sequence[j-1]) ,acc, 999);
                     min = tmp;
                     chosen = 24;  best_i = i;
                     if (fres[i+1].pair == j-1)  must_choose_this_branch = 1;
@@ -1350,19 +1477,19 @@ void s_min_folding::compute_W_restricted (int j, str_features *fres)
     if (must_choose_this_branch)
     {
         W[j] = m2;
-        //printf ("j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
+        printf ("must choose j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
     }
     else
     {
         if (m1 < m2) // this is kind of stupid, dunno why it's here    || (m1 >= MAXENERGY && m2 >= MAXENERGY))
         {
             W[j] = m1;
-            //printf ("j=%d, chose branch 1, W[%d]=%d\n", j, j, W[j]);
+            printf ("j=%d, chose branch 1, W[%d]=%d\n", j, j, W[j]);
         }
         else
         {
             W[j] = m2;
-            //printf ("j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
+            printf ("j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
         }
     }
 }

@@ -3,6 +3,7 @@
 
 #include "h_struct.h"
 #include "common.h"
+#include "Result.h"
 
 //Hosna: June 22, 2007
 
@@ -78,5 +79,9 @@ h_str_features *convert_str_features_to_h_str_features(str_features *f);
 str_features *convert_h_str_features_to_str_features(h_str_features *f);
 
 void detect_h_structure_features (char *structure, h_str_features *f);
+
+//kevin 27 Sept 2017
+bool compare_result_ptr(Result* a, Result* b);
+
 
 #endif /*H_COMMON_H_*/
