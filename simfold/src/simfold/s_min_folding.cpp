@@ -210,9 +210,9 @@ void s_min_folding::get_hotspots(std::vector<Hotspot*>* hotspot_list){
                     current_hotspot->set_structure();
                     hotspot_list->push_back(current_hotspot);
 
-                    printf("done: %d %d %d %d final_en: %lf\n",current_hotspot->get_left_outer_index(),current_hotspot->get_left_inner_index(),current_hotspot->get_right_inner_index(),current_hotspot->get_right_outer_index(),current_hotspot->get_energy());
-                    printf("str: %s\n",current_hotspot->get_structure());
-                    printf("\n\n");
+                    //printf("done: %d %d %d %d final_en: %lf\n",current_hotspot->get_left_outer_index(),current_hotspot->get_left_inner_index(),current_hotspot->get_right_inner_index(),current_hotspot->get_right_outer_index(),current_hotspot->get_energy());
+                    //printf("str: %s\n",current_hotspot->get_structure());
+                    //printf("\n\n");
                 }
             }
         }
@@ -231,12 +231,13 @@ void s_min_folding::get_hotspots(std::vector<Hotspot*>* hotspot_list){
         hotspot->set_default_structure();
         hotspot_list->push_back(hotspot);
     }
-
+/*
     printf("final:\n");
     for(int i = 0; i< hotspot_list->size(); i++){
         printf("%s %lf\n",hotspot_list->at(i)->get_structure(),hotspot_list->at(i)->get_energy());
     }
-    
+*/
+
     
     return;
 }
@@ -357,7 +358,7 @@ double s_min_folding::fold_sequence_restricted ()
             if (fres[i].pair == -1 || fres[j].pair == -1)   // i or j MUST be unpaired
                 continue;
             V->compute_energy_restricted (i, j, fres);
-            printf("i: %d j: %d V= %d\n",i,j,V->get_energy(i,j));
+            //printf("i: %d j: %d V= %d\n",i,j,V->get_energy(i,j));
         }
         // if I put this before V calculation, WM(i,j) cannot be calculated, because it returns infinity
         VM->compute_energy_WM_restricted (j, fres);
@@ -1444,8 +1445,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
             if (tmp < min)
             {
                 
-                printf("min #1, i:%d j:%d\n",i,j);
-                printf("tmp: %d %d %d no_dangle\n",energy_ij , AU_penalty (int_sequence[i],int_sequence[j]) ,acc);
+                //printf("min #1, i:%d j:%d\n",i,j);
+                //printf("tmp: %d %d %d no_dangle\n",energy_ij , AU_penalty (int_sequence[i],int_sequence[j]) ,acc);
                 min = tmp;
                 chosen = 21;        best_i = i;
                 if (fres[i].pair == j)  must_choose_this_branch = 1;
@@ -1473,8 +1474,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                 }
                 if (tmp < min)
                 {
-                    printf("min #2, i:%d j:%d\n",i,j);
-                    printf("tmp: %d %d %d dangle_bot: %d\n",energy_ij , AU_penalty (int_sequence[i+1],int_sequence[j]) ,acc, dangle_bot [int_sequence[j]][int_sequence[i+1]][int_sequence[i]]);
+                    //printf("min #2, i:%d j:%d\n",i,j);
+                    //printf("tmp: %d %d %d dangle_bot: %d\n",energy_ij , AU_penalty (int_sequence[i+1],int_sequence[j]) ,acc, dangle_bot [int_sequence[j]][int_sequence[i+1]][int_sequence[i]]);
                     min = tmp;
                     chosen = 22;  best_i = i;
                     if (fres[i+1].pair == j)  must_choose_this_branch = 1;
@@ -1504,8 +1505,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                 }
                 if (tmp < min)
                 {
-                    printf("min #3, i:%d j:%d\n",i,j);
-                    printf("tmp: %d %d %d dangle_top: %d\n",energy_ij , AU_penalty (int_sequence[i],int_sequence[j-1]) ,acc, dangle_top [int_sequence [j-1]][int_sequence [i]][int_sequence [j]]);
+                    //printf("min #3, i:%d j:%d\n",i,j);
+                    //printf("tmp: %d %d %d dangle_top: %d\n",energy_ij , AU_penalty (int_sequence[i],int_sequence[j-1]) ,acc, dangle_top [int_sequence [j-1]][int_sequence [i]][int_sequence [j]]);
                     min = tmp;
                     chosen = 23;  best_i = i;
                     if (fres[i].pair == j-1)  must_choose_this_branch = 1;
@@ -1535,8 +1536,8 @@ PARAMTYPE s_min_folding::compute_W_br2_restricted (int j, str_features *fres, in
 //                 }
                 if (tmp < min)
                 {
-                    printf("min #4, i:%d j:%d\n",i,j);
-                    printf("tmp:%d, energy_ij:%d AU:%d acc:%d dangle_bot: %d dangle_top:%d\n",tmp,energy_ij , AU_penalty (int_sequence[i+1],int_sequence[j-1]) ,acc, dangle_bot [int_sequence[j-1]][int_sequence[i+1]][int_sequence[i]],dangle_top [int_sequence [j-1]][int_sequence [i+1]][int_sequence [j]]);
+                    //printf("min #4, i:%d j:%d\n",i,j);
+                    //printf("tmp:%d, energy_ij:%d AU:%d acc:%d dangle_bot: %d dangle_top:%d\n",tmp,energy_ij , AU_penalty (int_sequence[i+1],int_sequence[j-1]) ,acc, dangle_bot [int_sequence[j-1]][int_sequence[i+1]][int_sequence[i]],dangle_top [int_sequence [j-1]][int_sequence [i+1]][int_sequence [j]]);
                     min = tmp;
                     chosen = 24;  best_i = i;
                     if (fres[i+1].pair == j-1)  must_choose_this_branch = 1;
@@ -1562,22 +1563,22 @@ void s_min_folding::compute_W_restricted (int j, str_features *fres)
     if (must_choose_this_branch)
     {
         W[j] = m2;
-        printf ("must choose j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
+        //printf ("must choose j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
     }
     else
     {
         if (m1 < m2) // this is kind of stupid, dunno why it's here    || (m1 >= MAXENERGY && m2 >= MAXENERGY))
         {
             W[j] = m1;
-            printf ("j=%d, chose branch 1, W[%d]=%d\n", j, j, W[j]);
+            //printf ("j=%d, chose branch 1, W[%d]=%d\n", j, j, W[j]);
         }
         else
         {
             W[j] = m2;
-            printf ("j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
+            //printf ("j=%d, chose branch 2, W[%d]=%d\n", j, j, W[j]);
         }
     }
-    printf("\n");
+    //printf("\n");
 }
 
 

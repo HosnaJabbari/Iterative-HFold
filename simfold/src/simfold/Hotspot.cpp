@@ -11,7 +11,7 @@ Hotspot::Hotspot(int left_inner_index, int right_inner_index, int length){
     this->length = length;
     this->energy = 0.0; //todo kevin set it to hairpin of left_inner_index,right_inner_index?
     this->size = 1;
-    this->structure = (char*) malloc(sizeof(char) * length);
+    this->structure = (char*) malloc(sizeof(char) * (length+1));
 
 }
 
@@ -50,14 +50,14 @@ void Hotspot::set_energy(double energy){
 }
 
 void Hotspot::set_structure(){
-    memset(this->structure,'\0',this->length);
+    memset(this->structure,'\0',this->length+1);
     for(int i =0; i < this->length; i++){
         if(i >= this->left_outer_index && i <= this->left_inner_index){
             this->structure[i] = '(';
         }else if(i <= this->right_outer_index && i >= this->right_inner_index){
             this->structure[i] = ')';
         }else{
-            this->structure[i] = '.';
+            this->structure[i] = '_';
         }
     }
     this->structure[this->length] = '\0';

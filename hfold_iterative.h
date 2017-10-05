@@ -1,6 +1,9 @@
 #ifndef HFOLD_H_
 #define HFOLD_H_
 
+#include <vector>
+#include "Result.h"
+
 double hfold(char *sequence, char *restricted, char *structure);
 double hfold_pkonly(char *sequence, char *restricted, char *structure);
 double hfold_iterative(char *sequence, char *restricted, char *structure); // April 3, 2012
@@ -38,5 +41,6 @@ double method3(char *sequence, char *restricted, char *structure);
 double method4(char *sequence, char *restricted, char *structure);
 
 double hfold_iterative(char* input_sequence, char* input_restricted, char* output_structure, int* method_chosen);
+bool write_output_file(char* path_to_file, int num_of_output, std::vector<Result*> result_list);
 #endif /*HFOLD_H_*/
 

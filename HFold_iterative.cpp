@@ -42,8 +42,6 @@
 
 //kevin 26 Sept 2017
 #include "Hotspot.h"
-#include <vector>
-#include "Result.h"
 #include "h_common.h"
 
 //#define HFOLD 						"./HFold"
@@ -145,7 +143,7 @@ int main (int argc, char **argv) {
 		// getopt_long stores the option index here.
                 int option_index = 0;
 
-		option = getopt_long (argc, argv, "s:r:i:o:", long_options, &option_index);
+		option = getopt_long (argc, argv, "s:r:i:o:n:", long_options, &option_index);
 
 		// Detect the end of the options
 		if (option == -1)
@@ -155,12 +153,12 @@ int main (int argc, char **argv) {
 		{
 		case 's':
 			if(sequenceFound){
-				fprintf(stderr, "-s is duplicated\n");
+				fprintf(stderr, "--s is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
+				printf("Cannot combine --i with --s/--r \n");
 				errorFound = true;
 				break;
 			}
@@ -170,17 +168,17 @@ int main (int argc, char **argv) {
 			break;
 		case 'r':
 			if(structureFound || inputPathFound){
-				fprintf(stderr, "-r is duplicated\n");
+				fprintf(stderr, "--r is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				fprintf(stderr, "Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine --i with --s/--r \n");
 				errorFound = true;
 				break;
 			}
 			if(number_of_suboptimal_structure != 0){
-				fprintf(stderr, "Cannot combine -r with -n \n");
+				fprintf(stderr, "Cannot combine --r with --n \n");
 				errorFound = true;
 				break;
 			}
@@ -190,7 +188,7 @@ int main (int argc, char **argv) {
 			break;
 		case 'i':
 			if(structureFound || sequenceFound){
-				fprintf(stderr, "Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine --i with --s/--r \n");
 				errorFound = true;
 				break;
 			}
@@ -224,7 +222,7 @@ int main (int argc, char **argv) {
 				break;
 			}
 			if(structureFound){
-				fprintf(stderr, "Cannot combine -r with -n \n");
+				fprintf(stderr, "Cannot combine --r with --n \n");
 				errorFound = true;
 				break;
 			}
@@ -236,28 +234,25 @@ int main (int argc, char **argv) {
 		//clean up when error
 		if(errorFound){
 			printUsage();
+			free(file);
+			free(output_path);
 			exit(1);
 		}
 	}
-/*
-	if(!inputPathFound){
-		//if sequence or structure is missing when input file is not present
-		if(!(sequenceFound)){
-			fprintf(stderr, "-s is missing\n");
+
+	if(!(sequenceFound)){
+			fprintf(stderr, "--s is missing\n");
 			printUsage();
-			exit(1);
-		}
-	}
-	*/
-if(!(sequenceFound)){
-			fprintf(stderr, "-s is missing\n");
-			printUsage();
+			free(file);
+			free(output_path);
 			exit(1);
 		}
 
 	if(!validateSequence(sequence)){
-		fprintf(stderr,"-s sequence is invalid. sequence: %s\n",sequence);
+		fprintf(stderr,"--s sequence is invalid. sequence: %s\n",sequence);
 		printUsage();
+		free(file);
+		free(output_path);
 		exit(1);
 	}
 	
@@ -265,19 +260,20 @@ if(!(sequenceFound)){
 	if(structureFound){
 		printf("structure found\n");
 		if(!validateStructure(structure, sequence)){
-			fprintf(stderr, "-r is invalid\n");
+			fprintf(stderr, "--r is invalid\n");
 			printUsage();
+			free(file);
+			free(output_path);
 			exit(1);
 		}else{
 			printf("replace brackets\n");
 			replaceBrackets(structure);
 		}
 	}else{
-		printf("getting hotspot\n");
+		//printf("getting hotspot\n");
 		get_hotspots(sequence, &hotspot_list);
-
-		printf("done hotspot\n");
-		exit(999);
+		//printf("done hotspot\n");
+		//exit(999);
 	}
 
 	//if we have output path and input path, try to combine both
@@ -299,46 +295,49 @@ if(!(sequenceFound)){
 		result = new Result(sequence,structure,final_structure,final_energy,method_chosen);
 		result_list.push_back(result);
 	}else{
-		//todo kevin: fix this
-		/*
+		
 		printf("number of hotspots: %d\n",hotspot_list.size());
 		for (int i=0; i < hotspot_list.size(); i++){
 			printf("hotspot #%d\n",i);
-			//printf("hotspot substructure: %s\n",hotspot_list[i]->get_structure());
+			printf("hotspot substructure: %s\n",hotspot_list[i]->get_structure());
 			final_energy = hfold_iterative(sequence,hotspot_list[i]->get_structure(),final_structure,&method_chosen);
 			result = new Result(sequence,hotspot_list[i]->get_structure(),final_structure,final_energy,method_chosen);
 			//printf("%s\n%s\n%s\n%lf%d\n",result->get_sequence(),result->get_restricted(),result->get_final_structure(),result->get_energy(),result->get_method_chosen());
 			result_list.push_back(result);
 		}
-	
 		std::sort(result_list.begin(), result_list.end(),compare_result_ptr);
+	}
 
-		int number_of_output;
-		printf("number_of_suboptimal_structure: %d\n",number_of_suboptimal_structure);
-		if(number_of_suboptimal_structure != 0){
-			number_of_output = MIN(result_list.size(),number_of_suboptimal_structure);
-		}else{
-			number_of_output = result_list.size();
-		}
-		for (int i=0; i < number_of_output; i++) {
-			printf("%s %lf\n",result_list[i]->get_final_structure(),result_list[i]->get_energy());
-		}
-		*/
+	//kevin 5 oct 2017
+	int number_of_output;
+	printf("number_of_suboptimal_structure: %d\n",number_of_suboptimal_structure);
+	if(number_of_suboptimal_structure != 0){
+		number_of_output = MIN(result_list.size(),number_of_suboptimal_structure);
+	}else{
+		number_of_output = 1;
 	}
 
 	//kevin: june 22 2017
 	//output to file
 	if(outputPathFound){
+		/*
 		if(!save_file("", output_path, sequence, structure, final_structure, final_energy, method_chosen)){
 			fprintf(stderr, "write to file fail\n");
 			exit(4);
 		}
+		*/
+		bool write_success = write_output_file(output_path, number_of_output, result_list);
+		if(!write_success){
+			fprintf(stderr, "write to file fail\n");
+			exit(4);
+		}
 	}else{
-		//kevin: june 22 2017
-		//changed format for ouptut to stdout
-		std::cout << "Seq: " << sequence << "\n";
-		std::cout << "RES: " << final_structure << "  " << final_energy << "\n" << std::flush;
-		//std::cout << "\nfinal structure: " << final_structure << " final energy: " << final_energy << "\n\n" << std::flush;
+		//kevin 5 oct 2017
+		printf("Seq: %s\n",sequence);
+		for (int i=0; i < number_of_output; i++) {
+			printf("restricted_%d: %s\n",i, result_list[i]->get_restricted());
+			printf("result_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+		}
 	}
 
 
@@ -365,8 +364,22 @@ if(!(sequenceFound)){
 	return 0;
 }
 
+bool write_output_file(char* path_to_file, int num_of_output, std::vector<Result*> result_list){
+	FILE* fp = fopen(path_to_file,"w");
+	if (fp == NULL) {
+		return false;
+	}
+	fprintf(fp,"Seq: %s\n",result_list[0]->get_sequence());
+	for (int i=0; i < num_of_output; i++) {
+		fprintf(fp,"restricted_%d: %s\n",i, result_list[i]->get_restricted());
+		fprintf(fp,"result_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+	}
+	fclose(fp);
+	return true;
+}
+
 double hfold_iterative(char* input_sequence, char* input_restricted, char* output_structure, int* method_chosen){
-	printf("restricted: %s\n",input_restricted);
+	
 	char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
 	char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
 	char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
