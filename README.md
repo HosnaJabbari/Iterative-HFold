@@ -72,7 +72,7 @@ After installing you can move the executables wherever you wish, but you should 
             make sure the <arguments> are enclosed in "", for example --r "..().." instead of --r ..()..
             input file for --i must be .txt
             if --i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
-            if --o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
+            if --o is provided with just a file name without a path, the output file will be generated in the directory where the executable is called
             if --o is provided with just a file name without a path, and if --i is provided, then the output file will be generated in the directory where the input file is located
 
         You can also include SHAPE data to be used. 
@@ -106,10 +106,10 @@ After installing you can move the executables wherever you wish, but you should 
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" 
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" --shape "shapefile" --b -0.4 --m 1.3
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" 
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" -o "outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" --shape "shapefile" --b -0.4 --m 1.3
 
     
 #### Exit code:

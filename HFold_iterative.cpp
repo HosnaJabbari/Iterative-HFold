@@ -520,7 +520,7 @@ void printUsage(){
         printf("--m (number) to specify a slope for the shape data (default is 1.800000)\n\n");
 
 	printf("Example:\n");
-        printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -r \"(____________________________)\" --shape \"shapefile\" --b -0.4 --m 1.3\n\n");
+        printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\" --shape \"shapefile\" --b -0.4 --m 1.3\n\n");
 
 	printf("Please read README for more details\n\n");
 }
