@@ -34,6 +34,7 @@
 #include "s_partition_function.h"
 
 
+
 PARAMTYPE s_dangling_energy (int *sequence, char *structure, int i1, int i2, int i3, int i4)
 //      (   )...(   )
 //      i1..i2..i3..i4
@@ -750,6 +751,20 @@ PARAMTYPE s_calculate_enthalpy (int *sequence, char *csequence, str_features *f)
 }
 
 
+//kevin 4 oct 2017
+//comparison function for hotspot so we can use it when sorting
+bool compare_hotspot_ptr(Hotspot* a, Hotspot* b) { 
+    return (a->get_energy() < b->get_energy()); 
+}
+
+
+//kevin 26 Sept 2017 
+//wrapper to cal get hotspots
+void get_hotspots(char *sequence,std::vector<Hotspot*>* hotspot_list){
+    s_min_folding *min_fold = new s_min_folding (sequence);
+    min_fold->get_hotspots(hotspot_list);
+    delete min_fold;
+}
 
 double simfold (char *sequence, char *structure)
 // PRE:  the init_data function has been called;
@@ -758,7 +773,7 @@ double simfold (char *sequence, char *structure)
 {
     double min_energy;
     s_min_folding *min_fold = new s_min_folding (sequence);
-    min_energy = min_fold->s_simfold();
+    min_energy = min_fold->s_simfold(); 
     min_fold->return_structure (structure);
     delete min_fold;
     return min_energy;
@@ -1416,6 +1431,7 @@ PFTYPE simfold_f_and_gradient_smart_numerical (char *sequence, PFTYPE *grad, int
     delete part;
     return pf.real();
 }
+
 
 
 #endif
