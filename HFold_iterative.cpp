@@ -38,6 +38,11 @@
 //kevin June 22 2017
 #include "hfold_validation.h"
 #include <getopt.h>
+#include "s_specific_functions.h"
+
+//kevin 26 Sept 2017
+#include "Hotspot.h"
+#include "h_common.h"
 
 //#define HFOLD 						"./HFold"
 //#define HFOLD_PKONLY 				"./HFold_pkonly"
@@ -56,7 +61,7 @@ char SIMFOLD[10] =                  "./simfold";
 
 FILE *logFile;
 char *file;
-int timeout = 1200;
+
 //static std::smatch match;
 //static std::regex sequenceRegex;
 //static std::regex structureRegex;
@@ -79,32 +84,12 @@ int main (int argc, char **argv) {
 
 	char sequence[MAXSLEN];
 	char structure[MAXSLEN];
-
-	char *output_path;
-	char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method4_structure = (char*) malloc(sizeof(char) * MAXSLEN);
 	char final_structure[MAXSLEN];
-
-	double *method1_energy = (double*) malloc(sizeof(double) * INF);
-	double *method2_energy = (double*) malloc(sizeof(double) * INF);
-	double *method3_energy = (double*) malloc(sizeof(double) * INF);
-	double *method4_energy = (double*) malloc(sizeof(double) * INF);
 	double final_energy = INF;
+	char *output_path;
+	int number_of_suboptimal_structure = 0;
 
-	int files_length = -1;
-        int method_chosen = -1;
-
-	int **result;
-	char **files_found;
-
-        result  = (int**) malloc(sizeof(int*) * MAXSLEN);
-        for (int i=0; i < MAXSLEN; i++) {
-                result[i] = (int*) malloc(sizeof(int) * 2);
-        }
-
-
+    int method_chosen = -1;
 
 	output_path = (char*) malloc(sizeof(char) * 1000);
 	file = (char*) malloc(sizeof(char) * 1000);
@@ -113,6 +98,24 @@ int main (int argc, char **argv) {
 	if (logFile == NULL) {
 		giveup("Could not open logfile", LOGFILEPATH);
 	}
+
+	char config_file[200];
+	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
+
+	//what to fold: RNA or DNA
+	int dna_or_rna;
+	dna_or_rna = RNA;
+	//temperature: any integer or real number between 0 and 100
+	// represents degrees Celsius
+	double temperature = 37.0;
+
+	// initialize the thermodynamic parameters
+	// call init_data only once for the same dna_or_rna and same temperature
+	// if one of them changes, call init_data again
+
+	init_data (HFOLD, config_file, dna_or_rna, temperature);
+	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
+	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/parameters_DP09.txt");
 
 	//kevin: june 22 2017
 	//validation for command line argument
@@ -131,6 +134,7 @@ int main (int argc, char **argv) {
                         {"r", required_argument, 0, 'r'},
                         {"i", required_argument, 0, 'i'},
                         {"o", required_argument, 0, 'o'},
+						{"n", required_argument, 0, 'n'},
                         {0, 0, 0, 0}
                 };
 
@@ -139,7 +143,7 @@ int main (int argc, char **argv) {
 		// getopt_long stores the option index here.
                 int option_index = 0;
 
-		option = getopt_long (argc, argv, "s:r:i:o:", long_options, &option_index);
+		option = getopt_long (argc, argv, "s:r:i:o:n:", long_options, &option_index);
 
 		// Detect the end of the options
 		if (option == -1)
@@ -149,12 +153,12 @@ int main (int argc, char **argv) {
 		{
 		case 's':
 			if(sequenceFound){
-				fprintf(stderr, "-s is duplicated\n");
+				fprintf(stderr, "--s is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
+				printf("Cannot combine --i with --s/--r \n");
 				errorFound = true;
 				break;
 			}
@@ -164,12 +168,17 @@ int main (int argc, char **argv) {
 			break;
 		case 'r':
 			if(structureFound || inputPathFound){
-				fprintf(stderr, "-r is duplicated\n");
+				fprintf(stderr, "--r is duplicated\n");
 				errorFound = true;
 				break;
 			}
 			if(inputPathFound){
-				fprintf(stderr, "Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine --i with --s/--r \n");
+				errorFound = true;
+				break;
+			}
+			if(number_of_suboptimal_structure != 0){
+				fprintf(stderr, "Cannot combine --r with --n \n");
 				errorFound = true;
 				break;
 			}
@@ -179,7 +188,7 @@ int main (int argc, char **argv) {
 			break;
 		case 'i':
 			if(structureFound || sequenceFound){
-				fprintf(stderr, "Cannot combine -i with -s/-r \n");
+				fprintf(stderr, "Cannot combine --i with --s/--r \n");
 				errorFound = true;
 				break;
 			}
@@ -189,11 +198,12 @@ int main (int argc, char **argv) {
 				fprintf(stderr, "Input file not exist\n");
 				exit(4);
 			}
-			if (!get_sequence_structure(file, sequence, structure)) {
+			if (!get_sequence_structure(file, sequence, structure,&sequenceFound, &structureFound)) {
 				fprintf(stderr, "Input file is invalid\n");
 				errorFound = true;
 				break;
 			}
+			
 			inputPathFound = true;
 			break;
 		case 'o':
@@ -204,6 +214,19 @@ int main (int argc, char **argv) {
 			}
 			outputPathFound = true;
 			break;
+		case 'n':
+			number_of_suboptimal_structure = atoi(optarg);
+			if(number_of_suboptimal_structure <= 0){
+				fprintf(stderr, "number must be > 0\n");
+				errorFound = true;
+				break;
+			}
+			if(structureFound){
+				fprintf(stderr, "Cannot combine --r with --n \n");
+				errorFound = true;
+				break;
+			}
+			break;
 		default:
 			errorFound = true;
 			break;
@@ -211,31 +234,46 @@ int main (int argc, char **argv) {
 		//clean up when error
 		if(errorFound){
 			printUsage();
+			free(file);
+			free(output_path);
 			exit(1);
 		}
 	}
 
-	if(!inputPathFound){
-		//if sequence or structure is missing when input file is not present
-		if(!(sequenceFound && structureFound)){
-			fprintf(stderr, "-s/-r is missing\n");
+	if(!(sequenceFound)){
+			fprintf(stderr, "--s is missing\n");
 			printUsage();
+			free(file);
+			free(output_path);
 			exit(1);
 		}
-	}
 
 	if(!validateSequence(sequence)){
-		fprintf(stderr,"-s sequence is invalid. sequence: %s\n",sequence);
+		fprintf(stderr,"--s sequence is invalid. sequence: %s\n",sequence);
 		printUsage();
+		free(file);
+		free(output_path);
 		exit(1);
 	}
-
-	if(!validateStructure(structure, sequence)){
-		fprintf(stderr, "-r is invalid\n");
-		printUsage();
-		exit(1);
+	
+	std::vector<Hotspot*> hotspot_list;
+	if(structureFound){
+		printf("structure found\n");
+		if(!validateStructure(structure, sequence)){
+			fprintf(stderr, "--r is invalid\n");
+			printUsage();
+			free(file);
+			free(output_path);
+			exit(1);
+		}else{
+			printf("replace brackets\n");
+			replaceBrackets(structure);
+		}
 	}else{
-		replaceBrackets(structure);
+		//printf("getting hotspot\n");
+		get_hotspots(sequence, &hotspot_list);
+		//printf("done hotspot\n");
+		//exit(999);
 	}
 
 	//if we have output path and input path, try to combine both
@@ -249,6 +287,109 @@ int main (int argc, char **argv) {
 
 	write_log_file("Starting Program", "", 'I');
 
+	Result* result;
+	std::vector<Result*> result_list;
+	
+	if(structureFound){
+		final_energy = hfold_iterative(sequence,structure,final_structure,&method_chosen);
+		result = new Result(sequence,structure,final_structure,final_energy,method_chosen);
+		result_list.push_back(result);
+	}else{
+		
+		printf("number of hotspots: %d\n",hotspot_list.size());
+		for (int i=0; i < hotspot_list.size(); i++){
+			printf("hotspot #%d\n",i);
+			printf("hotspot substructure: %s\n",hotspot_list[i]->get_structure());
+			final_energy = hfold_iterative(sequence,hotspot_list[i]->get_structure(),final_structure,&method_chosen);
+			result = new Result(sequence,hotspot_list[i]->get_structure(),final_structure,final_energy,method_chosen);
+			//printf("%s\n%s\n%s\n%lf%d\n",result->get_sequence(),result->get_restricted(),result->get_final_structure(),result->get_energy(),result->get_method_chosen());
+			result_list.push_back(result);
+		}
+		std::sort(result_list.begin(), result_list.end(),compare_result_ptr);
+	}
+
+	//kevin 5 oct 2017
+	int number_of_output;
+	printf("number_of_suboptimal_structure: %d\n",number_of_suboptimal_structure);
+	if(number_of_suboptimal_structure != 0){
+		number_of_output = MIN(result_list.size(),number_of_suboptimal_structure);
+	}else{
+		number_of_output = 1;
+	}
+
+	//kevin: june 22 2017
+	//output to file
+	if(outputPathFound){
+		/*
+		if(!save_file("", output_path, sequence, structure, final_structure, final_energy, method_chosen)){
+			fprintf(stderr, "write to file fail\n");
+			exit(4);
+		}
+		*/
+		bool write_success = write_output_file(output_path, number_of_output, result_list);
+		if(!write_success){
+			fprintf(stderr, "write to file fail\n");
+			exit(4);
+		}
+	}else{
+		//kevin 5 oct 2017
+		printf("Seq: %s\n",sequence);
+		for (int i=0; i < number_of_output; i++) {
+			printf("restricted_%d: %s\n",i, result_list[i]->get_restricted());
+			printf("result_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+		}
+	}
+
+
+
+	write_log_file("Ending Program", "", 'I');
+
+	// Clean up
+	free(file);
+	free(output_path);
+
+	for (int i=0; i < result_list.size(); i++) {
+		delete result_list[i];
+	}
+
+	for(int i =0; i<hotspot_list.size(); i++){
+		delete hotspot_list[i];
+	}
+
+	// This will cause a seg fault if you have the log file open and are watching it.
+	if (logFile) {
+		fclose(logFile);
+	}
+
+	return 0;
+}
+
+bool write_output_file(char* path_to_file, int num_of_output, std::vector<Result*> result_list){
+	FILE* fp = fopen(path_to_file,"w");
+	if (fp == NULL) {
+		return false;
+	}
+	fprintf(fp,"Seq: %s\n",result_list[0]->get_sequence());
+	for (int i=0; i < num_of_output; i++) {
+		fprintf(fp,"restricted_%d: %s\n",i, result_list[i]->get_restricted());
+		fprintf(fp,"result_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+	}
+	fclose(fp);
+	return true;
+}
+
+double hfold_iterative(char* input_sequence, char* input_restricted, char* output_structure, int* method_chosen){
+	
+	char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+	char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+	char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+	char *method4_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+
+	double *method1_energy = (double*) malloc(sizeof(double) * INF);
+	double *method2_energy = (double*) malloc(sizeof(double) * INF);
+	double *method3_energy = (double*) malloc(sizeof(double) * INF);
+	double *method4_energy = (double*) malloc(sizeof(double) * INF);
+	double final_energy = INF;
 
 	*method1_energy = INF;
 	*method2_energy = INF;
@@ -259,84 +400,62 @@ int main (int argc, char **argv) {
 	method2_structure[0] = '\0';
 	method3_structure[0] = '\0';
 	method4_structure[0] = '\0';
-	final_structure[0] = '\0';
+	memset(output_structure,'\0',strlen(input_restricted));
 
 	printf("method1\n");
-	*method1_energy = method1(sequence, structure, method1_structure);
+	*method1_energy = method1(input_sequence, input_restricted, method1_structure);
 	printf("method2\n");
-	*method2_energy = method2(sequence, structure, method2_structure);
+	*method2_energy = method2(input_sequence, input_restricted, method2_structure);
 	printf("method3\n");
-	*method3_energy = method3(sequence, structure, method3_structure);
+	*method3_energy = method3(input_sequence, input_restricted, method3_structure);
 	printf("method4\n");
-	*method4_energy = method4(sequence, structure, method4_structure);
+	*method4_energy = method4(input_sequence, input_restricted, method4_structure);
+	//We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
+	if (*method1_energy < final_energy) {
+	//if (*method1_energy < final_energy && *method1_energy != 0) {
+			final_energy = *method1_energy;
+			strcpy(output_structure, method1_structure);
+			*method_chosen = 1;
+	}
 
+	if (*method2_energy < final_energy) {
+	//if (*method2_energy < final_energy && *method2_energy != 0) {
+			final_energy = *method2_energy;
+			strcpy(output_structure, method2_structure);
+			*method_chosen = 2;
+	}
 
+	if (*method3_energy < final_energy) {
+	//if (*method3_energy < final_energy && *method3_energy != 0) {
+			final_energy = *method3_energy;
+			strcpy(output_structure, method3_structure);
+			*method_chosen = 3;
+	}
 
-        //We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
-        if (*method1_energy < final_energy) {
-        //if (*method1_energy < final_energy && *method1_energy != 0) {
-                final_energy = *method1_energy;
-                strcpy(final_structure, method1_structure);
-                method_chosen = 1;
-        }
+	if (*method4_energy < final_energy) {
+	//if (*method4_energy < final_energy && *method4_energy != 0) {
+			final_energy = *method4_energy;
+			strcpy(output_structure, method4_structure);
+			*method_chosen = 4;
+	}
 
-        if (*method2_energy < final_energy) {
-        //if (*method2_energy < final_energy && *method2_energy != 0) {
-                final_energy = *method2_energy;
-                strcpy(final_structure, method2_structure);
-                method_chosen = 2;
-        }
-
-        if (*method3_energy < final_energy) {
-        //if (*method3_energy < final_energy && *method3_energy != 0) {
-                final_energy = *method3_energy;
-                strcpy(final_structure, method3_structure);
-                method_chosen = 3;
-        }
-
-        if (*method4_energy < final_energy) {
-        //if (*method4_energy < final_energy && *method4_energy != 0) {
-                final_energy = *method4_energy;
-                strcpy(final_structure, method4_structure);
-                method_chosen = 4;
-        }
-
-
-	if (final_energy == INF || method_chosen == -1) {
+	//printf("%s\n%s\n",input_restricted,output_structure);
+	//printf("method: %d\n",*method_chosen);
+	if (final_energy == INF || *method_chosen == -1) {
 		write_log_file("Could not find energy", "", 'E');
 		fprintf(stderr, "ERROR: could not find energy\n");
-		fprintf(stderr, "SEQ: %s\n",sequence);
-		fprintf(stderr, "Structure: %s\n",structure);
+		fprintf(stderr, "SEQ: %s\n",input_sequence);
+		fprintf(stderr, "Restricted structure: %s\n",input_restricted);
+		free(method1_structure);
+		free(method2_structure);
+		free(method3_structure);
+		free(method4_structure);
+		free(method1_energy);
+		free(method2_energy);
+		free(method3_energy);
+		free(method4_energy);
 		exit(6);
 	}
-
-
-
-
-	//kevin: june 22 2017
-	//output to file
-	if(outputPathFound){
-		if(!save_file("", output_path, sequence, structure, final_structure, final_energy, method_chosen)){
-			fprintf(stderr, "write to file fail\n");
-			exit(4);
-		}
-	}else{
-		//kevin: june 22 2017
-		//changed format for ouptut to stdout
-		std::cout << "Seq: " << sequence << "\n";
-		std::cout << "RES: " << final_structure << "  " << final_energy << "\n" << std::flush;
-		//std::cout << "\nfinal structure: " << final_structure << " final energy: " << final_energy << "\n\n" << std::flush;
-	}
-
-
-
-	write_log_file("Ending Program", "", 'I');
-
-	// Clean up
-
-	free(file);
-
-	//free(tinfo);
 
 	free(method1_structure);
 	free(method2_structure);
@@ -346,22 +465,9 @@ int main (int argc, char **argv) {
 	free(method2_energy);
 	free(method3_energy);
 	free(method4_energy);
-        free(output_path);
-        for (int i=0; i < MAXSLEN; i++) {
-                free(result[i]);
-        }
-	free(result);
 
-
-	// This will cause a seg fault if you have the log file open and are watching it.
-	if (logFile) {
-		fclose(logFile);
-	}
-
-	return 0;
+	return final_energy;
 }
-
-
 
 void printUsage(){
 	/*
@@ -397,29 +503,6 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 //Calling HFold: programPath = HFOLD
 //Calling HFold_PKonly: programPath = HFOLD_PKONLY
 bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
-	char config_file[200];
-	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
-
-	//what to fold: RNA or DNA
-	int dna_or_rna;
-	dna_or_rna = RNA;
-	//temperature: any integer or real number between 0 and 100
-	// represents degrees Celsius
-	double temperature = 37.0;
-
-	// initialize the thermodynamic parameters
-	// call init_data only once for the same dna_or_rna and same temperature
-	// if one of them changes, call init_data again
-
-	//init_data ("./HFold", config_file, dna_or_rna, temperature);
-	init_data (programPath, config_file, dna_or_rna, temperature);
-
-	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
-
-	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
-	// so we add it here
-	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/parameters_DP09.txt");
-
         if (strcmp(programPath, HFOLD) == 0) {
             *output_energy = hfold(input_sequence, input_structure, output_structure);
         }
@@ -440,20 +523,7 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 }
 
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
-        std::string result = "";
-
-	char config_file[200] = SIMFOLD_HOME "/params/multirnafold.conf";
-
-	double temperature;
-	temperature = 37;
-	init_data ("./simfold", config_file, RNA, temperature);
-
-        fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
-	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
-	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt,
-	// but still getting seg fault!
-	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/parameters_DP09_chopped.txt");
-
+    std::string result = "";
 	*output_energy = simfold_restricted (input_sequence, input_structure, output_structure);
 //	printf ("Call_Simfold_RES( can be called by different methods): %s  %.2lf\n", output_structure, output_energy);
 	if(is_invalid_restriction(input_structure,output_structure)){
@@ -485,7 +555,46 @@ void removeSpaces(char *str)
 }
 
 
-bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
+bool get_sequence_structure (char *fileName, char *sequence, char *structure, bool* sequenceFound, bool* structureFound) {
+	//printf("path: %s\n", path);
+    FILE* fp;
+    char line[MAXSLEN];
+
+    fp = fopen(fileName, "r");
+    if(!fp){
+        printf("File not found\n");
+        return false;
+    }
+    fscanf(fp,"%s\n%s\n",sequence,structure);
+    //printf("%s|%s|%s|%s|\n",seq1,struc1,seq2,struc2);
+    fclose(fp);
+
+    if(!(validateSequence(sequence))){
+        printf("Line 1 is invalid\n");
+        return false;
+    }else{
+		*sequenceFound = true;
+	}
+
+
+	if(strlen(structure) != 0){
+		if(!(validateStructure(structure,sequence))){
+			printf("Line 2 is invalid\n");
+			return false;
+		}else{
+			printf("1\n");
+			*structureFound = true;
+		}
+	}
+    
+	
+
+
+    return true;
+
+
+
+	printf("get_sequence_structure\n");
         FILE *ioFile;
         size_t len = 0;
         ssize_t read = 0;
@@ -499,19 +608,23 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
         // Get structure and sequence from file
         ioFile = fopen(fileName, "r");
         if (ioFile != NULL) {
+			printf("not null\n");
                 if((read = getline(&sequenceBuffer, &len, ioFile)) == -1) {
+					printf("no seq\n");
                         write_log_file("Could not read the first sequence", fileName, 'E');
                         return false;
                 }
                 //sequenceString.assign(sequenceBuffer, read);
 
                 if((read = getline(&structureBuffer, &len, ioFile)) == -1) {
+					printf("no structure\n");
                         write_log_file("Could not read the first structure", fileName, 'E');
                         return false;
                 }
                 //structureString.assign(structureBuffer, read);
 
         } else {
+			printf("cant open \n");
                 write_log_file("Could not open file", fileName, 'E');
                 return false;
         }
@@ -524,7 +637,8 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
         //printf("new: %s \n",structureBuffer);
         strcpy(sequence, sequenceBuffer);
         strcpy(structure, structureBuffer);
-
+		
+		printf("%s\n%s\n",sequence,structure);
 /*
         sequenceString = std::regex_replace(sequenceString, sequenceRegex, replacementText);
         std::cout << "Sequence:  " << sequenceString << " Length: " << sequenceString.length() << '\n' << std::flush;
@@ -539,10 +653,12 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
 */
         // Clean up
         fclose(ioFile);
-        if (sequenceBuffer)
-        free(sequenceBuffer);
-        if (structureBuffer)
-        free(structureBuffer);
+        if (sequenceBuffer){
+        	free(sequenceBuffer);
+		}
+        if (structureBuffer){
+        	free(structureBuffer);
+		}
 /*
         if(sequenceString.length() != structureString.length()) {
                 write_log_file("Sequence and structure length do not match", fileName, 'E');

@@ -1,6 +1,9 @@
 #ifndef HFOLD_H_
 #define HFOLD_H_
 
+#include <vector>
+#include "Result.h"
+
 double hfold(char *sequence, char *restricted, char *structure);
 double hfold_pkonly(char *sequence, char *restricted, char *structure);
 double hfold_iterative(char *sequence, char *restricted, char *structure); // April 3, 2012
@@ -15,7 +18,7 @@ void method4_calculation (char *sequence, char *structure, char *method4_structu
 bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy);
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy);
 
-bool get_sequence_structure (char *fileName, char *sequence, char *structure);
+bool get_sequence_structure (char *fileName, char *sequence, char *structure, bool* sequenceFound, bool* structureFound);
 bool save_file (const char *fileName, char *outputPath, const char *sequence, char *restricted, char *structure, double energy, int chosen_method);
 void write_log_file(const char *message, const char *file, const char option);
 
@@ -37,5 +40,7 @@ double method2(char *sequence, char *restricted, char *structure);
 double method3(char *sequence, char *restricted, char *structure);
 double method4(char *sequence, char *restricted, char *structure);
 
+double hfold_iterative(char* input_sequence, char* input_restricted, char* output_structure, int* method_chosen);
+bool write_output_file(char* path_to_file, int num_of_output, std::vector<Result*> result_list);
 #endif /*HFOLD_H_*/
 
