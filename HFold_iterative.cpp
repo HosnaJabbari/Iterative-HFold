@@ -203,7 +203,7 @@ int main (int argc, char **argv) {
 				errorFound = true;
 				break;
 			}
-			
+
 			inputPathFound = true;
 			break;
 		case 'o':
@@ -255,10 +255,10 @@ int main (int argc, char **argv) {
 		free(output_path);
 		exit(1);
 	}
-	
+
 	std::vector<Hotspot*> hotspot_list;
 	if(structureFound){
-		printf("structure found\n");
+		//printf("structure found\n");
 		if(!validateStructure(structure, sequence)){
 			fprintf(stderr, "--r is invalid\n");
 			printUsage();
@@ -266,7 +266,7 @@ int main (int argc, char **argv) {
 			free(output_path);
 			exit(1);
 		}else{
-			printf("replace brackets\n");
+			//printf("replace brackets\n");
 			replaceBrackets(structure);
 		}
 	}else{
@@ -289,28 +289,28 @@ int main (int argc, char **argv) {
 
 	Result* result;
 	std::vector<Result*> result_list;
-	
+
 	if(structureFound){
 		final_energy = hfold_iterative(sequence,structure,final_structure,&method_chosen);
 		result = new Result(sequence,structure,final_structure,final_energy,method_chosen);
 		result_list.push_back(result);
 	}else{
-		
-		printf("number of hotspots: %d\n",hotspot_list.size());
+
+		//printf("number of hotspots: %d\n",hotspot_list.size());
 		for (int i=0; i < hotspot_list.size(); i++){
-			printf("hotspot #%d\n",i);
-			printf("hotspot substructure: %s\n",hotspot_list[i]->get_structure());
+			//printf("hotspot substructure #%d: %s\n",i,hotspot_list[i]->get_structure());
 			final_energy = hfold_iterative(sequence,hotspot_list[i]->get_structure(),final_structure,&method_chosen);
 			result = new Result(sequence,hotspot_list[i]->get_structure(),final_structure,final_energy,method_chosen);
 			//printf("%s\n%s\n%s\n%lf%d\n",result->get_sequence(),result->get_restricted(),result->get_final_structure(),result->get_energy(),result->get_method_chosen());
 			result_list.push_back(result);
 		}
+
 		std::sort(result_list.begin(), result_list.end(),compare_result_ptr);
 	}
 
 	//kevin 5 oct 2017
 	int number_of_output;
-	printf("number_of_suboptimal_structure: %d\n",number_of_suboptimal_structure);
+	//printf("number_of_suboptimal_structure: %d\n",number_of_suboptimal_structure);
 	if(number_of_suboptimal_structure != 0){
 		number_of_output = MIN(result_list.size(),number_of_suboptimal_structure);
 	}else{
@@ -333,13 +333,20 @@ int main (int argc, char **argv) {
 		}
 	}else{
 		//kevin 5 oct 2017
-		printf("Seq: %s\n",sequence);
-		for (int i=0; i < number_of_output; i++) {
-			printf("restricted_%d: %s\n",i, result_list[i]->get_restricted());
-			printf("result_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+		printf("Sequence:     %s\n",sequence);
+
+		//If only printing one, don't need to print the numbers
+		if(number_of_output == 1) {
+			printf("Restricted:   %s\n", result_list[0]->get_restricted());
+			printf("Result:       %s %lf\n", result_list[0]->get_final_structure(),result_list[0]->get_final_energy());
+		} else {
+		    // print multiple outputs
+            for (int i=0; i < number_of_output; i++) {
+                printf("Restricted %d: %s\n",i, result_list[i]->get_restricted());
+                printf("Result %d:     %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+            }
 		}
 	}
-
 
 
 	write_log_file("Ending Program", "", 'I');
@@ -379,7 +386,7 @@ bool write_output_file(char* path_to_file, int num_of_output, std::vector<Result
 }
 
 double hfold_iterative(char* input_sequence, char* input_restricted, char* output_structure, int* method_chosen){
-	
+
 	char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
 	char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
 	char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
@@ -402,13 +409,13 @@ double hfold_iterative(char* input_sequence, char* input_restricted, char* outpu
 	method4_structure[0] = '\0';
 	memset(output_structure,'\0',strlen(input_restricted));
 
-	printf("method1\n");
+	//printf("method1\n");
 	*method1_energy = method1(input_sequence, input_restricted, method1_structure);
-	printf("method2\n");
+	//printf("method2\n");
 	*method2_energy = method2(input_sequence, input_restricted, method2_structure);
-	printf("method3\n");
+	//printf("method3\n");
 	*method3_energy = method3(input_sequence, input_restricted, method3_structure);
-	printf("method4\n");
+	//printf("method4\n");
 	*method4_energy = method4(input_sequence, input_restricted, method4_structure);
 	//We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
 	if (*method1_energy < final_energy) {
@@ -479,15 +486,20 @@ void printUsage(){
 	printf ("\t\t() restricted base pair\n");
 	printf ("\t\t _ no restriction\n");
 */
-	printf("Usage ./HFold_iterative --s <sequence> --r <structure> [--o </path/to/file>]\n");
+    printf("\nUsage:\n");
+	printf("./HFold_iterative --s <sequence> --r <structure> [--o </path/to/file>]\n");
 	printf("or\n");
-	printf("Usage ./HFold_iterative --i </path/to/file> [--o </path/to/file>]\n");
+	printf("./HFold_iterative --s <sequence> --n <# of output suboptimals> [--o </path/to/file>]\n");
+	printf("or\n");
+	printf("./HFold_iterative --i </path/to/file> [--o </path/to/file>]\n");
 	printf ("  Restricted structure symbols:\n");
 	printf ("    () restricted base pair\n");
 	printf ("    _ no restriction\n");
-	printf("Example:\n");
+	printf("\nExample:\n");
 	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
-	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
+	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --n 10\n");
+	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n\n");
+
 	printf("Please read README for more details\n");
 }
 
@@ -586,8 +598,8 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure, bo
 			*structureFound = true;
 		}
 	}
-    
-	
+
+
 
 
     return true;
@@ -637,7 +649,7 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure, bo
         //printf("new: %s \n",structureBuffer);
         strcpy(sequence, sequenceBuffer);
         strcpy(structure, structureBuffer);
-		
+
 		printf("%s\n%s\n",sequence,structure);
 /*
         sequenceString = std::regex_replace(sequenceString, sequenceRegex, replacementText);
