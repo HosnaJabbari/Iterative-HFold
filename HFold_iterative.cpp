@@ -131,7 +131,7 @@ int main (int argc, char **argv) {
                         {"r", required_argument, 0, 'r'},
                         {"i", required_argument, 0, 'i'},
                         {"o", required_argument, 0, 'o'},
-						{"dangle2", no_argument, 0, 'd'},
+			{"d2", no_argument, 0, 'd'},
                         {0, 0, 0, 0}
                 };
 
@@ -219,7 +219,7 @@ int main (int argc, char **argv) {
 		}
 	}
 
-	printf("DANGLE mode: %d\n",DANGLE_MODE);
+	//printf("DANGLE mode: %d\n",DANGLE_MODE);
 
 	if(!inputPathFound){
 		//if sequence or structure is missing when input file is not present
@@ -267,13 +267,13 @@ int main (int argc, char **argv) {
 	method4_structure[0] = '\0';
 	final_structure[0] = '\0';
 
-	printf("method1\n");
+	//printf("method1\n");
 	*method1_energy = method1(sequence, structure, method1_structure);
-	printf("method2\n");
+	//printf("method2\n");
 	*method2_energy = method2(sequence, structure, method2_structure);
-	printf("method3\n");
+	//printf("method3\n");
 	*method3_energy = method3(sequence, structure, method3_structure);
-	printf("method4\n");
+	//printf("method4\n");
 	*method4_energy = method4(sequence, structure, method4_structure);
 
 
@@ -384,7 +384,10 @@ void printUsage(){
 	printf("Usage ./HFold_iterative --i </path/to/file> [--o </path/to/file>]\n");
 	printf ("  Restricted structure symbols:\n");
 	printf ("    () restricted base pair\n");
-	printf ("    _ no restriction\n");
+	printf ("    _ no restriction\n\n");
+
+	printf("--d2 uses dangle 2 calculations\n\n");
+
 	printf("Example:\n");
 	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
 	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
