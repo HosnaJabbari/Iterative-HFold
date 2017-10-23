@@ -134,7 +134,8 @@ int main (int argc, char **argv) {
                         {"r", required_argument, 0, 'r'},
                         {"i", required_argument, 0, 'i'},
                         {"o", required_argument, 0, 'o'},
-						{"n", required_argument, 0, 'n'},
+			             			{"n", required_argument, 0, 'n'},
+			                  {"d2", no_argument, 0, 'd'},
                         {0, 0, 0, 0}
                 };
 
@@ -226,6 +227,8 @@ int main (int argc, char **argv) {
 				errorFound = true;
 				break;
 			}
+		case 'd': //setting dangle2 mode
+			DANGLE_MODE = 2;
 			break;
 		default:
 			errorFound = true;
@@ -242,6 +245,10 @@ int main (int argc, char **argv) {
 
 	if(!(sequenceFound)){
 			fprintf(stderr, "--s is missing\n");
+    
+	//printf("DANGLE mode: %d\n",DANGLE_MODE);
+
+	if(!inputPathFound){
 			printUsage();
 			free(file);
 			free(output_path);
@@ -495,7 +502,11 @@ void printUsage(){
 	printf ("  Restricted structure symbols:\n");
 	printf ("    () restricted base pair\n");
 	printf ("    _ no restriction\n");
-	printf("\nExample:\n");
+
+	printf("--d2 uses dangle 2 calculations\n\n");
+
+	printf("Example:\n");
+
 	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
 	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --n 10\n");
 	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n\n");

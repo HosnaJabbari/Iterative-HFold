@@ -362,6 +362,17 @@ void W_final::compute_W_restricted_pkonly (int j, str_features *fres)
 
 }
 
+int W_final::outer_dangles(int i, int j) {
+    int tmp=0;
+    if ( j+1<nb_nucleotides) {
+        tmp = dangle_top [int_sequence [j]][int_sequence [i]][int_sequence [j+1]];
+    }
+    if ( i>0 ) {
+        tmp += dangle_bot [int_sequence[j]][int_sequence[i]][int_sequence[i-1]];
+    }
+    return tmp;
+}
+
 int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choose_this_branch)
 {
 	int min = INF, tmp, energy_ij = INF, acc;
@@ -384,6 +395,9 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
         if (energy_ij < INF)
         {
             tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
+			if ( DANGLE_MODE == 2 ) {
+                tmp += outer_dangles(i,j);
+            }
             if (tmp < min)
             {
                 min = tmp;
@@ -394,6 +408,10 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
                 else                    must_choose_this_branch = 0;
             }
         }
+
+		if (DANGLE_MODE!=1) { 
+			continue; 
+		}
 
         // I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
         if (fres[i].pair <= -1 && i+1 < j)
@@ -514,6 +532,9 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
         if (energy_ij < INF)
         {
             tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
+			if ( DANGLE_MODE == 2 ) {
+                tmp += outer_dangles(i,j);
+            }
             if (tmp < min)
             {
                 min = tmp;
@@ -524,7 +545,9 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
                 else                    must_choose_this_branch = 0;
             }
         }
-
+		if (DANGLE_MODE!=1) {
+			continue; 
+		}
         // I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
 		// in the pk_only version we don't add any pseudoknot free base pairs
         if (fres[i].pair <= -1 && i+1 < j && fres[i+1].pair ==j && fres[j].pair==i+1)
@@ -853,46 +876,52 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 							best_k = k;
 							best_row = 1;
 						  }
-						  // TODO:
-						  // Hosna, May 1st, 2012
-						  // do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
-						if (fres[i+1].pair <= -1)
-						{
-							tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-1) +
-							dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
-							misc.multi_free_base_penalty;
-							if (tmp < min)
+						if (DANGLE_MODE == 1) {
+							// TODO:
+							// Hosna, May 1st, 2012
+							// do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
+							if (fres[i+1].pair <= -1)
 							{
-								min = tmp;
-								best_k = k;
-								best_row = 2;
+								tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-1) +
+								dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
+								misc.multi_free_base_penalty;
+								if (DANGLE_MODE == 2) {
+									tmp += dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]]
+											+ dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]];
+								}
+								if (tmp < min)
+								{
+									min = tmp;
+									best_k = k;
+									best_row = 2;
+								}
 							}
-						}
-						if (fres[j-1].pair <= -1)
-						{
-							tmp = vm->get_energy_WM (i+1,k) + vm->get_energy_WM (k+1, j-2) +
-							dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
-							misc.multi_free_base_penalty;
-							if (tmp < min)
+							if (fres[j-1].pair <= -1)
 							{
-								min = tmp;
-								best_k = k;
-								best_row = 3;
+								tmp = vm->get_energy_WM (i+1,k) + vm->get_energy_WM (k+1, j-2) +
+								dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
+								misc.multi_free_base_penalty;
+								if (tmp < min)
+								{
+									min = tmp;
+									best_k = k;
+									best_row = 3;
+								}
 							}
-						}
-						if (fres[i+1].pair <= -1 && fres[j-1].pair <= -1)
-						{
-							tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-2) +
-							dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
-							dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
-							2*misc.multi_free_base_penalty;
-							if (tmp < min)
+							if (fres[i+1].pair <= -1 && fres[j-1].pair <= -1)
 							{
-								min = tmp;
-								best_k = k;
-								best_row = 4;
+								tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-2) +
+								dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
+								dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
+								2*misc.multi_free_base_penalty;
+								if (tmp < min)
+								{
+									min = tmp;
+									best_k = k;
+									best_row = 4;
+								}
 							}
-						}
+						} // end DANLGE_MODE==1
 
 						// Hosna: June 28, 2007
 						// the last branch of VM, which is WMB_(i+1),(j-1)
@@ -972,6 +1001,9 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
+					if (DANGLE_MODE == 2) {
+                        tmp += outer_dangles(i,j);
+                    }
 					if (tmp < min)
 					{
 					min = tmp;
@@ -979,7 +1011,9 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 					best_row = 1;
 					}
 				}
-
+				if (DANGLE_MODE != 1) { 
+					continue; 
+				}
 				if (fres[i].pair <= -1)
 				{
 					energy_ij = v->get_energy(i+1,j);
@@ -1191,11 +1225,17 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 			  tmp = v->get_energy(i,j) +
 				AU_penalty (int_sequence[i], int_sequence[j]) +
 				misc.multi_helix_penalty;
+
+			  if (DANGLE_MODE==2) {
+                tmp += outer_dangles(i,j);
+              }
+
 			  if (tmp < min)
 				{
 				  min = tmp;
 				  best_row = 1;
 				}
+			if ( DANGLE_MODE == 1 ) {
 			  if (fres[i].pair <= -1)
 			  {
 				  tmp = v->get_energy(i+1,j) +
@@ -1262,7 +1302,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 					  best_row = 6;
 				  }
 			  }
-
+			}
 			  for (int k=i; k < j; k++)
 				{
 					tmp = vm->get_energy_WM (i, k) + vm->get_energy_WM (k+1, j);
@@ -1511,50 +1551,58 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 					for (k = i+1; k <= j-1; k++)
 					{
 						tmp = vm->get_energy_WM (i+1,k) + vm->get_energy_WM (k+1, j-1);
+
+						if (DANGLE_MODE == 2) {
+                            tmp += dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]]
+                                + dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]];
+                        }
+
 						if (tmp < min)
 						{
 							min = tmp;
 							best_k = k;
 							best_row = 1;
 						}
-						if (fres[i+1].pair <= -1)
-						{
-							tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-1) +
-							dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
-							misc.multi_free_base_penalty;
-							if (tmp < min)
+						if (DANGLE_MODE == 1) {
+							if (fres[i+1].pair <= -1)
 							{
-								min = tmp;
-								best_k = k;
-								best_row = 2;
+								tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-1) +
+								dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
+								misc.multi_free_base_penalty;
+								if (tmp < min)
+								{
+									min = tmp;
+									best_k = k;
+									best_row = 2;
+								}
 							}
-						}
-						if (fres[j-1].pair <= -1)
-						{
-							tmp = vm->get_energy_WM (i+1,k) + vm->get_energy_WM (k+1, j-2) +
-							dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
-							misc.multi_free_base_penalty;
-							if (tmp < min)
+							if (fres[j-1].pair <= -1)
 							{
-								min = tmp;
-								best_k = k;
-								best_row = 3;
+								tmp = vm->get_energy_WM (i+1,k) + vm->get_energy_WM (k+1, j-2) +
+								dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
+								misc.multi_free_base_penalty;
+								if (tmp < min)
+								{
+									min = tmp;
+									best_k = k;
+									best_row = 3;
+								}
 							}
-						}
-						if (fres[i+1].pair <= -1 && fres[j-1].pair <= -1)
-						{
-							tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-2) +
-							dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
-							dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
-							2*misc.multi_free_base_penalty;
-							if (tmp < min)
+							if (fres[i+1].pair <= -1 && fres[j-1].pair <= -1)
 							{
-								min = tmp;
-								best_k = k;
-								best_row = 4;
+								tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-2) +
+								dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
+								dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]] +
+								2*misc.multi_free_base_penalty;
+								if (tmp < min)
+								{
+									min = tmp;
+									best_k = k;
+									best_row = 4;
+								}
 							}
-						}
-
+						} // end DANLGE_MODE==1
+						
 						// Hosna: June 28, 2007
 						// the last branch of VM, which is WMB_(i+1),(j-1)
 						// Hosna: July 5th, 2007
@@ -1636,12 +1684,21 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 				if (energy_ij < INF)
 				{
 					tmp = energy_ij + AU_penalty (int_sequence[i],int_sequence[j]) + acc;
+
+					if (DANGLE_MODE == 2) {
+                        tmp += outer_dangles(i,j);
+                    }
+
 					if (tmp < min)
 					{
 						min = tmp;
 						best_i = i;
 						best_row = 1;
 					}
+				}
+
+				if (DANGLE_MODE != 1) { 
+					continue; 
 				}
 
 				if (fres[i].pair <= -1)
@@ -1857,91 +1914,101 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 				tmp = v->get_energy(i,j) +
 				AU_penalty (int_sequence[i], int_sequence[j]) +
 				misc.multi_helix_penalty;
+
+				if (DANGLE_MODE==2) {
+    	            tmp += outer_dangles(i,j);
+	            }
+
 				if (tmp < min)
 				{
 					min = tmp;
 					best_row = 1;
 				}
 			}
-			if (fres[i].pair <= -1 && fres[j].pair == i+1 && fres[i+1].pair == j)
-			{
-				tmp = v->get_energy(i+1,j) +
-				AU_penalty (int_sequence[i+1], int_sequence[j]) +
-				dangle_bot [int_sequence[j]]
-				[int_sequence[i+1]]
-				[int_sequence[i]] +
-				misc.multi_helix_penalty +
-				misc.multi_free_base_penalty;
-				if (tmp < min)
-				{
-					min = tmp;
-					best_row = 2;
-				}
-			}
-			if (fres[j].pair <= -1 && fres[j-1].pair == i && fres[i].pair == j-1)
-			{
-				tmp = v->get_energy(i,j-1) +
-				AU_penalty (int_sequence[i], int_sequence[j-1]) +
-				dangle_top [int_sequence[j-1]]
-				[int_sequence[i]]
-				[int_sequence[j]] +
-				misc.multi_helix_penalty +
-				misc.multi_free_base_penalty;
-				if (tmp < min)
-				{
-					min = tmp;
-					best_row = 3;
-				}
-			}
-			if (fres[i].pair <= -1 && fres[j].pair <= -1 && fres[j-1].pair == i+1 && fres[i+1].pair == j-1)
-			{
-				tmp = v->get_energy(i+1,j-1) +
-				AU_penalty (int_sequence[i+1], int_sequence[j-1]) +
-				dangle_bot [int_sequence[j-1]]
-				[int_sequence[i+1]]
-				[int_sequence[i]] +
-				dangle_top [int_sequence[j-1]]
-				[int_sequence[i+1]]
-				[int_sequence[j]] +
-				misc.multi_helix_penalty +
-				2*misc.multi_free_base_penalty;
-				if (tmp < min)
-				{
-					min = tmp;
-					best_row = 4;
-				}
-			}
 
-			// TODO: April 3, 2012
-			// do I need to change WM to pk_only as well?
-			if (fres[i].pair <= -1)
-			{
-				tmp = vm->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
-				if (tmp < min)
-				{
-					min = tmp;
-					best_row = 5;
-				}
-			}
-			if (fres[j].pair <= -1)
-			{
-				tmp = vm->get_energy_WM (i,j-1) + misc.multi_free_base_penalty;
-				if (tmp < min)
-				{
-					min = tmp;
-					best_row = 6;
-				}
-			}
+			if ( DANGLE_MODE == 1 ) {
 
-			for (int k=i; k < j; k++)
-			{
-				tmp = vm->get_energy_WM (i, k) + vm->get_energy_WM (k+1, j);
-				if (tmp < min)
+				if (fres[i].pair <= -1 && fres[j].pair == i+1 && fres[i+1].pair == j)
 				{
-					min = tmp;
-					best_k = k;
-					best_row = 7;
+					tmp = v->get_energy(i+1,j) +
+					AU_penalty (int_sequence[i+1], int_sequence[j]) +
+					dangle_bot [int_sequence[j]]
+					[int_sequence[i+1]]
+					[int_sequence[i]] +
+					misc.multi_helix_penalty +
+					misc.multi_free_base_penalty;
+					if (tmp < min)
+					{
+						min = tmp;
+						best_row = 2;
+					}
 				}
+				if (fres[j].pair <= -1 && fres[j-1].pair == i && fres[i].pair == j-1)
+				{
+					tmp = v->get_energy(i,j-1) +
+					AU_penalty (int_sequence[i], int_sequence[j-1]) +
+					dangle_top [int_sequence[j-1]]
+					[int_sequence[i]]
+					[int_sequence[j]] +
+					misc.multi_helix_penalty +
+					misc.multi_free_base_penalty;
+					if (tmp < min)
+					{
+						min = tmp;
+						best_row = 3;
+					}
+				}
+				if (fres[i].pair <= -1 && fres[j].pair <= -1 && fres[j-1].pair == i+1 && fres[i+1].pair == j-1)
+				{
+					tmp = v->get_energy(i+1,j-1) +
+					AU_penalty (int_sequence[i+1], int_sequence[j-1]) +
+					dangle_bot [int_sequence[j-1]]
+					[int_sequence[i+1]]
+					[int_sequence[i]] +
+					dangle_top [int_sequence[j-1]]
+					[int_sequence[i+1]]
+					[int_sequence[j]] +
+					misc.multi_helix_penalty +
+					2*misc.multi_free_base_penalty;
+					if (tmp < min)
+					{
+						min = tmp;
+						best_row = 4;
+					}
+				}
+
+				// TODO: April 3, 2012
+				// do I need to change WM to pk_only as well?
+				if (fres[i].pair <= -1)
+				{
+					tmp = vm->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
+					if (tmp < min)
+					{
+						min = tmp;
+						best_row = 5;
+					}
+				}
+				if (fres[j].pair <= -1)
+				{
+					tmp = vm->get_energy_WM (i,j-1) + misc.multi_free_base_penalty;
+					if (tmp < min)
+					{
+						min = tmp;
+						best_row = 6;
+					}
+				}
+
+				for (int k=i; k < j; k++)
+				{
+					tmp = vm->get_energy_WM (i, k) + vm->get_energy_WM (k+1, j);
+					if (tmp < min)
+					{
+						min = tmp;
+						best_k = k;
+						best_row = 7;
+					}
+				}
+
 			}
 			// Hosna: June 28, 2007
 			// the last branch of W, which is WMB_i,j

@@ -75,6 +75,12 @@ class W_final: public s_min_folding{
         //int *intseq;
 //        int *index;
 
+        // Sebastian, Sep 7, 2017:
+        // energy contributions of left and right dangling end of stem closed by i and j;
+        // use for d2 mode
+        int outer_dangles(int i, int j);
+
+
 };
 
 #endif /*W_FINAL_H_*/
