@@ -26,6 +26,11 @@
 #include "structs.h"
 #include "constants.h"
 
+// global for which dangle mode to use
+// mode number models Vienna RNA's -d option
+// 1 is normal, original CCJ. 2 is used for compatibility with Vienna RNA
+extern int DANGLE_MODE;
+
 extern int *known_pairings;    // used for the loss-augmented prediction
 extern int *pred_pairings;
 
@@ -293,5 +298,10 @@ extern int linker_length;
 extern char structure_one_type[3];
 extern char structure_two_type[3];
 extern bool is_hybrid;
+
+// global for which dangle mode to use
+// mode number models Vienna RNA's -d option
+// 1 is normal, original iterative. 2 is used for compatibility with Vienna RNA
+extern int DANGLE_MODE;
 
 #endif

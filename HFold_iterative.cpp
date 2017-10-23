@@ -131,6 +131,7 @@ int main (int argc, char **argv) {
                         {"r", required_argument, 0, 'r'},
                         {"i", required_argument, 0, 'i'},
                         {"o", required_argument, 0, 'o'},
+						{"dangle2", no_argument, 0, 'd'},
                         {0, 0, 0, 0}
                 };
 
@@ -204,6 +205,9 @@ int main (int argc, char **argv) {
 			}
 			outputPathFound = true;
 			break;
+		case 'd': //setting dangle2 mode
+			DANGLE_MODE = 2;
+			break;
 		default:
 			errorFound = true;
 			break;
@@ -214,6 +218,8 @@ int main (int argc, char **argv) {
 			exit(1);
 		}
 	}
+
+	printf("DANGLE mode: %d\n",DANGLE_MODE);
 
 	if(!inputPathFound){
 		//if sequence or structure is missing when input file is not present
