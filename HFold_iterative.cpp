@@ -245,10 +245,6 @@ int main (int argc, char **argv) {
 
 	if(!(sequenceFound)){
 			fprintf(stderr, "--s is missing\n");
-    
-	//printf("DANGLE mode: %d\n",DANGLE_MODE);
-
-	if(!inputPathFound){
 			printUsage();
 			free(file);
 			free(output_path);
