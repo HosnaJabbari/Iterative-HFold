@@ -961,22 +961,12 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
             for (k = i+1; k <= j-1; k++)
               {
                 tmp = VM->get_energy_WM (i+1,k) + VM->get_energy_WM (k+1, j-1);
-
-                if (DANGLE_MODE == 2) {
-                    tmp +=
-                        dangle_top [int_sequence [i]][int_sequence [j]][int_sequence [i+1]]
-                        + dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]];
-                }
-
                 if (tmp < min)
                   {
                     min = tmp;
                     best_k = k;
                     best_row = 1;
                   }
-                
-                if (DANGLE_MODE != 1) continue;
-
                 if (fres[i+1].pair <= -1)
                 {
                     tmp = VM->get_energy_WM (i+2,k) + VM->get_energy_WM (k+1, j-1) +
@@ -1069,16 +1059,6 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
 //                     best_row = 1;
 //                     continue;
 //                 }
-
-                if (DANGLE_MODE == 2) {
-                    if ( j<nb_nucleotides) {
-                        tmp += dangle_top [sequence [j]][sequence [i]][sequence [j+1]];
-                    }
-                    if ( i>0 ) {
-                        tmp += dangle_bot [sequence[j]][sequence[i]][sequence[i-1]];
-                    }
-                }
-
                 if (tmp < min)
                 {
                 min = tmp;
@@ -1086,8 +1066,6 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
                 best_row = 1;
                 }
             }
-
-            if ( DANGLE_MODE !=1 ) continue;
 
             if (fres[i].pair <= -1)
             {
@@ -1199,75 +1177,59 @@ void s_min_folding::backtrack_restricted (seq_interval *cur_interval, str_featur
       tmp = V->get_energy(i,j) +
         AU_penalty (int_sequence[i], int_sequence[j]) +
         misc.multi_helix_penalty;
-    
-       if (DANGLE_MODE == 2) {
-            if ( j<nb_nucleotides) {
-                tmp += dangle_top [sequence [j]][sequence [i]][sequence [j+1]];
-            }
-            if ( i>0 ) {
-                tmp += dangle_bot [sequence[j]][sequence[i]][sequence[i-1]];
-            }
-       }
-
       if (tmp < min)
         {
           min = tmp;
           best_row = 1;
         }
-
-      if ( DANGLE_MODE == 1) {
-
-        if (fres[i].pair <= -1)
-        {
-            tmp = V->get_energy(i+1,j) +
-                    AU_penalty (int_sequence[i+1], int_sequence[j]) +
-                    dangle_bot [int_sequence[j]]
-                    [int_sequence[i+1]]
-                    [int_sequence[i]] +
-                    misc.multi_helix_penalty +
-                    misc.multi_free_base_penalty;
-            if (tmp < min)
-            {
-                min = tmp;
-                best_row = 2;
-            }
-        }
-        if (fres[j].pair <= -1)
-        {
-            tmp = V->get_energy(i,j-1) +
-                    AU_penalty (int_sequence[i], int_sequence[j-1]) +
-                    dangle_top [int_sequence[j-1]]
-                                [int_sequence[i]]
-                                [int_sequence[j]] +
-                    misc.multi_helix_penalty +
-                    misc.multi_free_base_penalty;
-            if (tmp < min)
-            {
-                min = tmp;
-                best_row = 3;
-            }
-        }
-        if (fres[i].pair <= -1 && fres[j].pair <= -1)
-        {
-            tmp = V->get_energy(i+1,j-1) +
-                    AU_penalty (int_sequence[i+1], int_sequence[j-1]) +
-                    dangle_bot [int_sequence[j-1]]
-                                [int_sequence[i+1]]
-                                [int_sequence[i]] +
-                    dangle_top [int_sequence[j-1]]
-                                [int_sequence[i+1]]
-                                [int_sequence[j]] +
-                    misc.multi_helix_penalty +
-                    2*misc.multi_free_base_penalty;
-            if (tmp < min)
-            {
-                min = tmp;
-                best_row = 4;
-            }
-        }
-      
-      } // end DANGLE_MODE == 1
-      
+      if (fres[i].pair <= -1)
+      {
+          tmp = V->get_energy(i+1,j) +
+                AU_penalty (int_sequence[i+1], int_sequence[j]) +
+                dangle_bot [int_sequence[j]]
+                [int_sequence[i+1]]
+                [int_sequence[i]] +
+                misc.multi_helix_penalty +
+                misc.multi_free_base_penalty;
+          if (tmp < min)
+          {
+              min = tmp;
+              best_row = 2;
+          }
+      }
+      if (fres[j].pair <= -1)
+      {
+          tmp = V->get_energy(i,j-1) +
+                AU_penalty (int_sequence[i], int_sequence[j-1]) +
+                dangle_top [int_sequence[j-1]]
+                            [int_sequence[i]]
+                            [int_sequence[j]] +
+                misc.multi_helix_penalty +
+                misc.multi_free_base_penalty;
+          if (tmp < min)
+          {
+              min = tmp;
+              best_row = 3;
+          }
+      }
+      if (fres[i].pair <= -1 && fres[j].pair <= -1)
+      {
+          tmp = V->get_energy(i+1,j-1) +
+                AU_penalty (int_sequence[i+1], int_sequence[j-1]) +
+                dangle_bot [int_sequence[j-1]]
+                            [int_sequence[i+1]]
+                            [int_sequence[i]] +
+                dangle_top [int_sequence[j-1]]
+                            [int_sequence[i+1]]
+                            [int_sequence[j]] +
+                misc.multi_helix_penalty +
+                2*misc.multi_free_base_penalty;
+          if (tmp < min)
+          {
+              min = tmp;
+              best_row = 4;
+          }
+      }
       if (fres[i].pair <= -1)
       {
           tmp = VM->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
