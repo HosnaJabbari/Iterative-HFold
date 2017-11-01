@@ -940,7 +940,6 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 
 					  }
 
-					  printf("best row: %d min: %d\n",best_row,min);
 					switch (best_row)
 					  {
 					  case 1:
@@ -1330,7 +1329,6 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 				best_row = 8;
 			  }
 
-              printf("M_WM | best_row: %d min: %d\n",best_row, min);
 			  switch (best_row)
 				{
 				  case 1: insert_node (i, j, LOOP); break;
