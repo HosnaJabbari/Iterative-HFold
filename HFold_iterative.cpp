@@ -352,7 +352,7 @@ int main (int argc, char **argv) {
 	free(method2_energy);
 	free(method3_energy);
 	free(method4_energy);
-        free(output_path);
+    free(output_path);
         for (int i=0; i < MAXSLEN; i++) {
                 free(result[i]);
         }
