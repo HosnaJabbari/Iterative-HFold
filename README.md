@@ -67,7 +67,6 @@ After installing you can move the executables wherever you wish, but you should 
             --r <structure>
             --i </path/to/file>
             --o </path/to/file>
-            --n <number of suboptimal structures to output>
 
         Remarks:
             make sure the <arguments> are enclosed in "", for example --r "..().." instead of --r ..()..
@@ -100,10 +99,9 @@ After installing you can move the executables wherever you wish, but you should 
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --n 10
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" -o "outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
 
     
 #### Exit code:

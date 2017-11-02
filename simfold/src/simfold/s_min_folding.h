@@ -28,9 +28,6 @@
 #include "s_energy_matrix.h"
 #include "s_multi_loop.h"
 
-#include <vector>
-#include "Hotspot.h"
-
 
 class s_min_folding
 {
@@ -58,9 +55,6 @@ class s_min_folding
         void return_structure (char *structure) { strcpy (structure, this->structure); }        
         // writes the predicted MFE structure into structure       
 
-        //kevin 4 oct 2017
-        void get_hotspots(std::vector<Hotspot*>* hotspot_list);
-
     // better to have protected variable rather than private, it's necessary for Hfold
     protected:
     //private:
@@ -84,7 +78,7 @@ class s_min_folding
         void allocate_space();
         // allocate the necessary memory
         
-        double fold_sequence (std::vector<Hotspot*>* hotspot_list = NULL);
+        double fold_sequence ();
         double fold_sequence_restricted ();
         void insert_node (int i, int j, char type);
         
@@ -112,12 +106,6 @@ class s_min_folding
         // PRE:  The matrix V has been calculated and the results written in f
         // POST: Prints details of each elementary structure        
 
-        void hotspot_backtrack (seq_interval *cur_interval, std::vector<Hotspot*> &hotspot_list);
-
-        //kevin 4 oct 2017
-        int distance(int left, int right);
-        void expand_hotspot(Hotspot* hotspot);
-        
 };
 
 #endif //S_MIN_FOLDING_H
