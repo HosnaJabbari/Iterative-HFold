@@ -395,6 +395,10 @@ int W_final::compute_W_br2_restricted (int j, str_features *fres, int &must_choo
             }
         }
 
+		if (DANGLE_MODE!=1) {
+			continue;
+		}
+
         // I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
         if (fres[i].pair <= -1 && i+1 < j)
         {
@@ -525,6 +529,9 @@ int W_final::compute_W_br2_restricted_pkonly (int j, str_features *fres, int &mu
             }
         }
 
+		if (DANGLE_MODE!=1) {
+			continue;
+		}
         // I have to condition on  fres[i].pair <= -1 to make sure that i can be unpaired
 		// in the pk_only version we don't add any pseudoknot free base pairs
         if (fres[i].pair <= -1 && i+1 < j && fres[i+1].pair ==j && fres[j].pair==i+1)
@@ -847,25 +854,36 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 					for (k = i+1; k <= j-1; k++)
 					  {
 						tmp = vm->get_energy_WM (i+1,k) + vm->get_energy_WM (k+1, j-1);
+						if (DANGLE_MODE == 2) {
+                            tmp += dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]]
+                                + dangle_bot [int_sequence[i]][int_sequence[j]][int_sequence[j-1]];
+                        }
+
 						if (tmp < min)
 						  {
 							min = tmp;
 							best_k = k;
 							best_row = 1;
 						  }
-						  // TODO:
-						  // Hosna, May 1st, 2012
-						  // do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
-						if (fres[i+1].pair <= -1)
-						{
-							tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-1) +
-							dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
-							misc.multi_free_base_penalty;
-							if (tmp < min)
+
+
+						if (DANGLE_MODE == 1) {
+							// TODO:
+							// Hosna, May 1st, 2012
+							// do I need to check for non-canonical base pairings here as well so the dangle values not be INF??
+							if (fres[i+1].pair <= -1)
 							{
-								min = tmp;
-								best_k = k;
-								best_row = 2;
+								tmp = vm->get_energy_WM (i+2,k) + vm->get_energy_WM (k+1, j-1) +
+								dangle_top [int_sequence[i]][int_sequence[j]][int_sequence[i+1]] +
+								misc.multi_free_base_penalty;
+
+								if (tmp < min)
+								{
+									min = tmp;
+									best_k = k;
+									best_row = 2;
+								}
+
 							}
 						}
 						if (fres[j-1].pair <= -1)
@@ -892,7 +910,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 								best_k = k;
 								best_row = 4;
 							}
-						}
+						} // end DANGLE_MODE==1
 
 						// Hosna: June 28, 2007
 						// the last branch of VM, which is WMB_(i+1),(j-1)
@@ -906,6 +924,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 						}
 
 					  }
+
 					switch (best_row)
 					  {
 					  case 1:
@@ -978,6 +997,10 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 					best_i = i;
 					best_row = 1;
 					}
+				}
+
+				if (DANGLE_MODE != 1) {
+					continue;
 				}
 
 				if (fres[i].pair <= -1)
@@ -1244,6 +1267,9 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, str_features *fre
 					  best_row = 4;
 				  }
 			  }
+
+            } // end DANGLE_MODE == 1
+
 			  if (fres[i].pair <= -1)
 			  {
 				  tmp = vm->get_energy_WM (i+1,j) + misc.multi_free_base_penalty;
@@ -1553,7 +1579,9 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 								best_k = k;
 								best_row = 4;
 							}
-						}
+
+						} // end DANLGE_MODE==1
+
 
 						// Hosna: June 28, 2007
 						// the last branch of VM, which is WMB_(i+1),(j-1)
@@ -1642,6 +1670,11 @@ void W_final::backtrack_restricted_pkonly (seq_interval *cur_interval, str_featu
 						best_i = i;
 						best_row = 1;
 					}
+				}
+
+
+				if (DANGLE_MODE != 1) {
+					continue;
 				}
 
 				if (fres[i].pair <= -1)
