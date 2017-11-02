@@ -465,6 +465,7 @@ double hfold_iterative(char* input_sequence, char* input_restricted, char* outpu
 	free(method3_energy);
 	free(method4_energy);
 
+
 	return final_energy;
 }
 

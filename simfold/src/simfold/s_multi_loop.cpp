@@ -370,6 +370,11 @@ PARAMTYPE s_multi_loop::compute_energy_restricted (int i, int j, str_features *f
         if (tmp < min)
             min = tmp;
 
+
+        if (DANGLE_MODE != 1) continue;
+
+
+
         if (fres[i+1].pair <= -1)
         {
             tmp = WM[iplus2k] + WM[kplus1jminus1] +
@@ -407,6 +412,7 @@ PARAMTYPE s_multi_loop::compute_energy_restricted (int i, int j, str_features *f
 
     min += misc.multi_helix_penalty + misc.multi_offset +
            AU_penalty (sequence[i], sequence[j]);
+
     return min;
 }
 
