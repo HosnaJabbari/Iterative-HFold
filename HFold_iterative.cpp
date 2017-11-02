@@ -335,19 +335,10 @@ int main (int argc, char **argv) {
 			exit(4);
 		}
 	}else{
-		//kevin 5 oct 2017
-		printf("Sequence:     %s\n",sequence);
-
-		//If only printing one, don't need to print the numbers
-		if(number_of_output == 1) {
-			printf("Restricted:   %s\n", result_list[0]->get_restricted());
-			printf("Result:       %s %lf\n", result_list[0]->get_final_structure(),result_list[0]->get_final_energy());
-		} else {
-		    // print multiple outputs
-            for (int i=0; i < number_of_output; i++) {
-                printf("Restricted %d: %s\n",i, result_list[i]->get_restricted());
-                printf("Result %d:     %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
-            }
+		printf("Seq: %s\n",sequence);
+		for (int i=0; i < number_of_output; i++) {
+			printf("restricted_%d: %s\n",i, result_list[i]->get_restricted());
+			printf("result_str_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
 		}
 	}
 
