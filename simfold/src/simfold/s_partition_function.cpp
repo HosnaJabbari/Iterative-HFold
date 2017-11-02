@@ -433,37 +433,37 @@ PFTYPE s_partition_function::compute_partition_function ()
                 compute_u1 (i,j);   // must be after s3!!
                 compute_s2 (i,j);
 
-                if (isinf(upm[ij]) || isnan(upm[ij]))
+                if (std::isinf(upm[ij]) || std::isnan(upm[ij]))
                 {
                     fprintf (stderr, "UPM(%d,%d) = %Lg\n", i, j, upm[ij]);
                     exit(1);
                 }
-                if (isinf(up[ij])  || isnan(up[ij]))
+                if (std::isinf(up[ij])  || std::isnan(up[ij]))
                 {
                     fprintf (stderr, "UP(%d,%d) = %Lg\n", i, j, up[ij]);
                     exit(1);
                 }
-                if (isinf(s1[ij])  || isnan(s1[ij]))
+                if (std::isinf(s1[ij])  || std::isnan(s1[ij]))
                 {
                     fprintf (stderr, "S1(%d,%d) = %Lg\n", i, j, s1[ij]);
                     exit(1);
                 }
-                if (isinf(u[ij])   || isnan(u[ij]))
+                if (std::isinf(u[ij])   || std::isnan(u[ij]))
                 {
                     fprintf (stderr, "U(%d,%d) = %Lg\n", i, j, u[ij]);
                     exit(1);
                 }
-                if (isinf(s3[ij])  || isnan(s3[ij]))
+                if (std::isinf(s3[ij])  || std::isnan(s3[ij]))
                 {
                     fprintf (stderr, "S3(%d,%d) = %Lg\n", i, j, s3[ij]);
                     exit(1);
                 }
-                if (isinf(u1[ij])  || isnan(u1[ij]))
+                if (std::isinf(u1[ij])  || std::isnan(u1[ij]))
                 {
                     fprintf (stderr, "U1(%d,%d) = %Lg\n", i, j, u1[ij]);
                     exit(1);
                 }
-                if (isinf(s2[ij])  || isnan(s2[ij]))
+                if (std::isinf(s2[ij])  || std::isnan(s2[ij]))
                 {
                     fprintf (stderr, "S2(%d,%d) = %Lg\n", i, j, s2[ij]);
                     exit(1);
@@ -2709,7 +2709,7 @@ int s_partition_function::verify_partition_function()
     }
     printf ("Checking partition function... ");
     // no idea why valgrind doesn't like this if, it says Z is not initialized
-    if (isnan(Z) || isnan(Zexhaustive))     error = 1;
+    if (std::isnan(Z) || std::isnan(Zexhaustive))     error = 1;
     // actually check the ratio, not the difference
     // the difference depends on the scale of Z , so then one Z is large, the difference becomes large too, but it's good
     // example: Z = 270.721, Ze = 270.721, diff = -2.35534e-13, ratio = -8.70025e-16
@@ -2762,7 +2762,7 @@ void s_partition_function::verify_recurrences()
         for (j=i+1; j < seqlen; j++)
         {
             ij = index[i]+j-i;
-            if (isnan(up[ij]) || isnan(upexhaustive[ij]))
+            if (std::isnan(up[ij]) || std::isnan(upexhaustive[ij]))
             {
 #ifdef DOUUBLEPARAMS
                 printf ("\tup[%d,%d] = %g, upex = %g, diff = %g\n", i,j,up[ij],upexhaustive[ij], up[ij]-upexhaustive[ij]);
@@ -2797,7 +2797,7 @@ void s_partition_function::verify_recurrences()
         for (j=i+1; j < seqlen; j++)
         {
             ij = index[i]+j-i;
-            if (isnan(p[ij]) || isnan(pexhaustive[ij]))
+            if (std::isnan(p[ij]) || std::isnan(pexhaustive[ij]))
             {
                 printf ("\tp[%d,%d] = %g, pex = %g, diff = %g\n", i,j,p[ij],pexhaustive[ij], p[ij]-pexhaustive[ij]);
                 pfine = 0;
@@ -2834,7 +2834,7 @@ void s_partition_function::verify_recurrences()
                 unew = u[ij];
             else
                 unew = u_ip_jp[ij] + u_ip_ju[ij] + u_iu_jp[ij] + u_iu_ju[ij];
-            if (isnan(unew) || isnan(uexhaustive[ij]))
+            if (std::isnan(unew) || std::isnan(uexhaustive[ij]))
             {
                 printf ("\tunew[%d,%d] = %g, u = %g, diff = %g\n", i,j,unew,uexhaustive[ij], unew-uexhaustive[ij]);
                 ufine = 0;
@@ -5702,7 +5702,7 @@ int s_partition_function::correct_gradient ()
     {
         diff = GlogZexhaustive[i] - GlogZ[i];
         if (diff < 0)     diff *= -1.0;
-        if (((GlogZexhaustive[i] != 0 || GlogZ[i] != 0 ) && diff > PREC ) || isnan(GlogZ[i]))
+        if (((GlogZexhaustive[i] != 0 || GlogZ[i] != 0 ) && diff > PREC ) || std::isnan(GlogZ[i]))
         {
 #ifdef DOUBLEPARAMS
             printf ("%4d %30s\texhaust=%10g\tsmart=%10g\tdiff=%g\n", i, string_params[i], GlogZexhaustive[i], GlogZ[i], diff);
@@ -5751,7 +5751,7 @@ int s_partition_function::correct_gradient_nan ()
     int correct = 1;
     for (i=0; i < num_params; i++)
     {
-        if (isnan(GlogZ[i]))
+        if (std::isnan(GlogZ[i]))
         {
             printf ("Glog[%d]=%g\n", i, GlogZ[i]);
             correct = 0;
