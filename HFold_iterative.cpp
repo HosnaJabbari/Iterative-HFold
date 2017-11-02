@@ -601,7 +601,6 @@ bool get_sequence_structure (char *fileName, char *sequence, char *structure, bo
 			printf("Line 2 is invalid\n");
 			return false;
 		}else{
-			printf("1\n");
 			*structureFound = true;
 		}
 	}

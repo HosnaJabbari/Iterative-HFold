@@ -825,6 +825,7 @@ double simfold_restricted (char *sequence, char *restricted, char *structure)
             exit(1);
         }
     }
+    /*
     // now check if the free energy obtained with simfold_restricted is correct
     double correct_energy = free_energy_simfold_restricted (sequence, structure, restricted);
     if (fabs (correct_energy-min_energy) > 1.0)
@@ -834,6 +835,7 @@ double simfold_restricted (char *sequence, char *restricted, char *structure)
         fprintf (stderr, "ERROR!!! The dp energy is different from the energy calculated at the end!!\n");
         exit(1);
     }
+    */
     return min_energy;
 }
 
