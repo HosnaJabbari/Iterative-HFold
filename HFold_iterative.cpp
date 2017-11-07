@@ -317,7 +317,6 @@ int main (int argc, char **argv) {
 	//output to file
 	if(outputPathFound){
 		if(!save_file("", output_path, sequence, structure, final_structure, final_energy, method_chosen)){
-			fprintf(stderr, "write to file fail\n");
 			exit(4);
 		}
 	}else{
@@ -573,6 +572,7 @@ bool save_file (const char *fileName, char *outputPath, const char *sequence, ch
 		fprintf(ioFile, "Sequence: %s\nInput_structure: %s\nOutput_structure: %s\nEnergy: %.2f\nMethod: %i", sequence, restricted, structure, energy, chosen_method);
 	} else {
 		write_log_file("Could not open file", fileName, 'E');
+		perror("Write to file fail");
 		return false;
 	}
 
