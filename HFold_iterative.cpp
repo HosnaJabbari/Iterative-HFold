@@ -572,7 +572,7 @@ bool save_file (const char *fileName, char *outputPath, const char *sequence, ch
 		fprintf(ioFile, "Sequence: %s\nInput_structure: %s\nOutput_structure: %s\nEnergy: %.2f\nMethod: %i", sequence, restricted, structure, energy, chosen_method);
 	} else {
 		write_log_file("Could not open file", fileName, 'E');
-		perror("Write to file fail");
+		perror("Write to file error");
 		return false;
 	}
 
