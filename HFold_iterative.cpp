@@ -44,6 +44,8 @@
 #include "Hotspot.h"
 #include "h_common.h"
 
+#include "shape_data.h"
+
 //#define HFOLD 						"./HFold"
 //#define HFOLD_PKONLY 				"./HFold_pkonly"
 //#define HFOLD_INTERACTING 			"./HFold_interacting"
@@ -134,8 +136,11 @@ int main (int argc, char **argv) {
                         {"r", required_argument, 0, 'r'},
                         {"i", required_argument, 0, 'i'},
                         {"o", required_argument, 0, 'o'},
-			             			{"n", required_argument, 0, 'n'},
-			                  {"d2", no_argument, 0, 'd'},
+			            {"n", required_argument, 0, 'n'},
+			        	{"d2", no_argument, 0, 'd'},
+						{"shape", required_argument, 0, 'g'},
+						{"b", required_argument, 0, 'h'},
+						{"m", required_argument, 0, 'm'},
                         {0, 0, 0, 0}
                 };
 
@@ -144,7 +149,7 @@ int main (int argc, char **argv) {
 		// getopt_long stores the option index here.
                 int option_index = 0;
 
-		option = getopt_long (argc, argv, "s:r:i:o:n:", long_options, &option_index);
+		option = getopt_long (argc, argv, "", long_options, &option_index);
 
 		// Detect the end of the options
 		if (option == -1)
@@ -230,6 +235,28 @@ int main (int argc, char **argv) {
 		case 'd': //setting dangle2 mode
 			DANGLE_MODE = 2;
 			break;
+		case 'g': //--shape (shape file path)
+      		if(!sequenceFound){
+				fprintf(stderr, "Must define sequence before shape file\n");
+				errorFound = true;
+				break;
+			}
+			// important that this is before set_shape_file
+			shape.set_sequence_length(strlen(sequence));
+			shape.set_shape_file(std::string(optarg));
+			break;
+		case 'h': //--b (shape intercept)
+				if (shape.is_number(optarg))
+						shape.set_b(atof(optarg));
+				else
+						errorFound = true;
+				break;
+		case 'm': //--m (shape slope)
+				if (shape.is_number(optarg))
+						shape.set_m(atof(optarg));
+				else
+						errorFound = true;
+				break;
 		default:
 			errorFound = true;
 			break;
@@ -337,8 +364,8 @@ int main (int argc, char **argv) {
 	}else{
 		printf("Seq: %s\n",sequence);
 		for (int i=0; i < number_of_output; i++) {
-			printf("restricted_%d: %s\n",i, result_list[i]->get_restricted());
-			printf("result_str_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+			printf("Restricted_%d: %s\n",i, result_list[i]->get_restricted());
+			printf("Result_%d: %s \nEnergy_%d: %lf\n",i, result_list[i]->get_final_structure(),i,result_list[i]->get_final_energy());
 		}
 	}
 
@@ -372,8 +399,8 @@ bool write_output_file(char* path_to_file, int num_of_output, std::vector<Result
 	}
 	fprintf(fp,"Seq: %s\n",result_list[0]->get_sequence());
 	for (int i=0; i < num_of_output; i++) {
-		fprintf(fp,"restricted_%d: %s\n",i, result_list[i]->get_restricted());
-		fprintf(fp,"result_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+		fprintf(fp,"Restricted_%d: %s\n",i, result_list[i]->get_restricted());
+		fprintf(fp,"Result_%d: %s \nEnergy_%d: %lf\n",i, result_list[i]->get_final_structure(),i,result_list[i]->get_final_energy());
 	}
 	fclose(fp);
 	return true;
@@ -495,10 +522,19 @@ void printUsage(){
 	printf("Example:\n");
 
 	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
-	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --n 10\n");
 	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n\n");
 
-	printf("Please read README for more details\n");
+	printf("You can also include SHAPE data to be used.\n");
+    printf("The SHAPE data must be in a file with 1 number per line.\n");
+	printf("The number corresponds with each nucleotide in order, and the file must be exactly the same length as the sequence.\n");
+    printf("--shape (\"filename\") to specify a file for shape data\n");
+    printf("--b (number) to specify an intercept for the shape data (default is -0.600000)\n");
+    printf("--m (number) to specify a slope for the shape data (default is 1.800000)\n\n");
+
+	printf("Example:\n");
+    printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" -r \"(____________________________)\" --shape \"shapefile\" --b -0.4 --m 1.3\n\n");
+
+	printf("Please read README for more details\n\n");
 }
 
 
