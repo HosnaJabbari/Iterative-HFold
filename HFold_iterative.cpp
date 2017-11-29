@@ -337,8 +337,8 @@ int main (int argc, char **argv) {
 	}else{
 		printf("Seq: %s\n",sequence);
 		for (int i=0; i < number_of_output; i++) {
-			printf("restricted_%d: %s\n",i, result_list[i]->get_restricted());
-			printf("result_str_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+			printf("Restricted_%d: %s\n",i, result_list[i]->get_restricted());
+			printf("Result_%d: %s \nEnergy_%d: %lf\n",i, result_list[i]->get_final_structure(),i,result_list[i]->get_final_energy());
 		}
 	}
 
@@ -372,8 +372,8 @@ bool write_output_file(char* path_to_file, int num_of_output, std::vector<Result
 	}
 	fprintf(fp,"Seq: %s\n",result_list[0]->get_sequence());
 	for (int i=0; i < num_of_output; i++) {
-		fprintf(fp,"restricted_%d: %s\n",i, result_list[i]->get_restricted());
-		fprintf(fp,"result_%d: %s %lf\n",i, result_list[i]->get_final_structure(),result_list[i]->get_final_energy());
+		fprintf(fp,"Restricted_%d: %s\n",i, result_list[i]->get_restricted());
+		fprintf(fp,"Result_%d: %s \nEnergy_%d: %lf\n",i, result_list[i]->get_final_structure(),i,result_list[i]->get_final_energy());
 	}
 	fclose(fp);
 	return true;
