@@ -75,7 +75,7 @@ void shape_info::set_data(std::string filename) {
     }
 
     if (i != sequence_length()) {
-        fprintf(stderr, "SHAPE data file error: length less than sequence length (%d compared to %d)\n",i-1,sequence_length());
+        fprintf(stderr, "SHAPE data file error: length less than sequence length (%d compared to %d)\n",i,sequence_length());
         exit(-1);
     }
 

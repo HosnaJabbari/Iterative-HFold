@@ -316,7 +316,6 @@ int main (int argc, char **argv) {
 	//end of validation for command line arguments
 
 	write_log_file("Starting Program", "", 'I');
-
 	Result* result;
 	std::vector<Result*> result_list;
 
