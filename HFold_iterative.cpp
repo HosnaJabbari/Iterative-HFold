@@ -127,6 +127,11 @@ int main (int argc, char **argv) {
 	bool outputPathFound = false;
 	bool errorFound = false;
 
+	//kevin 8 Dec 2017
+	bool hotspot_only = false;
+	char* hotspotDir;
+	hotspotDir = (char*) malloc(sizeof(char) * 1000);
+
 	int option;
 
 	//kevin: june 23 2017 https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
@@ -141,6 +146,7 @@ int main (int argc, char **argv) {
 						{"shape", required_argument, 0, 'g'},
 						{"b", required_argument, 0, 'h'},
 						{"m", required_argument, 0, 'm'},
+						{"hotspot_only", required_argument, 0, 'l'}, //only dump hotspots to file
                         {0, 0, 0, 0}
                 };
 
@@ -257,6 +263,11 @@ int main (int argc, char **argv) {
 				else
 						errorFound = true;
 				break;
+		//kevin 8 Dec 2017
+		case 'l':
+			hotspot_only = true;
+			strcpy(hotspotDir, optarg);
+			break;
 		default:
 			errorFound = true;
 			break;
@@ -305,6 +316,24 @@ int main (int argc, char **argv) {
 		//printf("done hotspot\n");
 		//exit(999);
 	}
+
+	//kevin 8 Dec 2017
+	if(hotspot_only){
+		FILE* fp = fopen(hotspotDir,"w");
+		if(fp == NULL){
+			fprintf(stderr, "cannot write to hotspot file\n");
+			exit(4);
+		}
+		for(int i =0; i < hotspot_list.size(); i++){
+			fprintf(fp,"Seq1_hotspot_%d: %s\n",i,hotspot_list[i]->get_structure());
+		}
+		fprintf(fp,"-----\n");
+
+		fclose(fp);
+		free(hotspotDir);
+		exit(0);
+	}
+
 
 	//if we have output path and input path, try to combine both
 	if(outputPathFound && inputPathFound){
@@ -374,6 +403,7 @@ int main (int argc, char **argv) {
 	// Clean up
 	free(file);
 	free(output_path);
+	free(hotspotDir);
 
 	for (int i=0; i < result_list.size(); i++) {
 		delete result_list[i];
