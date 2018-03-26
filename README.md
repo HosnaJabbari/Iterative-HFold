@@ -68,8 +68,10 @@ After installing you can move the executables wherever you wish, but you should 
             --i </path/to/file>
             --o </path/to/file>
             --n <number of suboptimal structures to output>
+            --d use dangle2 calculation
 
         Remarks:
+            Required arguments: --s <sequence> or --i </path/to/file>
             make sure the <arguments> are enclosed in "", for example --r "..().." instead of --r ..()..
             input file for --i must be .txt
             if --i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
@@ -100,10 +102,12 @@ After installing you can move the executables wherever you wish, but you should 
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC"
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)"
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --n 10
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" -o "outputfile.txt"
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --d
 
     
 #### Exit code:
