@@ -69,6 +69,9 @@ After installing you can move the executables wherever you wish, but you should 
             --o </path/to/file>
             --n <number of suboptimal structures to output>
             --hotspot_only </path/to/file>
+            --shape </path/to/file>
+            --b <number>
+            --m <number>
 
         Remarks:
             make sure the <arguments> are enclosed in "", for example --r "..().." instead of --r ..()..
