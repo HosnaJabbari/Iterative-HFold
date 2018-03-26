@@ -68,6 +68,7 @@ After installing you can move the executables wherever you wish, but you should 
             --i </path/to/file>
             --o </path/to/file>
             --n <number of suboptimal structures to output>
+            --hotspot_only </path/to/file>
 
         Remarks:
             make sure the <arguments> are enclosed in "", for example --r "..().." instead of --r ..()..
@@ -76,13 +77,24 @@ After installing you can move the executables wherever you wish, but you should 
             if --o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
             if --o is provided with just a file name without a path, and if --i is provided, then the output file will be generated in the directory where the input file is located
 
-            
             You can also include SHAPE data to be used. 
             The SHAPE data must be in a file with 1 number per line.
             The number corresponds with each nucleotide in order, and the file must be exactly the same length as the sequence.
             --shape ("filename") to specify a file for shape data
             --b (number) to specify an intercept for the shape data (default is -0.600000)
             --m (number) to specify a slope for the shape data (default is 1.800000)
+
+            --hotspot_only does not run the actual HFold_iterative program. This tells the program to generate 
+            restricted structures and write to the provided file. Usually used for large sequences and need to split it 
+            up and run it independently with an outside script
+            example file when calling ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --hotspot_only "./hotspot_file.txt"
+            Seq1_hotspot_0: ____(((((_____)))))___________
+            Seq1_hotspot_1: ____((((______________))))____
+            Seq1_hotspot_2: ____((((_______))))___________
+            Seq1_hotspot_3: _______((((___________))))____
+            Seq1_hotspot_4: ____(((_________)))___________
+            -----
+
     
     Sequence requirements:
         containing only characters GCAUT
@@ -105,8 +117,8 @@ After installing you can move the executables wherever you wish, but you should 
 
 #### Example:
     assume you are in the directory where the HFold_iterative executable is loacted
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
-    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
     ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --r "(____________________________)"
     ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" --n 10
