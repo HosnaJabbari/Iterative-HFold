@@ -22,6 +22,7 @@
 // malloc.h is not needed on my mac as stdlib.h does the same
 //#include <malloc.h>
 #include <math.h>
+#include <cmath>
 #include <ctype.h>
 
 
