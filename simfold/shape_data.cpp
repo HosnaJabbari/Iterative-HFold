@@ -58,24 +58,25 @@ void shape_info::set_data(std::string filename) {
     // go through where each word is a shape data number
     int i = 0;
     while (valid) {
-        if (i > sequence_length()) {
-            fprintf(stderr, "SHAPE data file error: length greater than sequence length (sequence length = %d)\n",sequence_length());
-            exit(-1);
-        }
         if (!is_number(input)) {
             fprintf(stderr, "SHAPE data file error: line after start is not a number\n",i,sequence_length());
             exit(-1);
         }
 
-
-        data_[i] = std::stod(input);
+        if (i <= sequence_length()) {
+            data_[i] = std::stod(input);
+        }
         ++i;
 
         valid = static_cast<bool>(infile >> input);
     }
 
-    if (i != sequence_length()) {
-        fprintf(stderr, "SHAPE data file error: length less than sequence length (%d compared to %d)\n",i,sequence_length());
+    if (i < sequence_length()) {
+        fprintf(stderr, "SHAPE data file error: length less than sequence length (%d < %d)\n",i,sequence_length());
+        exit(-1);
+    }
+    else if (i > sequence_length()) {
+        fprintf(stderr, "SHAPE data file error: length greater than sequence length (%d > %d)\n",i,sequence_length());
         exit(-1);
     }
 
