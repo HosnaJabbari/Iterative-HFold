@@ -4,15 +4,20 @@
 Software implementation of Iterative HFold.      
 Iterative HFold is an algorithm for predicting the pseudoknotted secondary structures of RNA using relaxed Hierarchical Folding. 
 
-Paper: https://www.researchgate.net/publication/262810273_A_fast_and_robust_iterative_algorithm_for_prediction_of_RNA_pseudoknotted_secondary_structures
+Paper: [https://www.researchgate.net/publication/262810273_A_fast_and_robust_iterative_algorithm_for_prediction_of_RNA_pseudoknotted_secondary_structures](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-147)
 
 On the dataset tested in this paper, Iterative HFold generally has better accuracy that its predecessor, [HFold](https://github.com/HosnaJabbari/HFold).
 
 #### Supported OS: 
 Linux, macOS
 
+### Conda Package:
+```
+conda install -c uvic-cobra iterative-hfold
+```
+Works for Linux and macOS
 
-### Installation:  
+### Source code Installation:  
 Requirements: A compiler that supports C++11 standard (tested with g++ version 4.9.0 or higher), Pthreads, and CMake version 3.1 or greater.    
 
 [CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that HFold can find it.    
