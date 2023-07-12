@@ -1,6 +1,6 @@
 # make a directory in $PREFIX to build in
-mkdir -p $PREFIX/HFold && mv -v * $PREFIX/HFold
-cd $PREFIX/HFold
+mkdir -p $PREFIX/Iterative-HFold && mv -v * $PREFIX/Iterative-HFold
+cd $PREFIX/Iterative-HFold
 # build
 cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
 cmake --build build

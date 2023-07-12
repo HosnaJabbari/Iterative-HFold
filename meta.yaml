@@ -1,4 +1,4 @@
-{% set name = "HFold" %}
+{% set name = "Iterative-HFold" %}
 {% set version = "1.0.0" %}
 
 package:
