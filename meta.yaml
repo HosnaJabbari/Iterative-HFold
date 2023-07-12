@@ -1,0 +1,15 @@
+{% set name = "HFold" %}
+{% set version = "1.0.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+    git_url: https://github.com/mateog4712/{{ name }}.git
+
+requirements:
+  build:
+    - git
+    - cmake
+    - {{ compiler('cxx') }}

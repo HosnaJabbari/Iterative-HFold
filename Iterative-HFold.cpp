@@ -372,15 +372,15 @@ void printUsage(){
 	printf ("\t\t() restricted base pair\n");
 	printf ("\t\t _ no restriction\n");
 */
-	printf("Usage ./HFold_iterative --s <sequence> --r <structure> [--o </path/to/file>]\n");
+	printf("Usage Iterative-HFold --s <sequence> --r <structure> [--o </path/to/file>]\n");
 	printf("or\n");
-	printf("Usage ./HFold_iterative --i </path/to/file> [--o </path/to/file>]\n");
+	printf("Usage Iterative-HFold --i </path/to/file> [--o </path/to/file>]\n");
 	printf ("  Restricted structure symbols:\n");
 	printf ("    () restricted base pair\n");
 	printf ("    _ no restriction\n");
 	printf("Example:\n");
-	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
-	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
+	printf("Iterative-HFold --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
+	printf("Iterative-HFold --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
 	printf("Please read README for more details\n");
 }
 
@@ -396,7 +396,7 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 //Calling HFold: programPath = HFOLD
 //Calling HFold_PKonly: programPath = HFOLD_PKONLY
 bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
-	char config_file[200];
+	char config_file[400];
 	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
 	//what to fold: RNA or DNA
@@ -441,7 +441,7 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
         std::string result = "";
 
-	char config_file[200] = SIMFOLD_HOME "/params/multirnafold.conf";
+	char config_file[300] = SIMFOLD_HOME "/params/multirnafold.conf";
 
 	double temperature;
 	temperature = 37;
