@@ -73,6 +73,8 @@ After installing you can move the executables wherever you wish, but you should 
             -o </path/to/file>
             -v
             -V
+            -n <number of outputs>
+            -p
 
         Remarks:
             make sure the <arguments> are enclosed in "", for example -r "..().." instead of -r ..()..
@@ -82,6 +84,8 @@ After installing you can move the executables wherever you wish, but you should 
             if -o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
             if -v is provided, a verbose output will be given (method used is outputted)
             if -V is provided, the version is given
+            if -n is provided with a number, it will modify the number of hotspots looked and outputs given (the base is 1)
+            if -p is provided, it will change the output to pseudoknot-free
 
     
     Sequence requirements:
@@ -112,6 +116,8 @@ After installing you can move the executables wherever you wish, but you should 
     ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)"
     ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)" -o "outputfile.txt"
     ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC
+    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -n 10
+    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -p
 
     
 #### Exit code:
