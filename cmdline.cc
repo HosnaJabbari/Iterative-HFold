@@ -63,6 +63,10 @@ cmdline_parser_print_version (void)
 {
   printf (" %s\n",(strlen(package_name) ? package_name : "Iterative-HFold"));
 
+  printf ("%s %s\n",
+     (strlen(Iterative_HFold_CMDLINE_PACKAGE_NAME) ? Iterative_HFold_CMDLINE_PACKAGE_NAME : "Iterative-HFold"),
+     Iterative_HFold_CMDLINE_VERSION);
+
   if (strlen(args_info_versiontext) > 0)
     printf("\n%s\n", args_info_versiontext);
 }

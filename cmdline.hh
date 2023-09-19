@@ -2,6 +2,10 @@
 #define CMDLINE_H
 #include <string>
 
+#define Iterative_HFold_CMDLINE_PACKAGE_NAME "Iterative HFold"
+
+#define Iterative_HFold_CMDLINE_VERSION "1.1"
+
 
 // The restricted structure
 extern std::string input_struct;

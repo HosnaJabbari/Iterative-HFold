@@ -1,52 +1,35 @@
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
+# Prerequisites
+*.d
 
-# Folder config file
-Desktop.ini
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
 
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
+# Precompiled Headers
+*.gch
+*.pch
 
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
 
-# Windows shortcuts
-*.lnk
+# Fortran module files
+*.mod
+*.smod
 
-# =========================
-# Operating System Files
-# =========================
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
 
-# OSX
-# =========================
-
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+# Executables
+*.exe
+*.out
+*.app
 
 # build
 /build/
-**/build
-*.txt
