@@ -1,5 +1,6 @@
 // Iterative HFold files
 #include "hotspot.hh"
+#include "Result.hh"
 #include "cmdline.hh"
 #include "hfold_validation.h"
 #include "Iterative-HFold.hh"
@@ -52,6 +53,39 @@ void get_input(std::string file, std::string &sequence, std::string &structure){
 	}
 	in.close();
 }
+
+//check length and if any characters other than ._()
+void validateStructure(std::string sequence, std::string structure){
+	if(structure.length() != sequence.length()){
+		std::cout << " The length of the sequence and corresponding structure must have the same length" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+
+	//check if any characters are not ._()
+	for(char c : structure) {
+		if (!(c == '.' || c == '_' || c == '(' || c == ')')){
+			std::cout << "Structure must only contain ._(): " << c << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+}
+
+//check if sequence is valid with regular expression
+//check length and if any characters other than GCAUT
+void validateSequence(std::string sequence){
+
+	if(sequence.length() == 0){
+		std::cout << "sequence1 or sequence2 is missing" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+  // return false if any characters other than GCAUT -- future implement check based on type
+  for(char c : sequence) {
+    if (!(c == 'G' || c == 'C' || c == 'A' || c == 'U' || c == 'T')) {
+		std::cout << "Sequence contains character " << c << " that is not G,C,A,U, or T." << std::endl;
+		exit(EXIT_FAILURE);
+    }
+  }
+}
 /* I am changing iterative HFold so that we run 4 methods and choose the structure with the lowest energy as the winner
 1) run HFold_PKonly on input structure, if pked, keep the pk bases as input structure and run HFold on them and get the result
 2) run HFold on the original input and get the result
@@ -74,14 +108,24 @@ int main (int argc, char **argv) {
 	}
 	int n = seq.length();
 
+	validateSequence(seq);
+
 	std::string restricted;
     args_info.input_structure_given ? restricted = input_struct : restricted = "";
+
+	if(restricted != "") validateStructure(seq,restricted);
 
 	std::string fileI;
     args_info.input_file_given ? fileI = input_file : fileI = "";
 
 	std::string fileO;
-    args_info.output_file_given ? fileO = output_file : fileO = "";
+    args_info.output_file_given ? fileO = output_file : fileO = "";	
+
+	int max_hotspot = args_info.h_num_given ? hotspot_num : 20;
+	int number_of_suboptimal_structure = args_info.subopt_given ? subopt : 1;
+	bool pk_free = args_info.pk_free_given;
+
+	
 
 	if(fileI != ""){
 		
@@ -93,6 +137,17 @@ int main (int argc, char **argv) {
 		}
 		
 	}
+
+	// //set up for RNA so we can use this for building hotspot
+	// if(!args_info.input_structure_given){
+	// 	char config_file[200];
+	// 	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
+	// 	int dna_or_rna = RNA;
+	// 	double temperature = 37.0;
+	// 	init_data ("./simfold", config_file, dna_or_rna, temperature);
+	// 	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
+	// 	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/parameters_DP09.txt");
+	// }
 
 	char config_file[400];
 	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
@@ -110,144 +165,163 @@ int main (int argc, char **argv) {
 	// so we add it here
 	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/parameters_DP09.txt");
 
+	std::vector<Hotspot> hotspot_list;
 
-	char sequence[n];
+	char sequence[n+1];
 	strcpy(sequence,seq.c_str());
-	if(restricted == ""){
-		std::vector<Hotspot> hotspot_list;
-		get_hotspots(sequence, hotspot_list,20);
-		restricted = hotspot_list[0].get_structure();
-		std::cout << restricted << std::endl;
-
-	}
-
-	char structure[n];
-	strcpy(structure,restricted.c_str());
-
-	if(!validateSequence(sequence)){
-		fprintf(stderr,"-s sequence is invalid. sequence: %s\n",sequence);
-		printUsage();
-		exit(1);
-	}
-
-	if(!validateStructure(structure, sequence)){
-		fprintf(stderr, "-r is invalid\n");
-		printUsage();
-		exit(1);
-	}else{
-		replaceBrackets(structure);
-	}
+	// Hotspots
 
 	
-	//kevin: june 22 2017
-	//end of validation for command line arguments
-	int method_chosen = -1;
-	char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method4_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char final_structure[MAXSLEN];
-
-	double *method1_energy = (double*) malloc(sizeof(double) * INF);
-	double *method2_energy = (double*) malloc(sizeof(double) * INF);
-	double *method3_energy = (double*) malloc(sizeof(double) * INF);
-	double *method4_energy = (double*) malloc(sizeof(double) * INF);
-	double final_energy = INF;
-
-	*method1_energy = INF;
-	*method2_energy = INF;
-	*method3_energy = INF;
-	*method4_energy = INF;
-
-	method1_structure[0] = '\0';
-	method2_structure[0] = '\0';
-	method3_structure[0] = '\0';
-	method4_structure[0] = '\0';
-	final_structure[0] = '\0';
-
-	// printf("method1\n");
-	*method1_energy = method1(sequence, structure, method1_structure);
-	// printf("method2\n");
-	*method2_energy = method2(sequence, structure, method2_structure);
-	// printf("method3\n");
-	*method3_energy = method3(sequence, structure, method3_structure);
-	// printf("method4\n");
-	*method4_energy = method4(sequence, structure, method4_structure);
-
-        //We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
-        if (*method1_energy < final_energy) {
-        //if (*method1_energy < final_energy && *method1_energy != 0) {
-                final_energy = *method1_energy;
-                strcpy(final_structure, method1_structure);
-                method_chosen = 1;
-        }
-
-        if (*method2_energy < final_energy) {
-        //if (*method2_energy < final_energy && *method2_energy != 0) {
-                final_energy = *method2_energy;
-                strcpy(final_structure, method2_structure);
-                method_chosen = 2;
-        }
-
-        if (*method3_energy < final_energy) {
-        //if (*method3_energy < final_energy && *method3_energy != 0) {
-                final_energy = *method3_energy;
-                strcpy(final_structure, method3_structure);
-                method_chosen = 3;
-        }
-
-        if (*method4_energy < final_energy) {
-        //if (*method4_energy < final_energy && *method4_energy != 0) {
-                final_energy = *method4_energy;
-                strcpy(final_structure, method4_structure);
-                method_chosen = 4;
-        }
-
-
-	if (final_energy == INF || method_chosen == -1) {
-		fprintf(stderr, "ERROR: could not find energy\n");
-		fprintf(stderr, "SEQ: %s\n",sequence);
-		fprintf(stderr, "Structure: %s\n",structure);
-		exit(6);
+	if(restricted != ""){
+		Hotspot hotspot(0,restricted.length()-1,restricted.length());
+		hotspot.set_structure(restricted);
+		hotspot_list.push_back(hotspot);
+	}
+	else {
+		get_hotspots(sequence, hotspot_list,max_hotspot);
 	}
 
+	// Data structure for holding the output
+	std::vector<Result> result_list;
+
+	// Iterate through all hotspots or the single given input structure
+	for(int i = 0;i<hotspot_list.size();++i){
+
+		char structure[n+1];
+		std::string struc = hotspot_list[i].get_structure();
+		std::cout << struc << std::endl;
+		strcpy(structure,struc.c_str());
+
+		char final_structure[MAXSLEN];
+		double final_energy = INF;
+		int method_chosen = -1;
+		if(!pk_free){
+			char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+			char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+			char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+			char *method4_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+
+			double *method1_energy = (double*) malloc(sizeof(double) * INF);
+			double *method2_energy = (double*) malloc(sizeof(double) * INF);
+			double *method3_energy = (double*) malloc(sizeof(double) * INF);
+			double *method4_energy = (double*) malloc(sizeof(double) * INF);
+
+			*method1_energy = INF;
+			*method2_energy = INF;
+			*method3_energy = INF;
+			*method4_energy = INF;
+
+			method1_structure[0] = '\0';
+			method2_structure[0] = '\0';
+			method3_structure[0] = '\0';
+			method4_structure[0] = '\0';
+			final_structure[0] = '\0';
+
+			// printf("method1\n");
+			*method1_energy = method1(sequence, structure, method1_structure);
+			// printf("method2\n");
+			*method2_energy = method2(sequence, structure, method2_structure);
+			// printf("method3\n");
+			*method3_energy = method3(sequence, structure, method3_structure);
+			// printf("method4\n");
+			*method4_energy = method4(sequence, structure, method4_structure);
+
+				//We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
+				if (*method1_energy < final_energy) {
+				//if (*method1_energy < final_energy && *method1_energy != 0) {
+						final_energy = *method1_energy;
+						strcpy(final_structure, method1_structure);
+						method_chosen = 1;
+				}
+
+				if (*method2_energy < final_energy) {
+				//if (*method2_energy < final_energy && *method2_energy != 0) {
+						final_energy = *method2_energy;
+						strcpy(final_structure, method2_structure);
+						method_chosen = 2;
+				}
+
+				if (*method3_energy < final_energy) {
+				//if (*method3_energy < final_energy && *method3_energy != 0) {
+						final_energy = *method3_energy;
+						strcpy(final_structure, method3_structure);
+						method_chosen = 3;
+				}
+
+				if (*method4_energy < final_energy) {
+				//if (*method4_energy < final_energy && *method4_energy != 0) {
+						final_energy = *method4_energy;
+						strcpy(final_structure, method4_structure);
+						method_chosen = 4;
+				}
 
 
+			if (final_energy == INF || method_chosen == -1) {
+				fprintf(stderr, "ERROR: could not find energy\n");
+				fprintf(stderr, "SEQ: %s\n",sequence);
+				fprintf(stderr, "Structure: %s\n",structure);
+				exit(6);
+			}
 
-	//kevin: june 22 2017
+			// Clean up
+			free(method1_structure);
+			free(method2_structure);
+			free(method3_structure);
+			free(method4_structure);
+			free(method1_energy);
+			free(method2_energy);
+			free(method3_energy);
+			free(method4_energy);
+		} 
+		else{	
+			call_simfold(SIMFOLD, sequence, structure, final_structure, &final_energy);
+		}
+
+		std::string final(final_structure);
+		Result result(seq,hotspot_list[i].get_structure(),hotspot_list[i].get_energy(),final,final_energy,method_chosen);
+		result_list.push_back(result);
+	}
+	
+	Result::Result_comp result_comp;
+	std::sort(result_list.begin(), result_list.end(),result_comp );
+
+	int number_of_output = 1;
+
+	if(number_of_suboptimal_structure != 1){
+			number_of_output = std::min( (int) result_list.size(),number_of_suboptimal_structure);
+	}
+
 	//output to file
 	if(fileO != ""){
 		std::ofstream out(fileO);
 		out << sequence << std::endl;
-		out << restricted << std::endl;
-		out << structure << " (" << final_energy << ")" << std::endl;
-		if(args_info.verbose_given){
-			out << "Method: " << method_chosen << std::endl;
+		for (int i=0; i < number_of_output; i++) {
+			out << "Restricted_" << i << ": " << result_list[i].get_restricted() << std::endl;;
+			out << "Result_" << i << ":     " << result_list[i].get_final_structure() << " (" << result_list[i].get_final_energy() << ")" << std::endl;
+			if(args_info.verbose_given){
+				out << "Method: " << result_list[i].get_method_chosen() << std::endl;
+			}	
 		}
 
 	}else{
 		//kevin: june 22 2017
 		//Mateo: Sept 13 2023
 		//changed format for ouptut to stdout
-		std::cout << sequence << std::endl;
-		std::cout << restricted << std::endl;
-		std::cout << final_structure << " (" << final_energy << ")" << std::endl;
+		std::cout << "Seq:          " << seq << std::endl;
+		std::cout << "Restricted_" << 0 << ": " << result_list[0].get_restricted() << std::endl;;
+		std::cout << "Result_" << 0 << ":     " << result_list[0].get_final_structure() << " (" << result_list[0].get_final_energy() << ")" << std::endl;
 		if(args_info.verbose_given){
-			std::cout << "Method: " << method_chosen << std::endl;
+			std::cout << "Method: " << result_list[0].get_method_chosen() << std::endl;
+		}
+		for (int i=1; i < number_of_output; i++) {
+			if(result_list[i].get_final_structure() == result_list[i-1].get_final_structure()) continue;
+			std::cout << "Restricted_" << i << ": " << result_list[i].get_restricted() << std::endl;;
+			std::cout << "Result_" << i << ":     " << result_list[i].get_final_structure() << " (" << result_list[i].get_final_energy() << ")" << std::endl;
+			if(args_info.verbose_given){
+				std::cout << "Method: " << result_list[i].get_method_chosen() << std::endl;
+			}
 		}
 	}
-
-
-	// Clean up
-
-	free(method1_structure);
-	free(method2_structure);
-	free(method3_structure);
-	free(method4_structure);
-	free(method1_energy);
-	free(method2_energy);
-	free(method3_energy);
-	free(method4_energy);
 	cmdline_parser_free(&args_info);
 	return 0;
 }

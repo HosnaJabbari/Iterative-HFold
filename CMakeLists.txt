@@ -22,6 +22,7 @@ set(Iterative-HFold_SOURCE
     hfold_validation.cpp 
     Iterative-HFold.cpp
     cmdline.cc
+    Result.cc
 )
 
 # pass SIMFOLD_HOME to binary

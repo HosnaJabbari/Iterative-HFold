@@ -16,6 +16,12 @@ extern std::string input_file;
 // The output file
 extern std::string output_file;
 
+// The number of hotspots to make for each sequence
+extern int hotspot_num;
+
+// Number of Suboptimal structures to print
+extern int subopt;
+
 
 
 /** @brief Where the command line options are stored */
@@ -27,6 +33,9 @@ struct args_info
   const char *input_structure_help; /**< @brief Give restricted structure as input help description.  */
   const char *input_file_help; /**< @brief Give input file as input help description.  */
   const char *output_file_help; /**< @brief Give output file as input help description.  */
+  const char *h_num_help; /**< @brief Give a number for how many hotspots */
+  const char *subopt_help; /**< @brief Give a number of suboptimals to print  */
+  const char *pk_free_help; /**< @brief Specify if the structures calculated should be pseudoknot-free  */
 
   
   unsigned int help_given ;	/**< @brief Whether help was given.  */
@@ -35,7 +44,9 @@ struct args_info
   unsigned int input_structure_given ;	/**< @brief Whether restricted structure was given.  */
   unsigned int input_file_given ;	/**< @brief Whether restricted structure was given.  */
   unsigned int output_file_given ;	/**< @brief Whether restricted structure was given.  */
-
+  unsigned int h_num_given ;	/**< @brief Whether hotspot_num was given.  */
+  unsigned int subopt_given ;	/**< @brief Whether suboptimals was given.  */
+  unsigned int pk_free_given ;	/**< @brief Whether pk_free was given.  */
 
   char **inputs ; /**< @brief unnamed options (options without names) */
   unsigned inputs_num ; /**< @brief unnamed options number */
