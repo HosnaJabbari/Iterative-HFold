@@ -25,6 +25,7 @@
 #include "s_internal_loop.h"
 #include "s_multi_loop.h"
 #include "s_multi_loop_sub.h"
+#include <vector>
 
 
 class s_energy_matrix
@@ -36,6 +37,8 @@ class s_energy_matrix
         friend class s_multi_loop;
 
         s_energy_matrix (int *seq, int length);
+
+        s_energy_matrix (int *seq, int length, std::vector<energy_model> *energy_models);
         // The constructor
 
         ~s_energy_matrix ();
@@ -77,6 +80,9 @@ class s_energy_matrix
         char get_type (int i, int j) { int ij = index[i]+j-i; return nodes[ij].type; }
         // return the type at V(i,j)
 
+        //Mateo 13 Sept 2023
+        void compute_hotspot_energy (int i, int j, int is_stack);
+
 
     // better to have protected variable rather than private, it's necessary for Hfold
     protected:
@@ -86,6 +92,8 @@ class s_energy_matrix
         s_internal_loop *VBI;
         s_multi_loop *VM;
         s_multi_loop_sub *VM_sub;
+
+        std::vector<energy_model> *energy_models;
 
         int *sequence;             // the entire sequence for which we compute the energy.
                                    //     Each base is converted into integer, because it's faster.

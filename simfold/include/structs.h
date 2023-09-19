@@ -19,7 +19,9 @@
 #define STRUCTS_H
 
 #include "constants.h"
+#include <stdlib.h>
 #include <vector>
+#include <string>
 
 typedef struct
 {
@@ -252,6 +254,78 @@ struct free_energy_node
     }
 };
 
+
+//AP
+struct energy_model{
+	PARAMTYPE energy_value;
+	std::string config_file;
+	int dna_or_rna;
+	double temperature;
+
+	char **similarity_rule;
+
+	PARAMTYPE ****stack;
+	PARAMTYPE ****tstackh;
+	PARAMTYPE ****tstacki;
+	PARAMTYPE ******int11;
+	PARAMTYPE *******int21;
+	PARAMTYPE ********int22;
+	PARAMTYPE ***dangle_top;
+	PARAMTYPE ***dangle_bot;
+	PARAMTYPE *internal_penalty_by_size;
+	PARAMTYPE *bulge_penalty_by_size;
+	PARAMTYPE *hairpin_penalty_by_size;
+
+	//#if (MODEL == SIMPLE)
+	hairpin_tloop *triloop;
+	hairpin_tloop *tloop;
+	int nb_triloops;
+	int nb_tloops;
+
+	//#elif (MODEL == EXTENDED)
+	hairpin_tloop *special_hl;
+	int nb_special_hl;
+
+	// middle of asymmetric internal loops 2x2
+	//PARAMTYPE int22mid[NUCL] [NUCL] [NUCL] [NUCL];    // I'm not using this any more, I'm using int22_experimental_addition instead
+
+	PARAMTYPE ******int11_experimental_addition;       // values to be added to the simple 10-parameter model proposed by Davis_Znosko_2007, so that we use the experimental values for these parameters
+	PARAMTYPE *******int21_experimental_addition;       // values to be added to the simple 6-parameter model proposed by Badhwar_Znosko_2007, so that we use the experimental values for these parameters
+	PARAMTYPE ********int22_experimental_addition;       // values to be added to the simple 6-parameter model proposed by Christiansen_Znosko_2008, so that we use the experimental values for these parameters
+
+	PARAMTYPE internal_asymmetry_initiation;
+	PARAMTYPE internal_asymmetry_slope;
+	PARAMTYPE *internal_asymmetry;
+	//PARAMTYPE internal_symmetry [MAXLOOP+1];
+	//PARAMTYPE internal_penalty_by_size_2D[MAXLOOP_I][MAXLOOP_I];
+
+	PARAMTYPE bulgeA;
+	PARAMTYPE bulgeC;
+	PARAMTYPE bulgeG;
+	PARAMTYPE bulgeU;
+	PARAMTYPE *****bulge1;     // bulge of size 1     [i][j][k][ip][jp], where k=i+1, ip=k+1, j=jp+1
+	//#endif
+
+	PARAMTYPE ****enthalpy_stack;
+	PARAMTYPE ****enthalpy_tstackh;
+	PARAMTYPE ****enthalpy_tstacki;
+	PARAMTYPE ******enthalpy_int11;
+	PARAMTYPE *******enthalpy_int21;
+	PARAMTYPE ********enthalpy_int22;
+	PARAMTYPE ***enthalpy_dangle_top;
+	PARAMTYPE ***enthalpy_dangle_bot;
+	PARAMTYPE *enthalpy_internal_penalty_by_size;
+	PARAMTYPE *enthalpy_bulge_penalty_by_size;
+	PARAMTYPE *enthalpy_hairpin_penalty_by_size;
+
+	hairpin_tloop *enthalpy_triloop;
+	hairpin_tloop *enthalpy_tloop;
+	int enthalpy_nb_triloops;
+	int enthalpy_nb_tloops;
+
+	miscinfo enthalpy_misc;
+	miscinfo misc;
+};
 
 // create double parameters, so that we have better precision for Maximum likelihood
 // OBSOLETE

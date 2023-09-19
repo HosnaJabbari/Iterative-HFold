@@ -1,82 +1,73 @@
-<!-- Edited Aug 5 2022 by Connie He to reflect conda package installation-->
-# Iterative HFold
+# HFold Iterative
 
 #### Description:
 Software implementation of Iterative HFold.      
 Iterative HFold is an algorithm for predicting the pseudoknotted secondary structures of RNA using relaxed Hierarchical Folding. 
 
-Paper: https://www.researchgate.net/publication/262810273_A_fast_and_robust_iterative_algorithm_for_prediction_of_RNA_pseudoknotted_secondary_structures
+Paper: Jabbari, H., Condon, A. A fast and robust iterative algorithm for prediction of RNA pseudoknotted secondary structures. BMC Bioinformatics 15, 147 (2014). https://doi.org/10.1186/1471-2105-15-147 (https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-147)
 
 On the dataset tested in this paper, Iterative HFold generally has better accuracy that its predecessor, [HFold](https://github.com/HosnaJabbari/HFold).
 
 #### Supported OS: 
 Linux, macOS
 
-### Installation:
-Requirements: conda.    
-
-You can get conda by installing either [Miniconda](https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links) or [Anaconda](https://www.anaconda.com/products/distribution), but the easier method is to install Miniconda.
-
-To test if your Mac or Linux system already has conda, you can type into a terminal:      
-```
-conda --version
-```
-If it prints the message, `conda: command not found`, you will have to install conda. 
-
-#### Conda Installation:
-In the terminal, run one of the following set of commands according to your operating system:
-
-##### Mac (Intel chip):
-```
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
-bash Miniconda3-latest-MacOSX-x86_64.sh
-```
-
-##### Mac (M1 chip):
-```
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh
-bash Miniconda3-latest-MacOSX-arm64.sh
-```
-
-##### Linux 64-bit:
-```
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
-```
-
-##### Linux (others)
-For other Linux platforms, use the previous Linux 64-bit commands but replace `x86_64` with one of the following as per your platform:
-
-- AWS Graviton2 / ARM64: `aarch64`
-
-- Power8 / Power9: `ppc64le`
-
-- IBM Z / LinuxOne: `s390x`
-
-<br>
-
-After running one of the previous sets of commands, follow the prompts from the installer. When prompted with 
-```
-Do you wish the installer to initialize Miniconda3
-by running conda init? [yes|no]
-```
-Enter `yes`. 
-Once the installation is complete, restart your terminal and run the following in the terminal to verify that conda was installed:     
-```   
-conda --version  
-``` 
-If it does not work, run `conda init --all` then restart your terminal.
-
-#### Steps for installation   
-To install Iterative-HFold, run the following command in the terminal:
+### Conda Package:
 ```
 conda install -c uvic-cobra iterative-hfold
 ```
-And enter `y` when prompted with `Proceed ([y]/n)?`.
+Works for Linux and macOS
+
+### Source code Installation:  
+Requirements: A compiler that supports C++11 standard (tested with g++ version 4.9.0 or higher), Pthreads, and CMake version 3.1 or greater.    
+
+[CMake](https://cmake.org/install/) version 3.1 or greater must be installed in a way that HFold can find it.    
+To test if your Mac or Linux system already has CMake, you can type into a terminal:      
+```
+cmake --version
+```
+If it does not print a cmake version greater than or equal to 3.1, you will have to install CMake depending on your operating system.
+
+#### Mac:    
+Easiest way is to install homebrew and use that to install CMake.    
+To do so, run the following from a terminal to install homebrew:      
+```  
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"   
+```    
+When that finishes, run the following from a terminal to install CMake.     
+```   
+brew install cmake   
+``` 
+#### Linux:    
+Run from a terminal     
+```
+wget http://www.cmake.org/files/v3.8/cmake-3.8.2.tar.gz
+tar xzf cmake-3.8.2.tar.gz
+cd cmake-3.8.2
+./configure
+make
+make install
+```
+[Linux instructions source](https://geeksww.com/tutorials/operating_systems/linux/installation/downloading_compiling_and_installing_cmake_on_linux.php)
+
+#### Steps for installation   
+1. [Download the repository](https://github.com/HosnaJabbari/HFold_iterative.git) and extract the files onto your system.
+2. From a command line in the root directory (where this README.md is) run
+```
+cmake -H. -Bbuild
+cmake --build build
+```   
+If you need to specify a specific compiler, such as g++, you can instead run something like   
+```
+cmake -H. -Bbuild -DCMAKE_CXX_COMPILER=g++
+cmake --build build
+```   
+This can be useful if you are getting errors about your compiler not having C++11 features.
+
+After installing you can move the executables wherever you wish, but you should not delete or move the simfold folder, or you must recompile the executables. If you move the folders and wish to recompile, you should first delete the created "build" folder before recompiling.
 
 #### How to use:
     Arguments:
-        Iterative-HFold:
+        HFold_iterative:
             --s <sequence>
             --r <structure>
             --i </path/to/file>
@@ -109,12 +100,13 @@ And enter `y` when prompted with `Proceed ([y]/n)?`.
             (____________________________)
 
 #### Example:
-    Iterative-HFold --i "/home/username/Desktop/myinputfile.txt"
-    Iterative-HFold --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
-    Iterative-HFold --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    Iterative-HFold --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)"
-    Iterative-HFold --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
-    Iterative-HFold --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    assume you are in the directory where the HFold_iterative executable is loacted
+    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
+    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
+    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
+    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
 
     
 #### Exit code:

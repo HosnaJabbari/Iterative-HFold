@@ -1,6 +1,9 @@
 #ifndef HFOLD_H_
 #define HFOLD_H_
 
+#include <vector>
+#include <signal.h>
+
 double hfold(char *sequence, char *restricted, char *structure);
 double hfold_pkonly(char *sequence, char *restricted, char *structure);
 double hfold_iterative(char *sequence, char *restricted, char *structure); // April 3, 2012

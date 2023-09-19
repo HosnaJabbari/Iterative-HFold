@@ -64,6 +64,7 @@ PARAMTYPE s_hairpin_loop::compute_energy (int i, int j)
     int size;
     char seq[10] = "";
 
+
     size = j-i-1;
 
      // TODO
@@ -167,6 +168,8 @@ PARAMTYPE s_hairpin_loop::compute_energy (int i, int j)
         for (k=i+1; k < j; k++) pred_pairings[k] = -1;
         energy = energy - loss (i,j);
     }
+
+    // if(i==8 && j == 14) printf("here and %d and %s\n",energy,sequence);
     return energy;
 }
 

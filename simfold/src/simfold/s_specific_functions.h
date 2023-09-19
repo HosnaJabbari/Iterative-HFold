@@ -25,6 +25,9 @@
 #include "structs.h"
 
 
+#include "hotspot.hh"
+
+
 PARAMTYPE s_dangling_energy (int *sequence, char *structure, int i1, int i2, int i3, int i4);
 // PRE:  (i1, i2) and (i3, i4) are pairs, i2 and i3 are neighbours, i2 < i3
 // POST: return dangling energy between i2 and i3
@@ -72,5 +75,9 @@ PARAMTYPE s_calculate_enthalpy (int *sequence, char *csequence, str_features *f)
 // PRE:  the structure features have been determined
 // POST: return the enthalpy (as integer)
 
+//Mateo 13 Sept 2023
+//comparison function for hotspot so we can use it when sorting
+bool compare_hotspot_ptr(Hotspot &a, Hotspot &b);
+void get_hotspots(char *sequence,std::vector<Hotspot> &hotspot_list, int max_hotspot);
 
 #endif
