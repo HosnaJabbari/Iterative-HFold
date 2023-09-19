@@ -17,9 +17,9 @@ set(SIMFOLD_HOME ${CMAKE_SOURCE_DIR}/simfold)
 add_definitions("-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\"")
 
 # set location to make .a file
-set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+# set(LIBRARY_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # set location to make executable file
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+# set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 # create library at LIBRARY_OUTPUT_PATH
 add_library (simfold ${SOURCE})

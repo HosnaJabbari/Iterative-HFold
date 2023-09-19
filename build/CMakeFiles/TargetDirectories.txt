@@ -1,7 +1,0 @@
-/home/mgray7/Iterative-HFold/build/CMakeFiles/rebuild_cache.dir
-/home/mgray7/Iterative-HFold/build/CMakeFiles/edit_cache.dir
-/home/mgray7/Iterative-HFold/build/CMakeFiles/Iterative-HFold.dir
-/home/mgray7/Iterative-HFold/build/simfold/CMakeFiles/rebuild_cache.dir
-/home/mgray7/Iterative-HFold/build/simfold/CMakeFiles/edit_cache.dir
-/home/mgray7/Iterative-HFold/build/simfold/CMakeFiles/simfold_exec.dir
-/home/mgray7/Iterative-HFold/build/simfold/CMakeFiles/simfold.dir

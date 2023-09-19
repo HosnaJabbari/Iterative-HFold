@@ -29,7 +29,7 @@ set(SIMFOLD_HOME ${CMAKE_SOURCE_DIR}/simfold)
 add_definitions("-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\"")
 
 # set path for executable to be created
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+# set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # create executables
 add_executable(Iterative-HFold ${Iterative-HFold_SOURCE})
 
