@@ -68,17 +68,21 @@ After installing you can move the executables wherever you wish, but you should 
 #### How to use:
     Arguments:
         HFold_iterative:
-            --s <sequence>
-            --r <structure>
-            --i </path/to/file>
-            --o </path/to/file>
+            -r <structure>
+            -i </path/to/file>
+            -o </path/to/file>
+            -v
+            -V
 
         Remarks:
-            make sure the <arguments> are enclosed in "", for example --r "..().." instead of --r ..()..
-            input file for --i must be .txt
-            if --i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
-            if --o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
-            if --o is provided with just a file name without a path, and if --i is provided, then the output file will be generated in the directory where the input file is located
+            make sure the <arguments> are enclosed in "", for example -r "..().." instead of -r ..()..
+            The sequence does not need to be enclosed and can be given before or after the other arguments
+            if no structure is provided through -r , the input structure will be the hotspot with the lowest free energy
+            if -i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
+            if -o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
+            if -v is provided, a verbose output will be given (method used is outputted)
+            if -V is provided, the version is given
+
     
     Sequence requirements:
         containing only characters GCAUT
@@ -91,22 +95,23 @@ After installing you can move the executables wherever you wish, but you should 
                 () restricted base pair
                 _ no restriction
 
-
     Input file requirements:
-            Line1: Sequence
-            Line2: Structure
+            Line1: Name (optional, but must be fasta format; ignored in final input)
+            Line2: Sequence (required)
+            Line3: Structure (optional)
         sample:
+            >Srp_005
             GCAACGAUGACAUACAUCGCUAGUCGACGC
             (____________________________)
 
 #### Example:
     assume you are in the directory where the HFold_iterative executable is loacted
-    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt"
-    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
-    ./HFold_iterative --i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "outputfile.txt"
-    ./HFold_iterative --s "GCAACGAUGACAUACAUCGCUAGUCGACGC" -r "(____________________________)" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt"
+    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
+    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)"
+    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)" -o "outputfile.txt"
+    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC
 
     
 #### Exit code:

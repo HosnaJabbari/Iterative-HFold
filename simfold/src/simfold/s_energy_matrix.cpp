@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <vector>
+#include <iostream>
 // Hosna, March 5, 2012
 // malloc.h is not needed in my mac as stdlib.h does the same
 //#include <malloc.h>
@@ -37,6 +39,31 @@
 s_energy_matrix::s_energy_matrix (int *seq, int length)
 // The constructor
 {
+    this->H = NULL;
+    this->S = NULL;
+    this->VBI = NULL;
+    this->VM = NULL;
+
+    sequence = seq;     // just refer it from where it is in memory
+    seqlen = length;
+
+    // an array with indexes, such that we don't work with a 2D array, but with a 1D array of length (n*(n+1))/2
+    index = new int [length];
+    int total_length = (length *(length+1))/2;
+    index[0] = 0;
+    for (int i=1; i < length; i++)
+        index[i] = index[i-1]+length-i+1;
+
+    // this array holds V(i,j), and what (i,j) encloses: hairpin loop, stack pair, internal loop or multi-loop
+    nodes = new free_energy_node [total_length];
+    if (nodes == NULL) giveup ("Cannot allocate memory", "s_energy_matrix");
+}
+
+//AP. Needed a custom constructor to add the energy moodel vector.
+s_energy_matrix::s_energy_matrix (int *seq, int length, std::vector<energy_model> *energy_models)
+// The constructor
+{
+	this->energy_models = energy_models;
     this->H = NULL;
     this->S = NULL;
     this->VBI = NULL;
@@ -80,7 +107,7 @@ void s_energy_matrix::compute_energy (int i, int j)
     min_en[1] = INF;
     min_en[2] = INF;
     min_en[3] = INF;
-
+    printf("At %d and %d, it's %c and %c\n",i,j,sequence[i], sequence[j]);
     if (can_pair (sequence[i], sequence[j]))    // if i and j can pair
     {
         // compute free energy of hairpin loop, stack pair, internal loop and multi-loop
@@ -369,4 +396,23 @@ void s_energy_matrix::compute_energy_sub_restricted (int i, int j, str_features 
         nodes[ij].energy = min;
         nodes[ij].type = type;
     }
+}
+
+//Mateo 13 Sept 2023
+void s_energy_matrix::compute_hotspot_energy (int i, int j, int is_stack)
+{
+    //printf("in compute_hotspot_energy i:%d j:%d\n",i,j);
+    PARAMTYPE energy = 0;
+    if(is_stack){
+        energy = S->compute_energy (i, j);
+        // printf("stack: %d\n",energy);
+    }else{
+        energy = H->compute_energy (i, j);
+        // printf("hairpin: %d\n",energy);
+    }
+        
+    //printf ("V(%d,%d) is_stack: %d energy %d\n", i, j, is_stack, energy);
+    int ij = index[i]+j-i;
+    nodes[ij].energy = energy;
+    return;
 }

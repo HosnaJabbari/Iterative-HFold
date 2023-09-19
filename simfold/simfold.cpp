@@ -131,7 +131,7 @@ int main (int argc, char *argv[])
     //     and to call the function init_data, which loads the thermodynamic parameters into memory
 
     // configuration file, the path should be relative to the location of this executable
-    char config_file[200];
+    char config_file[400];
     strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
     // initialize the thermodynamic parameters

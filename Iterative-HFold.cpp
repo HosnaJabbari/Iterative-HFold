@@ -1,49 +1,28 @@
+// Iterative HFold files
+#include "hotspot.hh"
+#include "cmdline.hh"
+#include "hfold_validation.h"
+#include "Iterative-HFold.hh"
+//simfold files
+#include "s_specific_functions.h"
+#include "simfold.h"
+#include "externs.h"
+#include "h_globals.h"
+#include "constants.h"
+#include "params.h"
+#include "common.h"
 // a simple driver for the HFold
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include <iterator>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
 #include <stack>
-#include <ctime>
-#include <dirent.h>
-#include <signal.h>
-#include <pthread.h>
-
-// include the simfold header files
-#include "simfold.h"
-#include "externs.h"
-#include "h_globals.h"
-//#include "h_externs.h"
-#include "constants.h"
-#include "params.h"
-#include "common.h"
-
-#include <sys/types.h>
-#include <sys/wait.h>
+#include <sys/stat.h>
 #include <string>
-
-// Hosna June 20th, 2007
-//#include "W_final.h"
-//#include "hfold.h"
-#include "hfold_iterative.h"
-
-#include <ctime>
-//#include <regex>
-//#include <regex.h>
-
-//kevin June 22 2017
-#include "hfold_validation.h"
 #include <getopt.h>
-
-//#define HFOLD 						"./HFold"
-//#define HFOLD_PKONLY 				"./HFold_pkonly"
-//#define HFOLD_INTERACTING 			"./HFold_interacting"
-//#define HFOLD_INTERACTING_PKONLY 	"./HFold_interacting_pkonly"
-//#define SIMFOLD 					"./simfold"
 
 // this causes less compilation warnings than the #defines
 char HFOLD[8] =						"./HFold";
@@ -52,22 +31,27 @@ char HFOLD_INTERACTING[20] =	    "./HFold_interacting";
 char HFOLD_INTERACTING_PKONLY[27] =	"./HFold_interacting_pkonly";
 char SIMFOLD[10] =                  "./simfold";
 
-#define LOGFILEPATH 		"./logfile.txt"
+bool exists (const std::string path) {
+  struct stat buffer;   
+  return (stat (path.c_str(), &buffer) == 0); 
+}
 
-FILE *logFile;
-char *file;
-int timeout = 1200;
-//static std::smatch match;
-//static std::regex sequenceRegex;
-//static std::regex structureRegex;
-//static std::regex replacedRegex;
-static std::string sequenceString;
-static std::string structureString;
-static std::string replacementText;
-static std::string energyString;
-static std::stack<int> customStack;
-
-
+void get_input(std::string file, std::string &sequence, std::string &structure){
+	if(!exists(file)){
+		std::cout << "Input file does not exist" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	std::ifstream in(file.c_str());
+	std::string str;
+	int i = 0;
+	while(getline(in,str)){
+		if(str[0] == '>') continue;
+		if(i==0) sequence = str;
+		if(i==1) structure = str;
+		++i;
+	}
+	in.close();
+}
 /* I am changing iterative HFold so that we run 4 methods and choose the structure with the lowest energy as the winner
 1) run HFold_PKonly on input structure, if pked, keep the pk bases as input structure and run HFold on them and get the result
 2) run HFold on the original input and get the result
@@ -75,154 +59,70 @@ static std::stack<int> customStack;
 4) run simfold restricted with the given input sequence and structure, and get the simfold structure. Only choose part of the structure that contains the original given input structure, then give that to HFold_PKonly as input, get pked bases and run HFold on them and get the result. */
 int main (int argc, char **argv) {
 
-	void *res;
+	args_info args_info;
 
-	char sequence[MAXSLEN];
-	char structure[MAXSLEN];
-
-	char *output_path;
-	char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char *method4_structure = (char*) malloc(sizeof(char) * MAXSLEN);
-	char final_structure[MAXSLEN];
-
-	double *method1_energy = (double*) malloc(sizeof(double) * INF);
-	double *method2_energy = (double*) malloc(sizeof(double) * INF);
-	double *method3_energy = (double*) malloc(sizeof(double) * INF);
-	double *method4_energy = (double*) malloc(sizeof(double) * INF);
-	double final_energy = INF;
-
-	int files_length = -1;
-        int method_chosen = -1;
-
-	int **result;
-	char **files_found;
-
-        result  = (int**) malloc(sizeof(int*) * MAXSLEN);
-        for (int i=0; i < MAXSLEN; i++) {
-                result[i] = (int*) malloc(sizeof(int) * 2);
-        }
-
-
-
-	output_path = (char*) malloc(sizeof(char) * 1000);
-	file = (char*) malloc(sizeof(char) * 1000);
-
-	logFile = fopen(LOGFILEPATH, "w");
-	if (logFile == NULL) {
-		giveup("Could not open logfile", LOGFILEPATH);
+	// get options (call getopt command line parser)
+	if (cmdline_parser (argc, argv, &args_info) != 0) {
+	exit(1);
 	}
 
-	//kevin: june 22 2017
-	//validation for command line argument
-	bool sequenceFound = false;
-	bool structureFound = false;
-	bool inputPathFound = false;
-	bool outputPathFound = false;
-	bool errorFound = false;
+	std::string seq;
+	if (args_info.inputs_num>0) {
+	seq=args_info.inputs[0];
+	} else {
+		if(!args_info.input_file_given) std::getline(std::cin,seq);
+	}
+	int n = seq.length();
 
-	int option;
+	std::string restricted;
+    args_info.input_structure_given ? restricted = input_struct : restricted = "";
 
-	//kevin: june 23 2017 https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Option-Example.html
-        static struct option long_options[] =
-                {
-                        {"s", required_argument, 0, 's'},
-                        {"r", required_argument, 0, 'r'},
-                        {"i", required_argument, 0, 'i'},
-                        {"o", required_argument, 0, 'o'},
-                        {0, 0, 0, 0}
-                };
+	std::string fileI;
+    args_info.input_file_given ? fileI = input_file : fileI = "";
 
+	std::string fileO;
+    args_info.output_file_given ? fileO = output_file : fileO = "";
 
-	while (1){
-		// getopt_long stores the option index here.
-                int option_index = 0;
-
-		option = getopt_long (argc, argv, "s:r:i:o:", long_options, &option_index);
-
-		// Detect the end of the options
-		if (option == -1)
-			break;
-
-		switch (option)
-		{
-		case 's':
-			if(sequenceFound){
-				fprintf(stderr, "-s is duplicated\n");
-				errorFound = true;
-				break;
-			}
-			if(inputPathFound){
-				printf("Cannot combine -i with -s/-r \n");
-				errorFound = true;
-				break;
-			}
-			strcpy(sequence, optarg);
-			//printf("seq: %s\n",sequence);
-			sequenceFound = true;
-			break;
-		case 'r':
-			if(structureFound || inputPathFound){
-				fprintf(stderr, "-r is duplicated\n");
-				errorFound = true;
-				break;
-			}
-			if(inputPathFound){
-				fprintf(stderr, "Cannot combine -i with -s/-r \n");
-				errorFound = true;
-				break;
-			}
-			strcpy(structure, optarg);
-			//printf("structure: %s\n",structure);
-			structureFound = true;
-			break;
-		case 'i':
-			if(structureFound || sequenceFound){
-				fprintf(stderr, "Cannot combine -i with -s/-r \n");
-				errorFound = true;
-				break;
-			}
-			strcpy(file,optarg);
-			//printf("file: %s %d\n", file,access(file, F_OK|R_OK));
-			if(access(file, F_OK) == -1) { //if file does not exist
-				fprintf(stderr, "Input file not exist\n");
-				exit(4);
-			}
-			if (!get_sequence_structure(file, sequence, structure)) {
-				fprintf(stderr, "Input file is invalid\n");
-				errorFound = true;
-				break;
-			}
-			inputPathFound = true;
-			break;
-		case 'o':
-			strcpy(output_path, optarg);
-			//printf("access: %d\n",access(output_path, F_OK));
-			if(access(output_path, F_OK) != -1) { //if file already exist
-				addTimestamp(&output_path);
-			}
-			outputPathFound = true;
-			break;
-		default:
-			errorFound = true;
-			break;
+	if(fileI != ""){
+		
+		if(exists(fileI)){
+			get_input(fileI,seq,restricted);
 		}
-		//clean up when error
-		if(errorFound){
-			printUsage();
-			exit(1);
+		if(seq == ""){
+			std::cout << "sequence is missing from file" << std::endl; 
 		}
+		
 	}
 
-	if(!inputPathFound){
-		//if sequence or structure is missing when input file is not present
-		if(!(sequenceFound && structureFound)){
-			fprintf(stderr, "-s/-r is missing\n");
-			printUsage();
-			exit(1);
-		}
+	char config_file[400];
+	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
+
+	//what to fold: RNA or DNA
+	int dna_or_rna= RNA;
+	// represents degrees Celsius
+	double temperature = 37.0;
+	// initialize the thermodynamic parameters
+	init_data ("./simfold", config_file, dna_or_rna, temperature);
+
+	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
+
+	// in HotKnots and ComputeEnergy package the most up-to-date parameters set is DP09.txt
+	// so we add it here
+	fill_data_structures_with_new_parameters ( SIMFOLD_HOME "/params/parameters_DP09.txt");
+
+
+	char sequence[n];
+	strcpy(sequence,seq.c_str());
+	if(restricted == ""){
+		std::vector<Hotspot> hotspot_list;
+		get_hotspots(sequence, hotspot_list,20);
+		restricted = hotspot_list[0].get_structure();
+		std::cout << restricted << std::endl;
+
 	}
+
+	char structure[n];
+	strcpy(structure,restricted.c_str());
 
 	if(!validateSequence(sequence)){
 		fprintf(stderr,"-s sequence is invalid. sequence: %s\n",sequence);
@@ -238,17 +138,21 @@ int main (int argc, char **argv) {
 		replaceBrackets(structure);
 	}
 
-	//if we have output path and input path, try to combine both
-	if(outputPathFound && inputPathFound){
-		addPath(&output_path, file);
-		//printf("out path: %s\n",output_path);
-
-	}
+	
 	//kevin: june 22 2017
 	//end of validation for command line arguments
+	int method_chosen = -1;
+	char *method1_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+	char *method2_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+	char *method3_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+	char *method4_structure = (char*) malloc(sizeof(char) * MAXSLEN);
+	char final_structure[MAXSLEN];
 
-	write_log_file("Starting Program", "", 'I');
-
+	double *method1_energy = (double*) malloc(sizeof(double) * INF);
+	double *method2_energy = (double*) malloc(sizeof(double) * INF);
+	double *method3_energy = (double*) malloc(sizeof(double) * INF);
+	double *method4_energy = (double*) malloc(sizeof(double) * INF);
+	double final_energy = INF;
 
 	*method1_energy = INF;
 	*method2_energy = INF;
@@ -261,16 +165,14 @@ int main (int argc, char **argv) {
 	method4_structure[0] = '\0';
 	final_structure[0] = '\0';
 
-	printf("method1\n");
+	// printf("method1\n");
 	*method1_energy = method1(sequence, structure, method1_structure);
-	printf("method2\n");
+	// printf("method2\n");
 	*method2_energy = method2(sequence, structure, method2_structure);
-	printf("method3\n");
+	// printf("method3\n");
 	*method3_energy = method3(sequence, structure, method3_structure);
-	printf("method4\n");
+	// printf("method4\n");
 	*method4_energy = method4(sequence, structure, method4_structure);
-
-
 
         //We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
         if (*method1_energy < final_energy) {
@@ -303,7 +205,6 @@ int main (int argc, char **argv) {
 
 
 	if (final_energy == INF || method_chosen == -1) {
-		write_log_file("Could not find energy", "", 'E');
 		fprintf(stderr, "ERROR: could not find energy\n");
 		fprintf(stderr, "SEQ: %s\n",sequence);
 		fprintf(stderr, "Structure: %s\n",structure);
@@ -315,27 +216,29 @@ int main (int argc, char **argv) {
 
 	//kevin: june 22 2017
 	//output to file
-	if(outputPathFound){
-		if(!save_file("", output_path, sequence, structure, final_structure, final_energy, method_chosen)){
-			exit(4);
+	if(fileO != ""){
+		std::ofstream out(fileO);
+		out << sequence << std::endl;
+		out << restricted << std::endl;
+		out << structure << " (" << final_energy << ")" << std::endl;
+		if(args_info.verbose_given){
+			out << "Method: " << method_chosen << std::endl;
 		}
+
 	}else{
 		//kevin: june 22 2017
+		//Mateo: Sept 13 2023
 		//changed format for ouptut to stdout
-		std::cout << "Seq: " << sequence << "\n";
-		std::cout << "RES: " << final_structure << "  " << final_energy << "\n" << std::flush;
-		//std::cout << "\nfinal structure: " << final_structure << " final energy: " << final_energy << "\n\n" << std::flush;
+		std::cout << sequence << std::endl;
+		std::cout << restricted << std::endl;
+		std::cout << final_structure << " (" << final_energy << ")" << std::endl;
+		if(args_info.verbose_given){
+			std::cout << "Method: " << method_chosen << std::endl;
+		}
 	}
 
 
-
-	write_log_file("Ending Program", "", 'I');
-
 	// Clean up
-
-	free(file);
-
-	//free(tinfo);
 
 	free(method1_structure);
 	free(method2_structure);
@@ -345,42 +248,22 @@ int main (int argc, char **argv) {
 	free(method2_energy);
 	free(method3_energy);
 	free(method4_energy);
-        free(output_path);
-        for (int i=0; i < MAXSLEN; i++) {
-                free(result[i]);
-        }
-	free(result);
-
-
-	// This will cause a seg fault if you have the log file open and are watching it.
-	if (logFile) {
-		fclose(logFile);
-	}
-
+	cmdline_parser_free(&args_info);
 	return 0;
 }
 
 
 
 void printUsage(){
-	/*
-	printf ("\nUsage: HFold_iterative <sequence> <structure>\n");
-	printf ("Example: ./HFold_iterative \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" \"(____________________________)\" \n");
-	printf ("Or \nUsage: HFold_iterative <path to input file> <path to output file>\n");
-	printf ("Example: ./HFold_iterative \"/home/username/Desktop/inputFile.txt\" -o \"/home/username/Desktop/outFile.txt\" \n");
-	printf ("\tRestricted structure symbols:\n");
-	printf ("\t\t() restricted base pair\n");
-	printf ("\t\t _ no restriction\n");
-*/
-	printf("Usage ./HFold_iterative --s <sequence> --r <structure> [--o </path/to/file>]\n");
+	printf("Usage ./Iterative-HFold --s <sequence> --r <structure> [--o </path/to/file>]\n");
 	printf("or\n");
-	printf("Usage ./HFold_iterative --i </path/to/file> [--o </path/to/file>]\n");
+	printf("Usage ./Iterative-HFold --i </path/to/file> [--o </path/to/file>]\n");
 	printf ("  Restricted structure symbols:\n");
 	printf ("    () restricted base pair\n");
 	printf ("    _ no restriction\n");
 	printf("Example:\n");
-	printf("./HFold_iterative --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
-	printf("./HFold_iterative --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
+	printf("./Iterative-HFold --s \"GCAACGAUGACAUACAUCGCUAGUCGACGC\" --r \"(____________________________)\"\n");
+	printf("./Iterative-HFold --i \"/home/username/Desktop/myinputfile.txt\" --o \"/home/username/Desktop/some_folder/outputfile.txt\"\n");
 	printf("Please read README for more details\n");
 }
 
@@ -396,7 +279,7 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 //Calling HFold: programPath = HFOLD
 //Calling HFold_PKonly: programPath = HFOLD_PKONLY
 bool call_HFold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
-	char config_file[200];
+	char config_file[400];
 	strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
 	//what to fold: RNA or DNA
@@ -441,11 +324,12 @@ bool call_HFold (char *programPath, char *input_sequence, char *input_structure,
 bool call_simfold (char *programPath, char *input_sequence, char *input_structure, char *output_structure, double *output_energy) {
         std::string result = "";
 
-	char config_file[200] = SIMFOLD_HOME "/params/multirnafold.conf";
+		char config_file[400];
+		strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
-	double temperature;
-	temperature = 37;
-	init_data ("./simfold", config_file, RNA, temperature);
+		double temperature;
+		temperature = 37;
+		init_data ("./simfold", config_file, RNA, temperature);
 
         fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
 	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
@@ -482,133 +366,6 @@ void removeSpaces(char *str)
             str[count++] = str[i]; // here count is incremented
     str[count-1] = '\0';
 }
-
-
-bool get_sequence_structure (char *fileName, char *sequence, char *structure) {
-        FILE *ioFile;
-        size_t len = 0;
-        ssize_t read = 0;
-        char *sequenceBuffer = NULL;
-        char *structureBuffer = NULL;
-
-        //replacementText = "";
-        //sequenceRegex = "(\\s|\n|\r)";
-        //structureRegex = "(\\s|\n|\r|\Z)";
-
-        // Get structure and sequence from file
-        ioFile = fopen(fileName, "r");
-        if (ioFile != NULL) {
-                if((read = getline(&sequenceBuffer, &len, ioFile)) == -1) {
-                        write_log_file("Could not read the first sequence", fileName, 'E');
-                        return false;
-                }
-                //sequenceString.assign(sequenceBuffer, read);
-
-                if((read = getline(&structureBuffer, &len, ioFile)) == -1) {
-                        write_log_file("Could not read the first structure", fileName, 'E');
-                        return false;
-                }
-                //structureString.assign(structureBuffer, read);
-
-        } else {
-                write_log_file("Could not open file", fileName, 'E');
-                return false;
-        }
-
-		//kevin 28 Aug 2017
-        //added removeSpaces to replace the following regex things
-        removeSpaces(sequenceBuffer);
-        //printf("new: %s \n",sequenceBuffer);
-        removeSpaces(structureBuffer);
-        //printf("new: %s \n",structureBuffer);
-        strcpy(sequence, sequenceBuffer);
-        strcpy(structure, structureBuffer);
-
-/*
-        sequenceString = std::regex_replace(sequenceString, sequenceRegex, replacementText);
-        std::cout << "Sequence:  " << sequenceString << " Length: " << sequenceString.length() << '\n' << std::flush;
-
-        // Format structure
-        structureString = std::regex_replace(structureString, structureRegex, replacementText);
-        std::cout << "Structure: " << structureString << " Length: " << structureString.length() << '\n' << std::flush;
-
-        // Copy strings
-        strcpy(sequence, sequenceString.c_str());
-        strcpy(structure, structureString.c_str());
-*/
-        // Clean up
-        fclose(ioFile);
-        if (sequenceBuffer)
-        free(sequenceBuffer);
-        if (structureBuffer)
-        free(structureBuffer);
-/*
-        if(sequenceString.length() != structureString.length()) {
-                write_log_file("Sequence and structure length do not match", fileName, 'E');
-                return false;
-        }
-*/
-        //kevin 28 Aug 2017
-        //changed from sequenceString.length to strlen(sequence)
-        if(strlen(sequence) != strlen(structure)) {
-                write_log_file("Sequence and structure length do not match", fileName, 'E');
-                return false;
-        }
-
-        return true;
-}
-
-
-bool save_file (const char *fileName, char *outputPath, const char *sequence, char *restricted, char *structure, double energy, int chosen_method) {
-	FILE *ioFile;
-	char filePath[MAXSLEN];
-	strcpy(filePath, outputPath);
-	strcat(filePath, fileName);
-
-	std::cout << "Output File: " << filePath << '\n' << std::flush;
-
-	ioFile = fopen(filePath, "w");
-	if (ioFile != NULL) {
-		fprintf(ioFile, "Sequence: %s\nInput_structure: %s\nOutput_structure: %s\nEnergy: %.2f\nMethod: %i", sequence, restricted, structure, energy, chosen_method);
-	} else {
-		write_log_file("Could not open file", fileName, 'E');
-		perror("Write to file error");
-		return false;
-	}
-
-	// Clean up
-	fclose(ioFile);
-
-	return true;
-}
-
-void write_log_file(const char *message, const char *fileName, const char option) {
-	time_t now = time(0);
-	struct tm tstruct = *localtime(&now);
-	char buf[80];
-
-	strftime(buf, sizeof(buf), "%c", &tstruct);
-
-	switch (option) {
-		case 'i':
-		case 'I':
-			fprintf(logFile, "[%s] Info: %s\n", buf, message);
-			break;
-
-		case 'a':
-		case 'A':
-			fprintf(logFile, "[%s] Action: %s in file %s\n", buf, message, fileName);
-			break;
-
-		case 'e':
-		case 'E':
-			fprintf(logFile, "[%s] Error: %s in file %s\n", buf, message, fileName);
-			break;
-	}
-
-	fflush(logFile);
-}
-
 
 
 //---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
