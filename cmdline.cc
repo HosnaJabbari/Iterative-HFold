@@ -13,7 +13,8 @@
 std::string input_struct;
 std::string input_file;
 std::string output_file;
-int dangle_model;
+int hotspot_num;
+int subopt;
 
 static char *package_name = 0;
 
@@ -32,6 +33,9 @@ const char *args_info_help[] = {
   "  -r, --input-structure  Give a restricted structure as an input structure",
   "  -i, --input-file       Give a path to an input file containing the sequence (and input structure if known)",
   "  -o  --output-file      Give a path to an output file which will the sequence, and its structure and energy",
+  "  -k, --hotspot-num      Specify the max number of hotspots (default is 20)",
+  "  -n, --opt              Specify the number of suboptimal structures to output (default is 1)",
+  "  -p  --pk-free          Specify whether you only want the pseudoknot-free simfold structure to be calculated"
 
   "\nThe input sequence is read from standard input, unless it is\ngiven on the command line.\n",
   
@@ -54,6 +58,9 @@ static void init_args_info(struct args_info *args_info)
   args_info->input_structure_help = args_info_help[3] ;
   args_info->input_file_help = args_info_help[4] ;
   args_info->output_file_help = args_info_help[5] ;
+  args_info->h_num_help = args_info_help[6] ;
+  args_info->subopt_help = args_info_help[7] ;
+  args_info->pk_free_help = args_info_help[8] ;
 
 
   
@@ -107,6 +114,9 @@ static void clear_given (struct args_info *args_info)
   args_info->input_structure_given = 0 ;
   args_info->input_file_given = 0 ;
   args_info->output_file_given = 0 ;
+  args_info->h_num_given = 0 ;
+  args_info->subopt_given = 0 ;
+  args_info->pk_free_given = 0 ;
 }
 
 static void clear_args (struct args_info *args_info)
@@ -298,10 +308,13 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         { "input-structure",	required_argument, NULL, 'r' },
         { "input-file",	required_argument, NULL, 'i' },
         { "ouput-file",	required_argument, NULL, 'o' },
+        { "hotspot-num",	required_argument, NULL, 'k' },
+        { "subopt",	required_argument, NULL, 'n' },
+        { "pk-free",	0, NULL, 'p' },
         { 0,  0, 0, 0 }
       };
 
-      c = getopt_long (argc, argv, "hVvr:i:o:", long_options, &option_index);
+      c = getopt_long (argc, argv, "hVvr:i:o:k:n:p", long_options, &option_index);
 
       if (c == -1) break;	/* Exit from `while (1)' loop.  */
 
@@ -324,6 +337,30 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
                0 , &(args_info->verbose_given),
               &(local_args_info.verbose_given), optarg, 0, 0, ARG_NO,0, 0,"verbose", 'v',additional_error))
             goto failure;
+        
+          break;
+
+        case 'k':	/* Specify number of hotspots.  */
+        
+        
+          if (update_arg( 0 , 
+               0 , &(args_info->h_num_given),
+              &(local_args_info.h_num_given), optarg, 0, 0, ARG_NO,0, 0,"hotspot-num", 'k',additional_error))
+            goto failure;
+
+            hotspot_num = strtol(optarg,NULL,10);
+        
+          break;
+
+          case 'n':	/* Specify number of outputs.  */
+        
+        
+          if (update_arg( 0 , 
+               0 , &(args_info->subopt_given),
+              &(local_args_info.subopt_given), optarg, 0, 0, ARG_NO,0, 0,"subopt", 'n',additional_error))
+            goto failure;
+
+            subopt = strtol(optarg,NULL,10);
         
           break;
         case 'r':	/* Specify restricted structure.  */
@@ -360,9 +397,15 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         
           break;
 
-
-
-
+          case 'p':	/* Specify if pseudoknot-free.  */
+        
+        
+          if (update_arg( 0 , 
+               0 , &(args_info->pk_free_given),
+              &(local_args_info.pk_free_given), optarg, 0, 0, ARG_NO,0, 0,"pk-free", 'p',additional_error))
+            goto failure;
+        
+          break;
 
         case 0:	/* Long option with no short option */
           
