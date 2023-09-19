@@ -121,7 +121,6 @@ int main (int argc, char **argv) {
 	std::string fileO;
     args_info.output_file_given ? fileO = output_file : fileO = "";	
 
-	int max_hotspot = args_info.h_num_given ? hotspot_num : 20;
 	int number_of_suboptimal_structure = args_info.subopt_given ? subopt : 1;
 	bool pk_free = args_info.pk_free_given;
 
@@ -178,7 +177,7 @@ int main (int argc, char **argv) {
 		hotspot_list.push_back(hotspot);
 	}
 	else {
-		get_hotspots(sequence, hotspot_list,max_hotspot);
+		get_hotspots(sequence, hotspot_list,number_of_suboptimal_structure);
 	}
 
 	// Data structure for holding the output
