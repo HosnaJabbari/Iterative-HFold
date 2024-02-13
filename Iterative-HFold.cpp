@@ -188,7 +188,6 @@ int main (int argc, char **argv) {
 
 		char structure[n+1];
 		std::string struc = hotspot_list[i].get_structure();
-		std::cout << struc << std::endl;
 		strcpy(structure,struc.c_str());
 
 		char final_structure[MAXSLEN];
@@ -516,30 +515,73 @@ void obtainRelaxedStems(char* G1, char* G2, char* Gresult){
 	int i = 0;
 	int j = 0;
 
-	for(int k=0;k<length;k++){
+	for(int k=0;k<length;++k){
 		if(G2_pair[k] > -1){
 			i = k;
 			j = G2_pair[k];
 			if(i < j){ //for each ij in G2
 				if( (G1[i] != G2[i]) && (G1[j] != G2[j]) ){//if ij not in G1
+					//include stacking base pairs
+					if(paired_structure(i-1,j+1,G1_pair,length)){
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+						G1_pair[i] = j;
+						G1_pair[j] = i;
 					//include bulges of size 1
-					if(paired_structure(i-1,j+1,G1_pair,length) || paired_structure(i+1,j-1,G1_pair,length) ){
+					}else if(paired_structure(i-2,j+1,G1_pair,length) || paired_structure(i-1,j+2,G1_pair,length)){
 						Gresult[i] = G2[i];
 						Gresult[j] = G2[j];
+						G1_pair[i] = j;
+						G1_pair[j] = i;
 					//include loops of size 1x1
-					}else if( paired_structure(i-2,j+1,G1_pair,length) || paired_structure(i-1,j+2,G1_pair,length) || \
-							paired_structure(i+1,j-2,G1_pair,length) || paired_structure(i+2,j-1,G1_pair,length) ){
+					}else if(paired_structure(i-2,j+2,G1_pair,length)){
 						Gresult[i] = G2[i];
 						Gresult[j] = G2[j];
+						G1_pair[i] = j;
+						G1_pair[j] = i;
 					//include loops of size 1x2 or 2x1
-					}else if( paired_structure(i-2,j+2,G1_pair,length) || paired_structure(i+2,j-2,G1_pair,length) ){
+					}else if( paired_structure(i-3,j+2,G1_pair,length) || paired_structure(i-2,j+3,G1_pair,length)){
 						Gresult[i] = G2[i];
 						Gresult[j] = G2[j];
-					}else if( paired_structure(i-3,j+2,G1_pair,length) || paired_structure(i-2,j+3,G1_pair,length) || \
-							paired_structure(i+2,j-3,G1_pair,length) || paired_structure(i+3,j-2,G1_pair,length) ){
+						G1_pair[i] = j;
+						G1_pair[j] = i;
+					}
+				}
+			}
+		}
+	}
 
+	for(int k=length-1;k>=0;--k){
+		if(G2_pair[k] > -1){
+			i = k;
+			j = G2_pair[k];
+			if(i < j){ //for each ij in G2
+				if( (G1[i] != G2[i]) && (G1[j] != G2[j]) ){//if ij not in G1
+					//include stacking base pairs
+					if(paired_structure(i+1,j-1,G1_pair,length) ){
 						Gresult[i] = G2[i];
 						Gresult[j] = G2[j];
+						G1_pair[i] = j;
+						G1_pair[j] = i;
+						
+					//include bulges of size 1
+					}else if(paired_structure(i+1,j-2,G1_pair,length) || paired_structure(i+2,j-1,G1_pair,length) ){
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+						G1_pair[i] = j;
+						G1_pair[j] = i;
+					//include loops of size 1x1
+					}else if(paired_structure(i+2,j-2,G1_pair,length) ){
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+						G1_pair[i] = j;
+						G1_pair[j] = i;
+					//include loops of size 1x2 or 2x1
+					}else if(paired_structure(i+2,j-3,G1_pair,length) || paired_structure(i+3,j-2,G1_pair,length) ){
+						Gresult[i] = G2[i];
+						Gresult[j] = G2[j];
+						G1_pair[i] = j;
+						G1_pair[j] = i;
 					}
 				}
 			}
