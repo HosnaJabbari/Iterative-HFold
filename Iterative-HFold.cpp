@@ -305,18 +305,23 @@ int main (int argc, char **argv) {
 		//kevin: june 22 2017
 		//Mateo: Sept 13 2023
 		//changed format for ouptut to stdout
-		std::cout << "Seq:          " << seq << std::endl;
-		std::cout << "Restricted_" << 0 << ": " << result_list[0].get_restricted() << std::endl;;
-		std::cout << "Result_" << 0 << ":     " << result_list[0].get_final_structure() << " (" << result_list[0].get_final_energy() << ")" << std::endl;
-		if(args_info.verbose_given){
-			std::cout << "Method: " << result_list[0].get_method_chosen() << std::endl;
-		}
-		for (int i=1; i < number_of_output; i++) {
-			if(result_list[i].get_final_structure() == result_list[i-1].get_final_structure()) continue;
-			std::cout << "Restricted_" << i << ": " << result_list[i].get_restricted() << std::endl;;
-			std::cout << "Result_" << i << ":     " << result_list[i].get_final_structure() << " (" << result_list[i].get_final_energy() << ")" << std::endl;
+		std::cout << seq << std::endl;
+		if(result_list.size() == 1){
+			// std::cout << "Restricted_" << 0 << ": " << result_list[0].get_restricted() << std::endl;;
+			std::cout << result_list[0].get_final_structure() << " (" << result_list[0].get_final_energy() << ")" << std::endl;
+			
 			if(args_info.verbose_given){
-				std::cout << "Method: " << result_list[i].get_method_chosen() << std::endl;
+				std::cout << "Method: " << result_list[0].get_method_chosen() << std::endl;
+			}
+		}
+		else{
+			for (int i=0; i < number_of_output; i++) {
+				if(result_list[i].get_final_structure() == result_list[i-1].get_final_structure()) continue;
+				std::cout << "Restricted_" << i << ": " << result_list[i].get_restricted() << std::endl;;
+				std::cout << "Result_" << i << ":     " << result_list[i].get_final_structure() << " (" << result_list[i].get_final_energy() << ")" << std::endl;
+				if(args_info.verbose_given){
+					std::cout << "Method: " << result_list[i].get_method_chosen() << std::endl;
+				}
 			}
 		}
 	}
