@@ -107,7 +107,6 @@ void s_energy_matrix::compute_energy (int i, int j)
     min_en[1] = INF;
     min_en[2] = INF;
     min_en[3] = INF;
-    printf("At %d and %d, it's %c and %c\n",i,j,sequence[i], sequence[j]);
     if (can_pair (sequence[i], sequence[j]))    // if i and j can pair
     {
         // compute free energy of hairpin loop, stack pair, internal loop and multi-loop

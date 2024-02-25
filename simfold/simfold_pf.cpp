@@ -93,15 +93,15 @@ int main (int argc, char *argv[])
     //     and to call the function init_data, which loads the thermodynamic parameters into memory
     
     // configuration file, the path should be relative to the location of this executable
-    char config_file[200];
     //strcpy (config_file, "params/multirnafold.conf");
 
     //kevin 26 june 2017
     //occurs in /simfold/melting_temp.cpp, /simfold/simfold.cpp, /simfold/simfold_pf.cpp, /simfold/test_get_counts.cpp
     //changed strcpy to str cat beacause with installed simfold, it is trying to look at /simfold/.libs/params/multirnafold.conf
     //PARAMS_BASE_PATH is in constants.h to be ../params/ to get away from .libs directory
-    strcat(config_file, PARAMS_BASE_PATH);
-    strcat(config_file, "multirnafold.conf");
+    // strcat(config_file, PARAMS_BASE_PATH);
+     char config_file[400];
+    strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
 
     // what to fold: RNA or DNA
     int dna_or_rna;
@@ -114,13 +114,15 @@ int main (int argc, char *argv[])
     // initialize the thermodynamic parameters
     // call init_data only once for the same dna_or_rna and same temperature
     // if one of them changes, call init_data again   
-    init_data (argv[0], config_file, dna_or_rna, temperature);         
+    init_data (argv[0], config_file, dna_or_rna, temperature);        
 
-    if (strlen (parameter_filename) > 0)
-        fill_data_structures_with_new_parameters (parameter_filename);
-    else
-        fill_data_structures_with_new_parameters ("params/turner_parameters_fm363_constrdangles.txt");
-
+    if (dna_or_rna == RNA && temperature == 37.0)
+    {
+        if (strlen (parameter_filename) > 0)
+            fill_data_structures_with_new_parameters (parameter_filename);
+        else
+            fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
+    }
     printf ("Seq: %s\n", sequence);
 
     // create the partition function object. By default, it includes dangling ends.
@@ -136,11 +138,11 @@ int main (int argc, char *argv[])
     part->compute_base_pair_probabilities();
 
     // save the dot plot file (the lower triangle is empty for now)
-    part->PS_dot_plot("dot.ps");
+    // part->PS_dot_plot("dot.ps");
 
 
     // You can print the base pair probabilities above some threshold, for example 0.9
-    part->print_base_pair_probabilities(threshold);
+    // part->print_base_pair_probabilities(threshold);
 
     delete part;
     return 0;
