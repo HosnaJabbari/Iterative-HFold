@@ -218,11 +218,11 @@ int main (int argc, char **argv) {
 			// printf("method1\n");
 			*method1_energy = method1(sequence, structure, method1_structure);
 			// printf("method2\n");
-			// *method2_energy = method2(sequence, structure, method2_structure);
+			*method2_energy = method2(sequence, structure, method2_structure);
 			// printf("method3\n");
-			// *method3_energy = method3(sequence, structure, method3_structure);
+			*method3_energy = method3(sequence, structure, method3_structure);
 			// printf("method4\n");
-			// *method4_energy = method4(sequence, structure, method4_structure);
+			*method4_energy = method4(sequence, structure, method4_structure);
 
 				//We ignore non-negetive energy, only if the energy of the input sequnces are non-positive!
 				if (*method1_energy < final_energy) {
