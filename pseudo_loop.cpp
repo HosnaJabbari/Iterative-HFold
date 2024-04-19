@@ -747,6 +747,7 @@ void pseudo_loop::compute_WMBP(int i, int j, h_str_features *fres){
 		}
 
 		// 3)
+
 		if (fres[j].pair < 0){
 			int l, temp = INF, l_min=-1;
 			for (l = i+1; l<j ; l++)	{
@@ -771,6 +772,8 @@ void pseudo_loop::compute_WMBP(int i, int j, h_str_features *fres){
 								temp = sum;
 								l_min = l;
 							}
+
+
 	//						if (debug && fres[get_B(l,j)].pair == 6 && fres[get_Bp(l,j)].pair == 11){
 	//							printf("***************\n");
 	//							printf("WMBP(%d,%d) inside branch 3: l = %d, BE = %d, WMBP = %d, VP = %d ~~> sum = %d \n",i,j,l,get_BE(fres[get_B(l,j)].pair,get_B(l,j),fres[get_Bp(l,j)].pair,get_Bp(l,j)),get_WMBP(i,l-1),get_VP(l,j), sum);
@@ -862,6 +865,8 @@ void pseudo_loop::compute_WMB(int i, int j, h_str_features *fres){
 	else{
 		int m2 = INF, mWMBP = INF;
 		// 2)
+		
+
 		if (fres[j].pair >= 0 && j > fres[j].pair){
 			int l, l_min=-1;
 			int bp_j = fres[j].pair;
@@ -909,7 +914,6 @@ void pseudo_loop::compute_WMB(int i, int j, h_str_features *fres){
 		}
 		// check the WMBP value
 		mWMBP =  get_WMBP(i,j);
-
 		// get the min for WMB
 		WMB[ij] = MIN(m2,mWMBP);
 //		if (debug && i == 1 && j == 87){
