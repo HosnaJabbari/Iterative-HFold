@@ -58,7 +58,7 @@ void validateStructure(std::string sequence, std::string structure){
 void validateSequence(std::string sequence){
 
 	if(sequence.length() == 0){
-		std::cout << "sequence1 or sequence2 is missing" << std::endl;
+		std::cout << "sequence is missing" << std::endl;
 		exit(EXIT_FAILURE);
 	}
   // return false if any characters other than GCAUT -- future implement check based on type
@@ -288,15 +288,10 @@ int main (int argc, char *argv[])
 	seq=args_info.inputs[0];
 	} else {
 		if(!args_info.input_file_given) std::getline(std::cin,seq);
-	}
-	int n = seq.length();
-
-	validateSequence(seq);
+	}	
 
 	std::string restricted;
     args_info.input_structure_given ? restricted = input_struct : restricted = "";
-
-	if(restricted != "") validateStructure(seq,restricted);
 
 	std::string fileI;
     args_info.input_file_given ? fileI = input_file : fileI = "";
@@ -318,6 +313,10 @@ int main (int argc, char *argv[])
 		}
 		
 	}
+	int n = seq.length();
+	
+	validateSequence(seq);
+	if(restricted != "") validateStructure(seq,restricted);
 
 	std::string file = "src/params/parameters_DP09_Vienna.txt";
     vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
@@ -333,7 +332,7 @@ int main (int argc, char *argv[])
 		hotspot.set_structure(restricted);
 		hotspot_list.push_back(hotspot);
 	}
-	else {
+	if((number_of_suboptimal_structure-hotspot_list.size())>0) {
 		get_hotspots(seq, hotspot_list,number_of_suboptimal_structure,params);
 	}
 	free(params);
