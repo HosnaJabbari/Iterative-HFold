@@ -318,8 +318,11 @@ int main (int argc, char *argv[])
 	validateSequence(seq);
 	if(restricted != "") validateStructure(seq,restricted);
 
-	std::string file = "src/params/parameters_DP09_Vienna.txt";
-    vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
+	std::string file= "";
+	args_info.paramFile_given ? file = parameter_file : file = "";
+	if(file!=""){
+		vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
+	}
 
 	std::vector<Hotspot> hotspot_list;
 

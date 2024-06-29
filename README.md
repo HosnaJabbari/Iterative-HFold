@@ -63,41 +63,53 @@ cmake --build build
 ```   
 This can be useful if you are getting errors about your compiler not having C++11 features.
 
-After installing you can move the executables wherever you wish, but you should not delete or move the simfold folder, or you must recompile the executables. If you move the folders and wish to recompile, you should first delete the created "build" folder before recompiling.
+Help
+========================================
+
+```
+Usage: Iterative-HFold[options] [input sequence]
+```
+
+Read input file from cmdline; predict minimum free energy and optimum structure using the RNA folding algorithm.
+
+
+```
+  -h, --help             Print help and exit
+  -V, --version          Print version and exit
+  -v, --verbose          Give verbose output
+  -r, --input-structure  Give a restricted structure as an input structure
+  -i, --input-file       Give a path to an input file containing the sequence (and input structure if known)
+  -o, --output-file      Give a path to an output file which will the sequence, and its structure and energy
+  -n, --opt              Specify the number of suboptimal structures to output (default is 1)
+  -d  --dangles          Specify the dangle model to be used
+  -P, --paramFile        Read energy parameters from paramfile, instead of using the default parameter set.\n
+```
 
 #### How to use:
-    Arguments:
-        HFold_iterative:
-            -r <structure>
-            -i </path/to/file>
-            -o </path/to/file>
-            -v
-            -V
-            -n <number of outputs>
-            -p
 
         Remarks:
-            make sure the <arguments> are enclosed in "", for example -r "..().." instead of -r ..()..
+            make sure the <arguments> are enclosed in "", for example -r "..(...).." instead of -r ..(...)..
             The sequence does not need to be enclosed and can be given before or after the other arguments
             if no structure is provided through -r , the input structure will be the hotspot with the lowest free energy
             if -i is provided with just a file name without a path, it is assuming the file is in the diretory where the executable is called
             if -o is provided with just a file name without a path, the output file will be generated in the diretory where the executable is called
             if -v is provided, a verbose output will be given (method used is outputted)
             if -V is provided, the version is given
-            if -n is provided with a number, it will modify the number of hotspots looked and outputs given (the base is 1)
-            if -p is provided, it will change the output to pseudoknot-free
-
+            if -n is provided with a number, it will modify the number of hotspots looked and outputs given (the base is 1), repeated structures are skipped. That is, if different input structures come to the same conclusion, only those that are different are shown
+            If no input structure is given, or suboptimal structures are greater than the number given, CParty generates hotspots to be used as input structures -- where hotspots are energetically favorable stems
+            The default parameter file is Turner2004. This can be changed via -P and specifying the parameter file you would like
     
     Sequence requirements:
-        containing only characters GCAUT
+        containing only characters GCAU
 
     Structure requirements:
         -pseudoknot free
-        -containing only characters ._(){}[]
+        -containing only characters .x()
         Remarks:
             Restricted structure symbols:
                 () restricted base pair
-                _ no restriction
+                . no restriction
+                x restricted to unpaired
 
     Input file requirements:
             Line1: Name (optional, but must be fasta format; ignored in final input)
@@ -106,32 +118,19 @@ After installing you can move the executables wherever you wish, but you should 
         sample:
             >Srp_005
             GCAACGAUGACAUACAUCGCUAGUCGACGC
-            (____________________________)
+            (............................)
 
 #### Example:
     assume you are in the directory where the HFold_iterative executable is loacted
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt"
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)"
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)" -o "outputfile.txt"
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -n 10
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -p
+    ./build/Iterative-HFold -i "/home/username/Desktop/myinputfile.txt"
+    ./build/Iterative-HFold -i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
+    ./build/Iterative-HFold -i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./build/Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)"
+    ./build/Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)" -o "outputfile.txt"
+    ./build/Iterative-HFold -d1 GCAACGAUGACAUACAUCGCUAGUCGACGC
+    ./build/Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -n 10
+    ./build/Iterative-HFold -P "src/params/parameters_DP09.txt" GCAACGAUGACAUACAUCGCUAGUCGACGC 
 
     
-#### Exit code:
-    0       success
-    1	    invalid argument error 
-    3	    thread error
-    4       i/o error
-    5       pipe error
-    6       positive energy error
-    error code with special meaning: http://tldp.org/LDP/abs/html/exitcodes.html
-    2	    Misuse of shell builtins (according to Bash documentation)
-    126	    Command invoked cannot execute
-    127	    "command not found"
-    128	    Invalid argument to exit	
-    128+n	Fatal error signal "n"
-    130	    Script terminated by Control-C
-    255	    Exit status out of range (range is 0-255)
+## Questions
+For questions, you can email mateo2@ualberta.ca
