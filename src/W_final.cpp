@@ -75,7 +75,7 @@ energy_t W_final::hfold(sparse_tree &tree){
 
 
 				V->compute_WMv_WMp(i,j,WMB->get_WMB(i,j),tree.tree);
-				V->compute_energy_WM_restricted(i,j,tree);
+				V->compute_energy_WM_restricted(i,j,tree,WMB->WMB);
 			}
 
 		}
@@ -631,6 +631,13 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 			  energy_t min = INF;
 			  cand_pos_t best_k = j, best_row;
 
+			  if(tree.tree[j].pair<0){
+				if(V->get_energy_WM(i,j-1)< min){
+					min = V->get_energy_WM(i,j-1);
+					best_row = 5;
+				}
+			}
+
 			  for (cand_pos_t k=i; k <= j-TURN-1; k++)
 				{	energy_t m1 = INF,m2 = INF;
 					bool can_pair = tree.up[k-1] >= (k-(i));
@@ -671,6 +678,8 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 					  insert_node (i, best_k-1, M_WM);
 					  insert_node (best_k+1, j, M_WMp);
 					break;
+				  case 5:
+				  	  insert_node (i,j-1,M_WM); break;
 				  }
 			}
 			break;
@@ -682,31 +691,35 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 			cand_pos_t best_row;
 			cand_pos_t si = S_[i];
 			cand_pos_t sj = S_[j];
+			cand_pos_t si1 = (i>1) ? S_[i-1] : -1;
+			cand_pos_t sj1 = (j<n) ? S_[j+1] : -1;
 			pair_type tt = pair[S_[i]][S_[j]];
-			min = V->get_energy(i,j) + E_MLstem(tt,-1,-1,params_);
+			min = V->get_energy(i,j) + ((params_->model_details.dangles == 2) ? E_MLstem(tt,si1,sj1,params_) : E_MLstem(tt,-1,-1,params_));
 			best_row = 1;
-			if(tree.tree[i].pair<0){
-				tt = pair[S_[i+1]][S_[j]];
-				energy_t tmp = V->get_energy(i+1,j) + E_MLstem(tt,si,-1,params_);
-				if(tmp<min){
-					min = tmp;
-					best_row = 2;
+			if(params_->model_details.dangles == 1){
+				if(tree.tree[i].pair<0){
+					tt = pair[S_[i+1]][S_[j]];
+					energy_t tmp = V->get_energy(i+1,j) + E_MLstem(tt,si,-1,params_);
+					if(tmp<min){
+						min = tmp;
+						best_row = 2;
+					}
 				}
-			}
-			if(tree.tree[j].pair<0){
-				tt = pair[S_[i]][S_[j-1]];
-				energy_t tmp = V->get_energy(i,j-1) + E_MLstem(tt,-1,sj,params_);
-				if(tmp<min){
-					min = tmp;
-					best_row = 3;
+				if(tree.tree[j].pair<0){
+					tt = pair[S_[i]][S_[j-1]];
+					energy_t tmp = V->get_energy(i,j-1) + E_MLstem(tt,-1,sj,params_);
+					if(tmp<min){
+						min = tmp;
+						best_row = 3;
+					}
 				}
-			}
-			if(tree.tree[i].pair<0 && tree.tree[j].pair<0){
-				tt = pair[S_[i+1]][S_[j-1]];
-				energy_t tmp = V->get_energy(i+1,j-1) + E_MLstem(tt,si,sj,params_);
-				if(tmp<min){
-					min = tmp;
-					best_row = 4;
+				if(tree.tree[i].pair<0 && tree.tree[j].pair<0){
+					tt = pair[S_[i+1]][S_[j-1]];
+					energy_t tmp = V->get_energy(i+1,j-1) + E_MLstem(tt,si,sj,params_);
+					if(tmp<min){
+						min = tmp;
+						best_row = 4;
+					}
 				}
 			}
 			if(tree.tree[j].pair<0){

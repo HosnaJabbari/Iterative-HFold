@@ -41,6 +41,7 @@ public:
     seq_interval *get_stack_interval(){return stack_interval;}
     std::string get_structure(){return structure;}
     minimum_fold *get_minimum_fold(){return f;}
+	std::vector<energy_t> WMB;				// the main loop for pseudoloops and bands
 
 private:
 
@@ -61,7 +62,6 @@ private:
     std::vector<energy_t> VP;				// the loop corresponding to the pseudoknotted region of WMB
 	std::vector<energy_t> VPL;				// the loop corresponding to the pseudoknotted region of WMB
     std::vector<energy_t> VPR;				// the loop corresponding to the pseudoknotted region of WMB
-    std::vector<energy_t> WMB;				// the main loop for pseudoloops and bands
 	std::vector<energy_t> WMBP; 				// the main loop to calculate WMB
 	std::vector<energy_t> WMBW;
 	std::vector<energy_t> WIP;				// the loop corresponding to WI'
