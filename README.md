@@ -83,6 +83,7 @@ Read input file from cmdline; predict minimum free energy and optimum structure 
   -n, --opt              Specify the number of suboptimal structures to output (default is 1)
   -d  --dangles          Specify the dangle model to be used
   -P, --paramFile        Read energy parameters from paramfile, instead of using the default parameter set.\n
+      --noConv           Do not convert DNA into RNA. This will use the Matthews 2004 parameters for DNA
 ```
 
 #### How to use:

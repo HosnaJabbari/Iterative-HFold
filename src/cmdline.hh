@@ -39,6 +39,7 @@ struct args_info
   const char *subopt_help; /**< @brief Give a number of suboptimals to print  */
   const char *dangles_help; /**< @brief Specify the dangle model*/
   const char *paramFile_help; /**< @brief Use a separate parameter list */
+  const char *noConv_help; /**< @brief Turn off automated conversion to RNA help description.  */
 
 
   
@@ -51,6 +52,7 @@ struct args_info
   unsigned int subopt_given ;	/**< @brief Whether suboptimals was given.  */
   unsigned int dangles_given ;  /**< @brief Whether dangle model was given.  */
   unsigned int paramFile_given ; /** <@brief whether a parameter file was given */
+  unsigned int noConv_given ;	/**< @brief Whether noConv was given.  */
 
 
   char **inputs ; /**< @brief unnamed options (options without names) */
