@@ -314,6 +314,7 @@ int main (int argc, char *argv[])
 		
 	}
 	int n = seq.length();
+	std::transform(seq.begin(), seq.end(), seq.begin(), ::toupper);
 	
 	validateSequence(seq);
 	if(restricted != "") validateStructure(seq,restricted);
@@ -322,6 +323,9 @@ int main (int argc, char *argv[])
 	args_info.paramFile_given ? file = parameter_file : file = "";
 	if(file!=""){
 		vrna_params_load(file.c_str(), VRNA_PARAMETER_FORMAT_DEFAULT);
+	}
+	else if (seq.find('T') != std::string::npos){
+		vrna_params_load_DNA_Mathews2004();
 	}
 
 	std::vector<Hotspot> hotspot_list;
