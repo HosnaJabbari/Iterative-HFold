@@ -301,7 +301,7 @@ int main (int argc, char *argv[])
 
 	int number_of_suboptimal_structure = args_info.subopt_given ? subopt : 1;
 
-	int dangles = args_info.dangles_given ? dangle_model : 1;
+	int dangles = args_info.dangles_given ? dangle_model : 2;
 
 	if(fileI != ""){
 		
