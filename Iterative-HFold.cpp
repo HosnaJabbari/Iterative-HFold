@@ -106,14 +106,9 @@ int main (int argc, char **argv) {
 	} else {
 		if(!args_info.input_file_given) std::getline(std::cin,seq);
 	}
-	int n = seq.length();
-
-	validateSequence(seq);
 
 	std::string restricted;
     args_info.input_structure_given ? restricted = input_struct : restricted = "";
-
-	if(restricted != "") validateStructure(seq,restricted);
 
 	std::string fileI;
     args_info.input_file_given ? fileI = input_file : fileI = "";
@@ -136,6 +131,12 @@ int main (int argc, char **argv) {
 		}
 		
 	}
+
+	int n = seq.length();
+
+	validateSequence(seq);
+
+	if(restricted != "") validateStructure(seq,restricted);
 
 	// //set up for RNA so we can use this for building hotspot
 	// if(!args_info.input_structure_given){
