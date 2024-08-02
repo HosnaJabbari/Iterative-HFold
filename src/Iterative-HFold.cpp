@@ -46,8 +46,8 @@ void validateStructure(std::string sequence, std::string structure){
 
 	//check if any characters are not ._()
 	for(char c : structure) {
-		if (!(c == '.' || c == '_' || c == '(' || c == ')')){
-			std::cout << "Structure must only contain ._(): " << c << std::endl;
+		if (!(c == '.' || c == '_' || c == '(' || c == ')' || c == 'x')){
+			std::cout << "Structure must only contain ._()x: " << c << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}
