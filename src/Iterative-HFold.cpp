@@ -151,6 +151,13 @@ cand_pos_t paired_structure(cand_pos_t i, cand_pos_t j, std::vector<cand_pos_t> 
 	return (i >= 0 && j < n && (pair_index[i] == j));
 }
 
+/**
+ * @brief Takes the input constraint structure as the base output structure. Finds the stacking bases, bulges of size 1, internal loops of size 1x1, 2x1, and 1x2 on the pk_free structure
+ * which have these substructures forming on the base pairs and adds them to the output structure.
+ * 
+ * @param restricted input constraint structure used as the base output structure
+ * @param pkfree_structure structure post pseudoknot-free base pair filling.
+*/
 std::string obtainRelaxedStems(std::string restricted, std::string pkfree_structure){
 	cand_pos_t n = restricted.length();
 
