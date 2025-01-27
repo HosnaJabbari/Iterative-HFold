@@ -53,6 +53,24 @@ pseudo_loop::~pseudo_loop()
 {
 }
 
+/**
+ * In cases where the band border is not found, if specific cases are met, the value is Inf(i.e n) not -1.
+ * When applied to WMBP, if all cases are 0, then we can proceed with WMBP
+ * Mateo Jan 2025: Added to Fix WMBP problem
+*/
+int pseudo_loop::compute_exterior_cases(cand_pos_t l, cand_pos_t j, const sparse_tree &tree){
+	// Case 1 -> l is not covered
+	bool case1 = tree.tree[l].parent->index <= 0;
+	// Case 2 -> l is paired
+	bool case2 = tree.tree[l].pair > 0;
+	// Case 3 -> l is part of a closed subregion
+	// bool case3 = 0;
+	// Case 4 -> l.bp(l) i.e. l.j does not cross anything -- could I compare parents instead?
+	bool case4 = j<tree.Bp(l,j);
+	// By bitshifting each one, we have a more granular idea of what cases fail and is faster than branching
+	return (case1 <<2) | (case2 << 1) | case4;
+}
+
 void pseudo_loop::compute_energies(cand_pos_t i, cand_pos_t j, sparse_tree &tree)
 {
 	cand_pos_t ij = index[i]+j-i;
@@ -348,7 +366,9 @@ void pseudo_loop::compute_WMBP(cand_pos_t i, cand_pos_t j, sparse_tree &tree){
 			cand_pos_t Bp_lj = tree.Bp(l,j);
 			// Hosna: April 19th, 2007
 			// the chosen l should be less than border_b(i,j) -- should be greater than border_b(i,l)
-			if(b_ij > 0 && l < b_ij){
+			// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
+			int ext_case = compute_exterior_cases(l,j,tree);
+			if((b_ij > 0 && l < b_ij) || ext_case == 0){
 				if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 					cand_pos_t B_lj = tree.B(l,j);
 
@@ -376,7 +396,9 @@ void pseudo_loop::compute_WMBP(cand_pos_t i, cand_pos_t j, sparse_tree &tree){
 			cand_pos_t Bp_lj = tree.Bp(l,j);
 			// Hosna: April 19th, 2007
 			// the chosen l should be less than border_b(i,j) -- should be greater than border_b(i,l)
-			if(b_ij>0 && l<b_ij){
+			// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
+			int ext_case = compute_exterior_cases(l,j,tree);
+			if((b_ij > 0 && l < b_ij) || ext_case == 0){
 				if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 					cand_pos_t B_lj = tree.B(l,j);
 
@@ -746,7 +768,9 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 					for (cand_pos_t l = i+1; l<j ; l++)	{
 						cand_pos_t bp_il = tree.bp(i,l);
 						cand_pos_t Bp_lj = tree.Bp(l,j);
-						if(b_ij > 0 && l < b_ij){
+						// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
+						int ext_case = compute_exterior_cases(l,j,tree);
+						if((b_ij > 0 && l < b_ij) || ext_case == 0){
 							if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 		
 								cand_pos_t B_lj = tree.B(l,j);
@@ -776,7 +800,9 @@ void pseudo_loop::back_track(std::string structure, minimum_fold *f, seq_interva
 					for (cand_pos_t l = i+1; l<j ; l++)	{
 						cand_pos_t bp_il = tree.bp(i,l);
 						cand_pos_t Bp_lj = tree.Bp(l,j);
-						if(b_ij>0 && l<b_ij){
+						// Mateo Jan 2025 Added exterior cases to consider when looking at band borders. Solved case of [.(.].[.).]
+						int ext_case = compute_exterior_cases(l,j,tree);
+						if((b_ij > 0 && l < b_ij) || ext_case == 0){
 							if (bp_il >= 0 && l>bp_il && Bp_lj > 0 && l<Bp_lj){ // bp(i,l) < l < Bp(l,j)
 		
 								cand_pos_t B_lj = tree.B(l,j);
