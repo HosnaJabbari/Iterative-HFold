@@ -13,8 +13,6 @@
 #include <string>
 #include <getopt.h>
 
-int is_invalid_restriction(char* restricted_structure, char* current_structure);
-
 bool exists (const std::string path) {
   struct stat buffer;   
   return (stat (path.c_str(), &buffer) == 0); 
@@ -116,7 +114,7 @@ void find_disjoint_substructure(std::string structure, std::vector< std::pair<in
  * @param p_table Restricted array
  */
 void detect_pairs(const std::string &structure, std::vector<cand_pos_t> &p_table){
-	cand_pos_t i, j, count = 0, length = structure.length(),last_j=length;
+	cand_pos_t i, j, count = 0, length = structure.length();
 	std::vector<cand_pos_t>  pairs;
 	pairs.push_back(length);
 
@@ -322,7 +320,6 @@ int main (int argc, char *argv[])
 		}
 		
 	}
-	int n = seq.length();
 	std::transform(seq.begin(), seq.end(), seq.begin(), ::toupper);
 	
 	validateSequence(seq);
@@ -357,13 +354,14 @@ int main (int argc, char *argv[])
 	std::vector<Result> result_list;
 
 	// Iterate through all hotspots or the single given input structure
-	for(int i = 0;i<hotspot_list.size();++i){
+	cand_pos_t size = hotspot_list.size();
+	for(int i = 0;i<size;++i){
 		energy_t method1_energy = INF;
 		energy_t method2_energy = INF;
 		energy_t method3_energy = INF;
 		energy_t method4_energy = INF;
 		energy_t final_en = INF;
-		int method_chosen;
+		int method_chosen = -1;
 		std::string final_structure;
 		std::string res = hotspot_list[i].get_structure();
 
@@ -386,7 +384,8 @@ int main (int argc, char *argv[])
 		//Method3
 		std::string pk_free = hfold(seq,res,method3_energy,true,false,dangles);
 		std::string relaxed = obtainRelaxedStems(res,pk_free);
-		for(int i =0; i< res.length();++i) if(res[i] == 'x') relaxed[i] = 'x';
+		cand_pos_t n = res.length();
+		for(int i =0; i< n;++i) if(res[i] == 'x') relaxed[i] = 'x';
 		std::string method3_structure = method2(seq,relaxed,method3_energy,dangles);
 		if(method3_energy < final_en){
 			final_en = method3_energy;
@@ -411,7 +410,8 @@ int main (int argc, char *argv[])
 
 			std::string pk_free = hfold(subsequence,substructure,energy,true,false,dangles);
 			std::string relaxed = obtainRelaxedStems(substructure,pk_free);
-			for(int i =0; i< substructure.length();++i) if(substructure[i] == 'x') relaxed[i] = 'x';
+			cand_pos_t sub_n = substructure.length();
+			for(int i =0; i< sub_n;++i) if(substructure[i] == 'x') relaxed[i] = 'x';
 			disjoint_structure.replace(i,j-i+1,relaxed);
 		}
 		std::string method4_structure = method2(seq,disjoint_structure,method4_energy,dangles);
@@ -441,12 +441,16 @@ int main (int argc, char *argv[])
 	if(fileO != ""){
 		std::ofstream out(fileO);
 		out << seq << std::endl;
-		for (int i=0; i < result_list.size(); i++) {
-			out << "Restricted_" << i << ": " << result_list[i].get_restricted() << std::endl;;
-			out << "Result_" << i << ":     " << result_list[i].get_final_structure() << " (" << result_list[i].get_final_energy() << ")" << std::endl;
+		std::cout << "Restricted_" << 0 << ": " << result_list[0].get_restricted() << std::endl;;
+		std::cout << "Result_" << 0 << ":     " << result_list[0].get_final_structure() << " (" << result_list[0].get_final_energy() << ")" << std::endl;
+		for (int i=1; i < number_of_output; i++) {
+			if(result_list[i].get_final_structure() == result_list[i-1].get_final_structure()) continue;
+			std::cout << "Restricted_" << i << ": " << result_list[i].get_restricted() << std::endl;;
+			std::cout << "Result_" << i << ":     " << result_list[i].get_final_structure() << " (" << result_list[i].get_final_energy() << ")" << std::endl;
 			if(args_info.verbose_given){
-				out << "Method: " << result_list[i].get_method_chosen() << std::endl;
-			}	
+				std::cout << "Method: " << result_list[i].get_method_chosen() << std::endl;
+			}
+			
 		}
 
 	}else{
@@ -464,7 +468,7 @@ int main (int argc, char *argv[])
 		else{
 			std::cout << "Restricted_" << 0 << ": " << result_list[0].get_restricted() << std::endl;;
 			std::cout << "Result_" << 0 << ":     " << result_list[0].get_final_structure() << " (" << result_list[0].get_final_energy() << ")" << std::endl;
-			for (int i=1; i < result_list.size(); i++) {
+			for (int i=1; i < number_of_output; i++) {
 				if(result_list[i].get_final_structure() == result_list[i-1].get_final_structure()) continue;
 				std::cout << "Restricted_" << i << ": " << result_list[i].get_restricted() << std::endl;;
 				std::cout << "Result_" << i << ":     " << result_list[i].get_final_structure() << " (" << result_list[i].get_final_energy() << ")" << std::endl;
@@ -478,26 +482,4 @@ int main (int argc, char *argv[])
 	cmdline_parser_free(&args_info);
 
     return 0;
-}
-
-//---------------------------------------this function is suppose to be the same as the one in Hfold_interacting, if any changes are made, please change that one too--------------------
-//kevin 30 Aug 2017
-//check if the computed structure matches the restricted structure
-int is_invalid_restriction(char* restricted_structure, char* current_structure){
-	std::string openBracketArray ("({[");
-	std::string closeBracketArray (")}]");
-
-	for (int i=0; i < strlen(restricted_structure); i++){
-        if(restricted_structure[i] != '_' && restricted_structure[i] != current_structure[i]){
-			if( (openBracketArray.find_first_of(restricted_structure[i]) != -1) && ((openBracketArray.find_first_of(current_structure[i]) != -1)) ){
-				continue;
-			}else if ( (closeBracketArray.find_first_of(restricted_structure[i]) != -1) && ((closeBracketArray.find_first_of(current_structure[i]) != -1)) ){
-				continue;
-			}else{
-				return 1;
-			}
-		}
-
-    }
-	return 0;
 }

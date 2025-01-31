@@ -13,6 +13,7 @@ std::string input_struct;
 std::string input_file;
 std::string output_file;
 std::string parameter_file;
+std::string shape_file;
 int subopt;
 int dangle_model;
 
@@ -35,7 +36,8 @@ const char *args_info_help[] = {
   "  -o  --output-file      Give a path to an output file which will the sequence, and its structure and energy",
   "  -n, --opt              Specify the number of suboptimal structures to output (default is 1)",
   "  -d  --dangles          Specify the dangle model to be used (base is 2)",
-  "  -P, --paramFile        Read energy parameters from paramfile, instead of using the default parameter set.\n",
+  "  -P, --paramFile        Read energy parameters from paramfile, instead of using the default parameter set.",
+  // "  -S  --shape            Give a path to a shape file corresponding to the sequence given",
   "      --noConv           Do not convert DNA into RNA. This will use the Matthews 2004 parameters for DNA",
 
   "\nThe input sequence is read from standard input, unless it is\ngiven on the command line.\n",
@@ -62,7 +64,9 @@ static void init_args_info(struct args_info *args_info)
   args_info->subopt_help = args_info_help[7] ;
   args_info->dangles_help = args_info_help[8] ;
   args_info->paramFile_help = args_info_help[9] ;
+  // args_info->shape_help = args_info_help[10] ;
   args_info->noConv_help = args_info_help[10] ;
+  
 
 
 
@@ -120,6 +124,7 @@ static void clear_given (struct args_info *args_info)
   args_info->dangles_given = 0 ;
   args_info->paramFile_given = 0 ;
   args_info->noConv_given = 0 ;
+  args_info->shape_given = 0 ;
 }
 
 static void clear_args (struct args_info *args_info)
@@ -314,11 +319,12 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         { "subopt",	required_argument, NULL, 'n' },
         { "dangles",	0, NULL, 'd' },
         { "paramFile",	required_argument, NULL, 'P' },
+        { "shape",	required_argument, NULL, 'S' },
         { "noConv",	0, NULL, 0 },
         { 0,  0, 0, 0 }
       };
 
-      c = getopt_long (argc, argv, "hVvr:i:o:n:d:P:", long_options, &option_index);
+      c = getopt_long (argc, argv, "hVvr:i:o:n:d:P:S:", long_options, &option_index);
 
       if (c == -1) break;	/* Exit from `while (1)' loop.  */
 
@@ -339,20 +345,31 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         
           if (update_arg( 0 , 
                0 , &(args_info->verbose_given),
-              &(local_args_info.verbose_given), optarg, 0, 0, ARG_NO,0, 0,"verbose", 'v',additional_error))
-            goto failure;
+              &(local_args_info.verbose_given), optarg, 0, 0, ARG_NO,0, 0,"verbose", 'v',additional_error)){
+            goto failure;}
         
           break;
 
-          case 'P':	/* Take in a different Parameter File.  */
+          case 'P':	/* Take in a a different Parameter File.  */
         
         
           if (update_arg( 0 , 
                0 , &(args_info->paramFile_given),
-              &(local_args_info.paramFile_given), optarg, 0, 0, ARG_NO,0, 0,"paramFile", 'P',additional_error))
-            goto failure;
+              &(local_args_info.paramFile_given), optarg, 0, 0, ARG_NO,0, 0,"paramFile", 'P',additional_error)){
+            goto failure;}
 
             parameter_file = optarg;
+          break;
+
+          case 'S':	/* Take in a shape file.  */
+        
+        
+          if (update_arg( 0 , 
+               0 , &(args_info->shape_given),
+              &(local_args_info.shape_given), optarg, 0, 0, ARG_NO,0, 0,"shape", 'S',additional_error)){
+            goto failure;}
+
+            shape_file = optarg;
           break;
 
           case 'n':	/* Specify number of outputs.  */
@@ -360,8 +377,8 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         
           if (update_arg( 0 , 
                0 , &(args_info->subopt_given),
-              &(local_args_info.subopt_given), optarg, 0, 0, ARG_NO,0, 0,"subopt", 'n',additional_error))
-            goto failure;
+              &(local_args_info.subopt_given), optarg, 0, 0, ARG_NO,0, 0,"subopt", 'n',additional_error)){
+            goto failure;}
 
             subopt = strtol(optarg,NULL,10);
         
@@ -371,8 +388,8 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         
           if (update_arg( 0 , 
                0 , &(args_info->input_structure_given),
-              &(local_args_info.input_structure_given), optarg, 0, 0, ARG_NO,0, 0,"input-structure", 'r',additional_error))
-            goto failure;
+              &(local_args_info.input_structure_given), optarg, 0, 0, ARG_NO,0, 0,"input-structure", 'r',additional_error)){
+            goto failure;}
 
             input_struct = optarg;
         
@@ -382,8 +399,8 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         
           if (update_arg( 0 , 
                0 , &(args_info->input_file_given),
-              &(local_args_info.input_file_given), optarg, 0, 0, ARG_NO,0, 0,"input-file", 'i',additional_error))
-            goto failure;
+              &(local_args_info.input_file_given), optarg, 0, 0, ARG_NO,0, 0,"input-file", 'i',additional_error)){
+            goto failure;}
 
             input_file = optarg;
         
@@ -393,20 +410,20 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
         
           if (update_arg( 0 , 
                0 , &(args_info->output_file_given),
-              &(local_args_info.output_file_given), optarg, 0, 0, ARG_NO,0, 0,"output-file", 'o',additional_error))
-            goto failure;
+              &(local_args_info.output_file_given), optarg, 0, 0, ARG_NO,0, 0,"output-file", 'o',additional_error)){
+            goto failure;}
 
             output_file = optarg;
         
           break;
         
-        case 'd':	/* Specify if pseudoknot-free.  */
+        case 'd':	/* Specify the dangle type.  */
         
         
           if (update_arg( 0 , 
                0 , &(args_info->dangles_given),
-              &(local_args_info.dangles_given), optarg, 0, 0, ARG_NO,0, 0,"dangles", 'd',additional_error))
-            goto failure;
+              &(local_args_info.dangles_given), optarg, 0, 0, ARG_NO,0, 0,"dangles", 'd',additional_error)){
+            goto failure;}
 
             dangle_model = std::stoi(optarg);
         
@@ -420,8 +437,8 @@ int cmdline_parser_internal (int argc, char **argv, struct args_info *args_info,
           
             if (update_arg( 0 , 
                  0 , &(args_info->noConv_given),
-                &(local_args_info.noConv_given), optarg, 0, 0, ARG_NO, 0, 0,"noConv", '-', additional_error))
-              goto failure;
+                &(local_args_info.noConv_given), optarg, 0, 0, ARG_NO, 0, 0,"noConv", '-', additional_error)){
+              goto failure;}
           
           }
           break;

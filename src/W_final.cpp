@@ -408,7 +408,8 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 
 			if (j==1) return;
 
-			int min = INF, tmp, best_row, i, best_i, acc, energy_ij;
+			energy_t min = INF, tmp = INF, acc = INF, energy_ij= INF;
+			cand_pos_t best_row = -1, best_i = -1;
 
 			// this case is for j unpaired, so I have to check that.
 			if (tree.tree[j].pair <= -1)
@@ -420,7 +421,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 					best_row = 0;
 				}
 			}
-			for (i=1; i<=j-1; i++)    // no TURN
+			for (cand_pos_t i=1; i<=j-1; i++)    // no TURN
 			{
 
 				// Don't need to make sure i and j don't have to pair with something else
@@ -494,7 +495,7 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 		// Hosna June 30, 2007
 		// The following would not take care of when
 		// we have some unpaired bases before the start of the WMB
-		for (i=1; i<=j-1; i++)
+		for (cand_pos_t i=1; i<=j-1; i++)
 		{
 			// Hosna: July 9, 2007
 			// We only chop W to W + WMB when the bases before WMB are free
@@ -637,7 +638,6 @@ void W_final::backtrack_restricted(seq_interval *cur_interval, sparse_tree &tree
 
 			for (cand_pos_t k=i; k <= j-TURN-1; k++)
 			{	energy_t m1 = INF,m2 = INF;
-				energy_t wm_kj = V->E_MLStem(V->get_energy(k,j),V->get_energy(k+1,j),V->get_energy(k,j-1),V->get_energy(k+1,j-1),S_,params_,k,j,n,tree.tree);
 				bool can_pair = tree.up[k-1] >= (k-(i));
 				if(can_pair) m1 = static_cast<energy_t>((k-i)*params_->MLbase) + V->get_energy_WMv (k, j);
 				if (m1 < min){
@@ -882,12 +882,13 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
 
     //make sure we only keep top 20 hotspot with lowest energy
     std::sort(hotspot_list.begin(), hotspot_list.end(),compare_hotspot_ptr);
-    while(hotspot_list.size() > max_hotspot){
+	cand_pos_t size = hotspot_list.size();
+    while(size > max_hotspot){
         hotspot_list.pop_back();
     }
 
     //if no hotspot found, add all _ as restricted
-    if(hotspot_list.size() == 0){
+    if(size == 0){
         Hotspot hotspot(1,n,n+1);
         hotspot.set_default_structure();
         hotspot_list.push_back(hotspot);

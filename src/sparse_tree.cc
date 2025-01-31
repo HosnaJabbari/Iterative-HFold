@@ -21,7 +21,6 @@ sparse_tree::sparse_tree(std::string structure,int n){
     preprocess();
     ptr = 0;
 
-    int cur = 1;
     dfs(0,-1,0);
     // depthArr.resize(euler.size());
     makeArr();
@@ -47,7 +46,7 @@ void sparse_tree::makeArr()
  * By using the sparse table which holds the the maximum height node for 2^dx ahead of the node,
  * we can cover the full area between l and r and find the max height node
  */
-const int sparse_tree::query(int l,int r) const{
+int sparse_tree::query(int l,int r){
     int d = r-l;
     int dx = logn[d];
     if (l==r) return l;
@@ -64,7 +63,7 @@ const int sparse_tree::query(int l,int r) const{
  * From query, we get the node with the maximum height between the two (the parent)
  * and we find the actual position in the dfs
 */
-const int sparse_tree::LCA(int i,int j) const{
+int sparse_tree::LCA(int i,int j){
             // trivial case
     if (i==j) return i;
 
@@ -181,7 +180,7 @@ void sparse_tree::buildSparseTable(int n){
 /**
  * Returns the left innermost pair in a band between i and l
 */
-const int sparse_tree::bp(int i, int l ) const{
+int sparse_tree::bp(int i, int l ){
     if(tree[l].parent->index == 0 || tree[l].pair > -1) return -2;
     if ((tree[l].parent)->index < i) return -1;
     return (tree[l].parent)->index;
@@ -189,7 +188,7 @@ const int sparse_tree::bp(int i, int l ) const{
 /**
  * Returns the right innermost pair in a band between l and j
 */
-const int sparse_tree::Bp(int l, int j) const{
+int sparse_tree::Bp(int l, int j){
     if(tree[l].parent->index == 0 || tree[l].pair > -1) return -2;
     if ((tree[l].parent)->pair > j) return -1;
     return (tree[l].parent)->pair;
@@ -197,7 +196,7 @@ const int sparse_tree::Bp(int l, int j) const{
 /**
  * Returns the right outermostpair in a band between l and j
 */
-const int sparse_tree::B(int l, int j) const{
+int sparse_tree::B(int l, int j){
     if(tree[l].parent->index == 0 || tree[l].pair > -1) return -2;
     if ((tree[l].parent)->pair > j) return -1;
     else{
@@ -210,7 +209,7 @@ const int sparse_tree::B(int l, int j) const{
     }
 }
 // Returns the left outermost pair in a band between i and l
-const int sparse_tree::b(int i, int l) const{
+int sparse_tree::b(int i, int l){
     if(tree[l].parent->index == 0 || tree[l].pair > -1) return -2;
     if ((tree[l].parent)->index < i) return -1;
     else{
@@ -226,7 +225,7 @@ const int sparse_tree::b(int i, int l) const{
 /**
  * Returns whether there the area between i and j is weakly closed, specifically if all pairs in the [i,j] stay within [i,j]
 */
-const bool sparse_tree::weakly_closed(int i, int j) const{
+bool sparse_tree::weakly_closed(int i, int j){
     if(j<i) return 0;
     if((i > tree[i].pair && tree[i].pair > 0) || tree[j].pair> j) return 0;
     if(i==j) return !(tree[j].pair > 0);

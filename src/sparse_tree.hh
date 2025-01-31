@@ -56,17 +56,17 @@ class sparse_tree{
         std::vector< std::vector<int> > sparse_table;
         int p2[maxSize];
 
-        const int bp(int i, int l ) const;
-        const int Bp(int l, int j) const;
-        const int B(int l, int j) const;
-        const int b(int i, int l) const;
-        const bool weakly_closed(int i, int j) const;
+        int bp(int i, int l );
+        int Bp(int l, int j);
+        int B(int l, int j);
+        int b(int i, int l);
+        bool weakly_closed(int i, int j);
 
 
     private:
         void makeArr();
-        const int query(int l,int r) const;
-        const int LCA(int i,int j) const;
+        int query(int l,int r);
+        int LCA(int i,int j);
         void preprocess();
         void create_tree(int n, std::string structure);
         void dfs(int cur, int prev, int dep);

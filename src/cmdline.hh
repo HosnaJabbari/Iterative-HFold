@@ -25,6 +25,9 @@ extern int dangle_model;
 // The parameter file location
 extern std::string parameter_file;
 
+// The shape file
+extern std::string shape_file;
+
 
 
 /** @brief Where the command line options are stored */
@@ -40,6 +43,7 @@ struct args_info
   const char *dangles_help; /**< @brief Specify the dangle model*/
   const char *paramFile_help; /**< @brief Use a separate parameter list */
   const char *noConv_help; /**< @brief Turn off automated conversion to RNA help description.  */
+  const char *shape_help; /**< @brief Give shape file as additional input help description.  */
 
 
   
@@ -53,6 +57,7 @@ struct args_info
   unsigned int dangles_given ;  /**< @brief Whether dangle model was given.  */
   unsigned int paramFile_given ; /** <@brief whether a parameter file was given */
   unsigned int noConv_given ;	/**< @brief Whether noConv was given.  */
+  unsigned int shape_given ; /**< @brief Whether shape was given.  */
 
 
   char **inputs ; /**< @brief unnamed options (options without names) */
