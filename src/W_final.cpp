@@ -882,13 +882,12 @@ void get_hotspots(std::string seq,std::vector<Hotspot> &hotspot_list,int max_hot
 
     //make sure we only keep top 20 hotspot with lowest energy
     std::sort(hotspot_list.begin(), hotspot_list.end(),compare_hotspot_ptr);
-	cand_pos_t size = hotspot_list.size();
-    while(size > max_hotspot){
+    while((int) hotspot_list.size() > max_hotspot){
         hotspot_list.pop_back();
     }
 
     //if no hotspot found, add all _ as restricted
-    if(size == 0){
+    if((int) hotspot_list.size() == 0){
         Hotspot hotspot(1,n,n+1);
         hotspot.set_default_structure();
         hotspot_list.push_back(hotspot);
