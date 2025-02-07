@@ -98,7 +98,7 @@ Read input file from cmdline; predict minimum free energy and optimum structure 
             if -V is provided, the version is given
             if -n is provided with a number, it will modify the number of hotspots looked and outputs given (the base is 1), repeated structures are skipped. That is, if different input structures come to the same conclusion, only those that are different are shown
             If no input structure is given, or suboptimal structures are greater than the number given, CParty generates hotspots to be used as input structures -- where hotspots are energetically favorable stems
-            The default parameter file is Turner2004. This can be changed via -P and specifying the parameter file you would like
+            The default parameter file is DP09. This can be changed via -P and specifying the parameter file you would like
     
     Sequence requirements:
         containing only characters GCAU
@@ -130,7 +130,7 @@ Read input file from cmdline; predict minimum free energy and optimum structure 
     ./build/Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)" -o "outputfile.txt"
     ./build/Iterative-HFold -d1 GCAACGAUGACAUACAUCGCUAGUCGACGC
     ./build/Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -n 10
-    ./build/Iterative-HFold -P "src/params/parameters_DP09.txt" GCAACGAUGACAUACAUCGCUAGUCGACGC 
+    ./build/Iterative-HFold -P "params/rna_Turner04.par" GCAACGAUGACAUACAUCGCUAGUCGACGC 
 
     
 ## Questions
