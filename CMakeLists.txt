@@ -8,21 +8,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \ -std=c++17 \ -O3")
+set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \ -std=c++17 -O3 -Wno-deprecated-declarations")
 
 # create simfold library
 add_subdirectory(simfold)
 
 set(Iterative-HFold_SOURCE
-    W_final.cpp 
-    pseudo_loop.cpp 
-    V_final.cpp 
-    VM_final.cpp 
-    h_common.cpp 
-    hfold_validation.cpp 
-    Iterative-HFold.cpp
-    cmdline.cc
-    Result.cc
+    src/W_final.cpp 
+    src/pseudo_loop.cpp 
+    src/V_final.cpp 
+    src/VM_final.cpp 
+    src/h_common.cpp 
+    src/hfold_validation.cpp 
+    src/Iterative-HFold.cpp
+    src/cmdline.cc
+    src/Result.cc
 )
 
 # pass SIMFOLD_HOME to binary
