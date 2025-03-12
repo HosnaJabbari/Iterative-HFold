@@ -109,15 +109,15 @@ After installing you can move the executables wherever you wish, but you should 
             (____________________________)
 
 #### Example:
-    assume you are in the directory where the HFold_iterative executable is loacted
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt"
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
-    ./HFold_iterative -i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)"
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)" -o "outputfile.txt"
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -n 10
-    ./HFold_iterative GCAACGAUGACAUACAUCGCUAGUCGACGC -p
+    assume you are in the directory where the Iterative-HFold executable is loacted
+    ./Iterative-HFold -i "/home/username/Desktop/myinputfile.txt"
+    ./Iterative-HFold -i "/home/username/Desktop/myinputfile.txt" -o "outputfile.txt"
+    ./Iterative-HFold -i "/home/username/Desktop/myinputfile.txt" -o "/home/username/Desktop/some_folder/outputfile.txt"
+    ./Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)"
+    ./Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -r "(____________________________)" -o "outputfile.txt"
+    ./Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC
+    ./Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -n 10
+    ./Iterative-HFold GCAACGAUGACAUACAUCGCUAGUCGACGC -p
 
     
 #### Exit code:

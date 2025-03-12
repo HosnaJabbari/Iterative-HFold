@@ -10,6 +10,7 @@ SET(SOURCE
   src/simfold/s_multi_loop.cpp src/simfold/s_multi_loop_sub.cpp		
   src/simfold/s_sub_folding.cpp src/simfold/s_partition_function.cpp
   src/simfold/Hotspot.cc
+  ../src/param_path.cc
 )
 
 SET(SOURCE_pf
@@ -22,6 +23,7 @@ SET(SOURCE_pf
   src/simfold/s_multi_loop.cpp src/simfold/s_multi_loop_sub.cpp		
   src/simfold/s_sub_folding.cpp src/simfold/s_partition_function.cpp
   src/simfold/Hotspot.cc
+  ../src/param_path.cc
 )
 
 # pass SIMFOLD_HOME to binary

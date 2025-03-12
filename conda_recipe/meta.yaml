@@ -1,0 +1,39 @@
+package:
+  name: iterative-hfold
+  version: "1.0.0"
+
+source:
+  path: ..
+  # git_url: https://github.com/HosnaJabbari/Iterative-HFold.git
+  # git_rev: (latest tag)
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - make
+    - cmake >=3.1
+  host:
+    - libstdcxx-ng    # [linux]
+    - libcxx          # [osx]
+  run:
+    - libstdcxx-ng    # [linux]
+    - libcxx          # [osx]
+
+about:
+  home: https://github.com/HosnaJabbari/Iterative-HFold
+  summary: "Iterative-HFold summary"
+  description: |
+    Iterative-HFold description
+  dev_url: https://github.com/HosnaJabbari/Iterative-HFold
+
+extra:
+  recipe-maintainers:
+    - PointlessUser
+
+test:
+  commands:
+    - Iterative-HFold --help
