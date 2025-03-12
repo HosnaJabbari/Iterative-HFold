@@ -23,6 +23,7 @@ set(Iterative-HFold_SOURCE
     src/Iterative-HFold.cpp
     src/cmdline.cc
     src/Result.cc
+    src/param_path.cc
 )
 
 # pass SIMFOLD_HOME to binary
@@ -33,6 +34,9 @@ add_definitions("-DSIMFOLD_HOME=\"${SIMFOLD_HOME}\"")
 # set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 # create executables
 add_executable(Iterative-HFold ${Iterative-HFold_SOURCE})
+
+# Install Iterative-HFold into the bin directory (Needed for conda)
+install(TARGETS Iterative-HFold RUNTIME DESTINATION bin)
 
 # link to simfold
 target_link_libraries(Iterative-HFold LINK_PUBLIC simfold)

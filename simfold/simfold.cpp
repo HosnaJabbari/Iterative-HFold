@@ -12,6 +12,7 @@
 #include "externs.h"
 #include "constants.h"
 #include "params.h"
+#include "../src/param_path.h"
 
 #include "s_partition_function.h"
 #include "s_partition_function_complex.h"
@@ -131,8 +132,7 @@ int main (int argc, char *argv[])
     //     and to call the function init_data, which loads the thermodynamic parameters into memory
 
     // configuration file, the path should be relative to the location of this executable
-    char config_file[400];
-    strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
+    char* config_file = getParamPath("multirnafold.conf");
 
     // initialize the thermodynamic parameters
     // call init_data only once for the same dna_or_rna and same temperature
@@ -172,9 +172,9 @@ int main (int argc, char *argv[])
     if (dna_or_rna == RNA && temperature == 37.0)
     {
         if (strlen (parameter_filename) > 0)
-            fill_data_structures_with_new_parameters (parameter_filename);
+            fill_data_structures_with_new_parameters(parameter_filename);
         else
-            fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
+            fill_data_structures_with_new_parameters(getParamPath("turner_parameters_fm363_constrdangles.txt"));
     }
     //misc.terminal_AU_penalty = 0.0;
 
@@ -186,7 +186,7 @@ int main (int argc, char *argv[])
 	// when I fill the structures with DP09 parameters, I get a segmentation fault for 108 base sequence!!!!
 	// So I chopped the parameter set to only hold the exact number as the turner_parameters_fm363_constrdangles.txt,
 	// but still getting seg fault!
-	fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/parameters_DP09_chopped.txt");
+	fill_data_structures_with_new_parameters(getParamPath("parameters_DP09_chopped.txt"));
 
     // if this structure must be restricted
     if (strlen (restricted) == strlen (sequence))

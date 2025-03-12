@@ -13,6 +13,7 @@
 #include "constants.h"
 #include "params.h"
 #include "s_partition_function.h"
+#include "../src/param_path.h"
 
 char sequence[MAXSLEN];
 char parameter_filename[500] = "";
@@ -100,8 +101,7 @@ int main (int argc, char *argv[])
     //changed strcpy to str cat beacause with installed simfold, it is trying to look at /simfold/.libs/params/multirnafold.conf
     //PARAMS_BASE_PATH is in constants.h to be ../params/ to get away from .libs directory
     // strcat(config_file, PARAMS_BASE_PATH);
-     char config_file[400];
-    strcpy (config_file, SIMFOLD_HOME "/params/multirnafold.conf");
+    char* config_file = getParamPath("multirnafold.conf");
 
     // what to fold: RNA or DNA
     int dna_or_rna;
@@ -119,9 +119,9 @@ int main (int argc, char *argv[])
     if (dna_or_rna == RNA && temperature == 37.0)
     {
         if (strlen (parameter_filename) > 0)
-            fill_data_structures_with_new_parameters (parameter_filename);
+            fill_data_structures_with_new_parameters(parameter_filename);
         else
-            fill_data_structures_with_new_parameters (SIMFOLD_HOME "/params/turner_parameters_fm363_constrdangles.txt");
+            fill_data_structures_with_new_parameters(getParamPath("turner_parameters_fm363_constrdangles.txt"));
     }
     printf ("Seq: %s\n", sequence);
 
