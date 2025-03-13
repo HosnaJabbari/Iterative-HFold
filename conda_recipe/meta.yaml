@@ -25,9 +25,25 @@ requirements:
 
 about:
   home: https://github.com/HosnaJabbari/Iterative-HFold
-  summary: "Iterative-HFold summary"
+  summary: "RNA secondary structure prediction with pseudoknots using relaxed Hierarchical Folding."
   description: |
-    Iterative-HFold description
+        HFold Iterative is a computational tool for predicting RNA secondary structures, 
+        including pseudoknotted configurations, using a relaxed Hierarchical Folding 
+        approach. This algorithm iteratively refines predictions to improve accuracy, 
+        outperforming its predecessor HFold on tested datasets.
+
+        The software is implemented in C++ and requires a C++11-compatible compiler, 
+        Pthreads, and CMake (≥3.1) for installation. It is compatible with Linux and macOS, 
+        offering a command-line interface for flexible usage.
+
+        Features:
+        - Predicts RNA secondary structures, including pseudoknots.
+        - Uses an iterative approach for improved accuracy.
+        - Supports user-defined structure constraints.
+        - Provides options for pseudoknot-free outputs.
+
+        For installation, usage instructions, and additional details, visit:
+        https://github.com/HosnaJabbari/Iterative-HFold
   dev_url: https://github.com/HosnaJabbari/Iterative-HFold
 
 extra:

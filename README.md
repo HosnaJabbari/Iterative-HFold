@@ -31,7 +31,7 @@ If it does not print a cmake version greater than or equal to 3.1, you will have
 Easiest way is to install homebrew and use that to install CMake.    
 To do so, run the following from a terminal to install homebrew:      
 ```  
-/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"   
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  
 ```    
 When that finishes, run the following from a terminal to install CMake.     
 ```   
