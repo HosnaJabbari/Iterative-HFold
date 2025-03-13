@@ -36,7 +36,7 @@ about:
         Pthreads, and CMake (≥3.1) for installation. It is compatible with Linux and macOS, 
         offering a command-line interface for flexible usage.
 
-        Features:
+        ### Features:
         - Predicts RNA secondary structures, including pseudoknots.
         - Uses an iterative approach for improved accuracy.
         - Supports user-defined structure constraints.
